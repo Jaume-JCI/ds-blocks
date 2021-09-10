@@ -1,0 +1,4 @@
+{"learning_rate": 1e-4,
+ "epochs": 50,
+ "path_results": "results/experiment4"
+ }

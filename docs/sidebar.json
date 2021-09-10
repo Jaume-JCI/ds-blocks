@@ -1,0 +1,24 @@
+{
+  "Block Types": {
+    "Overview": "/",
+    "": {
+        "Tutorials": {
+            "Configuration": "configuration_options.html"
+        }
+    },
+    " ":{
+      "Modules": {
+            "Datasets": "datasets.datasets.html",
+            "Block types": "core.block_types.html",
+            "Data Conversion": "core.data_conversion.html",
+            "Block utilities": "core.utils.html",
+            "Utils": "utils.utils.html"
+        }
+    },
+    "  ": {
+        "Misc": {
+            "Default values": "config.defaults.html"
+        }
+    }
+  }
+}
