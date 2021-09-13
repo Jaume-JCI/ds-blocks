@@ -9,7 +9,6 @@ import random as python_random
 import logging
 import shutil
 from pathlib import Path
-import tensorflow as tf
 
 # block-types
 import block_types.config.defaults as dflt
@@ -37,7 +36,11 @@ def make_reproducible ():
     # in the TensorFlow backend have a well-defined initial state.
     # For further details, see:
     # https://www.tensorflow.org/api_docs/python/tf/random/set_seed
-    tf.random.set_seed(1234)
+    try:
+        import tensorflow as tf
+        tf.random.set_seed(1234)
+    except:
+        print ('tensorflow needs to be installed in order to run make_reproducible()')
 
 # Cell
 def set_logger (name, path_results='log', stdout=True,

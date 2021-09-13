@@ -356,3 +356,4 @@ nbs/.ipynb_checkpoints
 docs/_site
 */**/.ipynb_checkpoints
 .ipynb_checkpoints
+block_types.egg-info
