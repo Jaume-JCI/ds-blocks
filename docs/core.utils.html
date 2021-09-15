@@ -525,7 +525,7 @@ otherwise transformed test data is saved.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnIO" class="doc_header"><code>class</code> <code>SklearnIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L346" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h3 id="SklearnIO" class="doc_header"><code>class</code> <code>SklearnIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L346" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>save_training_result</code></strong>=<em><code>True</code></em>, <strong><code>save_test_result</code></strong>=<em><code>True</code></em>, <strong><code>overwrite</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that uses pickle format for saving / loading the estimator.
@@ -561,7 +561,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L367" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>NoSaverIO</code>(<strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_fitting</code></strong>=<em><code>False</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_training_result</code></strong>=<em><code>False</code></em>, <strong><code>save_test_result</code></strong>=<em><code>False</code></em>, <strong><code>overwrite</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h3 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L381" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>NoSaverIO</code>(<strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_fitting</code></strong>=<em><code>False</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_training_result</code></strong>=<em><code>False</code></em>, <strong><code>save_test_result</code></strong>=<em><code>False</code></em>, <strong><code>overwrite</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that does not load or save anything.</code></pre>
@@ -600,7 +600,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L392" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h3 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L406" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Helper class that provides information about the component used for plotting the pipeline diagram.</code></pre>
@@ -633,7 +633,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L440" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
+<h2 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L454" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
 </blockquote>
 
 <pre><code>Convert CamelCase to snake_case.

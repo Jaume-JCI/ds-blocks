@@ -355,12 +355,26 @@ class SklearnIO (DataIO):
                   fitting_file_extension='.pk',
                   fitting_load_func=joblib.load,
                   fitting_save_func=joblib.dump,
+
+                  result_file_extension='.pk',
+                  result_load_func=joblib.load,
+                  result_save_func=joblib.dump,
+                  save_training_result=True,
+                  save_test_result=True,
+                  overwrite=dflt.overwrite,
                   **kwargs):
 
         # SkLearnIO over-rides the following parameters:
         super().__init__ (fitting_file_extension='.pk',
                           fitting_load_func=joblib.load,
                           fitting_save_func=joblib.dump,
+
+                          result_file_extension='.pk',
+                          result_load_func=joblib.load,
+                          result_save_func=joblib.dump,
+                          save_training_result=True,
+                          save_test_result=True,
+                          overwrite=dflt.overwrite,
                           **kwargs)
 
 # Cell

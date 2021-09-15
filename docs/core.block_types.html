@@ -52,6 +52,72 @@ nb_path: "nbs/core.block_types.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MyTransform</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_transform</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="n">my_transform</span> <span class="o">=</span> <span class="n">MyTransform</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">my_transform</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+
+<span class="k">class</span> <span class="nc">MyTransform2</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_apply</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+    
+<span class="n">my_transform2</span> <span class="o">=</span> <span class="n">MyTransform2</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">my_transform2</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform2</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform2</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+
+<span class="k">class</span> <span class="nc">MyTransform3</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_wrong_method</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="n">my_transform3</span> <span class="o">=</span> <span class="n">MyTransform3</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="n">my_transform3</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">/tmp/ipykernel_20803/1658830391.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span><span class="ansi-green-fg">class</span> MyTransform <span class="ansi-blue-fg">(</span>Component<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span>     <span class="ansi-green-fg">def</span> _transform <span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> x<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span>         <span class="ansi-green-fg">return</span> x<span class="ansi-blue-fg">*</span><span class="ansi-cyan-fg">2</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> 
+<span class="ansi-green-intense-fg ansi-bold">      5</span> my_transform <span class="ansi-blue-fg">=</span> MyTransform<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;Component&#39; is not defined</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -138,7 +204,7 @@ is False.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="predict" class="doc_header"><code>predict</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L153" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>predict</code>(<strong><code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="predict" class="doc_header"><code>predict</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L159" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>predict</code>(<strong><code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 
 <pre><code>Predicts binary labels and returns result.
@@ -153,7 +219,7 @@ Uses previously stored predictions if found in disk and overwrite is False.</cod
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L188" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L198" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics of transformed data.
@@ -201,7 +267,7 @@ training_data_flag: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L269" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L279" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -240,16 +306,13 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L290" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L300" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
 
-Convenience subclass used when the estimated parameters can be saved in
-pickle format. Note that data transformed by this component is still
-saved in parquet format by default, since DataFrame is the default format.
-These defaults, however, can change. See `SklearnIO` class in
-`core.utils`.</code></pre>
+Convenience subclass used when the results can be saved in
+pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 </div>
 
@@ -279,7 +342,7 @@ These defaults, however, can change. See `SklearnIO` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L314" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L324" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -312,7 +375,7 @@ These defaults, however, can change. See `SklearnIO` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L328" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L338" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -345,7 +408,7 @@ These defaults, however, can change. See `SklearnIO` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L345" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong><code>transformed_index</code></strong>=<em><code>None</code></em>, <strong><code>transformed_columns</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L354" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong><code>transformed_index</code></strong>=<em><code>None</code></em>, <strong><code>transformed_columns</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -397,7 +460,7 @@ conversion performed.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L370" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Pipeline</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h3 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L379" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Pipeline</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -428,7 +491,7 @@ the last one.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L392" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L401" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Assigns attributes and calls parent constructor.
@@ -448,7 +511,7 @@ separate_labels: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="construct_diagram" class="doc_header"><code>construct_diagram</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L443" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>construct_diagram</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>, <strong><code>include_url</code></strong>=<em><code>False</code></em>, <strong><code>port</code></strong>=<em><code>4000</code></em>, <strong><code>project</code></strong>=<em><code>'block_types'</code></em>)</p>
+<h4 id="construct_diagram" class="doc_header"><code>construct_diagram</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L452" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>construct_diagram</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>, <strong><code>include_url</code></strong>=<em><code>False</code></em>, <strong><code>port</code></strong>=<em><code>4000</code></em>, <strong><code>project</code></strong>=<em><code>'block_types'</code></em>)</p>
 </blockquote>
 
 <pre><code>Construct diagram of the pipeline components, data flow and dimensionality.
@@ -465,7 +528,7 @@ in the output of each component. This can be changed passing
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_summary" class="doc_header"><code>show_summary</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L496" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_summary</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="show_summary" class="doc_header"><code>show_summary</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L505" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_summary</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Show list of pipeline components, data flow and dimensionality.
@@ -482,7 +545,7 @@ in the output of each component. This can be changed passing
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L484" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L493" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics about results obtained by each component.
@@ -498,7 +561,7 @@ By default, this is shown on test data, although this can change setting
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="assert_equal" class="doc_header"><code>assert_equal</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L525" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>assert_equal</code>(<strong><code>path_reference_results</code></strong>, <strong><code>assert_equal_func</code></strong>=<em><code>assert_frame_equal</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="assert_equal" class="doc_header"><code>assert_equal</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L534" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>assert_equal</code>(<strong><code>path_reference_results</code></strong>, <strong><code>assert_equal_func</code></strong>=<em><code>assert_frame_equal</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Compare results stored in current run against reference results stored in given path.</code></pre>
@@ -531,7 +594,7 @@ By default, this is shown on test data, although this can change setting
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L567" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L576" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
