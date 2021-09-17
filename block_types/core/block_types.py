@@ -319,7 +319,6 @@ class SklearnComponent (Component):
         if data_io is None:
             data_io = SklearnIO (**kwargs)
 
-        # the SklearnComponent over-rides the following parameters:
         super().__init__ (estimator=estimator,
                           data_io = data_io,
                           transform_uses_labels=False,
@@ -339,7 +338,6 @@ class NoSaverComponent (Component):
         if data_io is None:
             data_io = NoSaverIO (**kwargs)
 
-        # the NoSaverComponent over-rides the following parameters:
         super().__init__ (estimator=estimator,
                           data_io=data_io,
                           **kwargs)
