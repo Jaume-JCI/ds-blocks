@@ -415,7 +415,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L332" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L331" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -448,7 +448,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L348" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L346" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -481,7 +481,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L364" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L362" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -532,7 +532,7 @@ conversion performed.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L389" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Pipeline</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h3 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L387" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Pipeline</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -566,7 +566,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L414" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L412" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Assigns attributes and calls parent constructor.
@@ -586,7 +586,7 @@ separate_labels: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="construct_diagram" class="doc_header"><code>construct_diagram</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L465" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>construct_diagram</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>, <strong><code>include_url</code></strong>=<em><code>False</code></em>, <strong><code>port</code></strong>=<em><code>4000</code></em>, <strong><code>project</code></strong>=<em><code>'block_types'</code></em>)</p>
+<h4 id="construct_diagram" class="doc_header"><code>construct_diagram</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L463" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>construct_diagram</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>, <strong><code>include_url</code></strong>=<em><code>False</code></em>, <strong><code>port</code></strong>=<em><code>4000</code></em>, <strong><code>project</code></strong>=<em><code>'block_types'</code></em>)</p>
 </blockquote>
 
 <pre><code>Construct diagram of the pipeline components, data flow and dimensionality.
@@ -603,7 +603,7 @@ in the output of each component. This can be changed passing
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_summary" class="doc_header"><code>show_summary</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L518" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_summary</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="show_summary" class="doc_header"><code>show_summary</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L516" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_summary</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Show list of pipeline components, data flow and dimensionality.
@@ -620,7 +620,7 @@ in the output of each component. This can be changed passing
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L506" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L504" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics about results obtained by each component.
@@ -636,7 +636,7 @@ By default, this is shown on test data, although this can change setting
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="assert_equal" class="doc_header"><code>assert_equal</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L547" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>assert_equal</code>(<strong><code>path_reference_results</code></strong>, <strong><code>assert_equal_func</code></strong>=<em><code>assert_frame_equal</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="assert_equal" class="doc_header"><code>assert_equal</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L545" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>assert_equal</code>(<strong><code>path_reference_results</code></strong>, <strong><code>assert_equal_func</code></strong>=<em><code>assert_frame_equal</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Compare results stored in current run against reference results stored in given path.</code></pre>
@@ -662,7 +662,7 @@ By default, this is shown on test data, although this can change setting
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L589" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L587" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -704,7 +704,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L611" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L609" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
