@@ -116,6 +116,9 @@ class DataIO ():
                   result_save_func=None,
                   save_training_result=True,
                   save_test_result=True,
+                  save_result=True,
+                  save=True,
+                  load=True,
                   overwrite=dflt.overwrite,
                   **kwargs):
         """
@@ -178,6 +181,12 @@ class DataIO ():
             If True, the transformed training data is saved.
         save_test_result : bool, optional
             If True, the transformed test data is saved.
+        save : bool, optional
+            If False, neither transformed data nor estimated parameters are saved,
+            regardless of the other arguments.
+        load: bool, optional
+            If False, neither transformed data nor estimated parameters are loaded,
+            regardless of the other arguments.
         overwrite : bool, optional
             If True, any existing file with the same name is overwritten.
         """
@@ -211,8 +220,18 @@ class DataIO ():
         # whether existing files should be overwritten or not
         self.set_overwrite (overwrite)
 
+        # global saving and loading
+        self.set_save (save)
+        self.set_load (load)
+
+        self.path_result_file_training = None
+        self.path_model_file = None
+        self.path_result_file_test = None
+
         if component is not None:
             self.setup (component)
+        else:
+            self.component = None
 
     def setup (self, component=None):
         """
@@ -228,27 +247,26 @@ class DataIO ():
         self.component = component
 
         # configuration for saving / loading fitted estimator
-
-        if self.path_results is None:
-            self.component.logger.warning ('path_results is None, you might have forgotten to pass **kwargs when constructing this object')
-            self.path_results = 'results'
-
-        self.path_results = Path(self.path_results).resolve()
         if self.fitting_file_name is None:
             self.fitting_file_name = f'{self.component.name}_estimator{self.fitting_file_extension}'
-        self.path_model_file = self.path_results / self.fitting_file_name
-
 
         # configuration for saving / loading result of transforming training data
         if self.result_file_name_training is None:
             self.result_file_name_training = f'{self.component.name}_result_training{self.result_file_extension}'
-        self.path_result_file_training = self.path_results / self.result_file_name_training
-
 
         # configuration for saving / loading result of transforming test data
         if self.result_file_name_test is None:
             self.result_file_name_test = f'{self.component.name}_result_test{self.result_file_extension}'
-        self.path_result_file_test = self.path_results / self.result_file_name_test
+
+        if self.path_results is not None:
+            self.path_results = Path(self.path_results).resolve()
+            self.path_result_file_training = self.path_results / self.result_file_name_training
+            self.path_model_file = self.path_results / self.fitting_file_name
+            self.path_result_file_test = self.path_results / self.result_file_name_test
+        else:
+            self.path_result_file_training = None
+            self.path_model_file = None
+            self.path_result_file_test = None
 
     def load_estimator (self):
         """Load estimator parameters."""
@@ -301,14 +319,14 @@ class DataIO ():
         return self._save (self.path_result_file_test, self.result_save_func, result, self.save_result_flag_test)
 
     def _load (self, path, load_func):
-        if path.exists():
+        if (path is not None) and path.exists() and self.load:
             self.component.logger.info (f'loading from {path}')
             return load_func (path)
         else:
             return None
 
     def _save (self, path, save_func, item, save_flag):
-        if (save_func is not None) and save_flag:
+        if (path is not None) and (save_func is not None) and save_flag and self.save:
             self.component.logger.debug (f'saving to {path}')
             # create parent directory if it does not exist
             self.path_results.mkdir(parents=True, exist_ok=True)
@@ -341,6 +359,25 @@ class DataIO ():
 
     def set_save_fitting (self, save_fitting):
         self.save_fitting = save_fitting
+
+    def set_path_results (self, path_results):
+        self.path_results = path_results
+        self.path_result_file_training, self.path_model_file, self.path_result_file_test = None, None, None
+        if self.path_results is not None:
+            self.path_results = Path(self.path_results).resolve()
+            if self.result_file_name_training is not None:
+                self.path_result_file_training = self.path_results / self.result_file_name_training
+            if self.fitting_file_name is not None:
+                self.path_model_file = self.path_results / self.fitting_file_name
+            if self.result_file_name_test is not None:
+                self.path_result_file_test = self.path_results / self.result_file_name_test
+
+    # global saving and loading
+    def set_save (self, save):
+        self.save = save
+
+    def set_load (self, load):
+        self.load = load
 
 # Cell
 class PandasIO (DataIO):
