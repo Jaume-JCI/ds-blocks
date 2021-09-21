@@ -253,7 +253,7 @@ class PandasPipeline (Pipeline):
                           **kwargs)
 
 # Cell
-class ColumnSelector (PandasComponent):
+class ColumnSelector (Component):
     def __init__ (self,
                   columns=[],
                   **kwargs):
@@ -264,7 +264,7 @@ class ColumnSelector (PandasComponent):
         return df[self.columns]
 
 # Cell
-class Concat (Pipeline):
+class Concat (Component):
     def __init__ (self,
                   **kwargs):
         super().__init__ (**kwargs)
@@ -273,7 +273,7 @@ class Concat (Pipeline):
         return pd.concat(list(dfs), axis=1)
 
 # Cell
-class _BaseColumnTransformer (PandasPipeline):
+class _BaseColumnTransformer (Pipeline):
     def __init__ (self, **kwargs):
         super().__init__ (**kwargs)
         self.concat = Concat (**kwargs)
@@ -310,7 +310,6 @@ def make_column_transformer_pipelines (*transformers, **kwargs):
             transformer = Identity (**kwargs)
         pipeline = make_pipeline(ColumnSelector(columns, **kwargs),
                                  transformer,
-                                 cls=PandasPipeline,
                                  name = name,
                                  **kwargs)
         pipelines.append (pipeline)
