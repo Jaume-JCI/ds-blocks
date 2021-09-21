@@ -345,6 +345,9 @@ class PandasConverter (DataConverter):
                     columns = self.new_columns if (self.new_columns is not None) else range(result.shape[1]) if (result.ndim > 1) else [0]
 
                 result = pd.DataFrame (result, index=index, columns=columns)
+            elif (type(result) is pd.DataFrame and self.new_columns is not None and
+                  result.shape[1]==len(self.new_columns) and not (result.columns==self.new_columns).all()):
+                result.columns = self.new_columns
 
             if type(result) is pd.DataFrame:
                 if ('label' in self.X_columns) and ('label' not in result.columns):

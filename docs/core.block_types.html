@@ -100,21 +100,12 @@ nb_path: "nbs/core.block_types.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>path_results is None, you might have forgotten to pass **kwargs when constructing this object
+<pre>applying my_transform transform
 applying my_transform transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
 applying my_transform transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
-applying my_transform transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
-path_results is None, you might have forgotten to pass **kwargs when constructing this object
 applying my_transform2 transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform2_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
 applying my_transform2 transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform2_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
 applying my_transform2 transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform2_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
-path_results is None, you might have forgotten to pass **kwargs when constructing this object
 applying my_transform3 transform
 </pre>
 </div>
@@ -163,12 +154,8 @@ applying my_transform3 transform
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>path_results is None, you might have forgotten to pass **kwargs when constructing this object
-applying my_transform transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
-path_results is None, you might have forgotten to pass **kwargs when constructing this object
+<pre>applying my_transform transform
 applying my_transform2 transform
-could not write to /home/jcidatascience/jaume/workspace/remote/block-types/results/my_transform2_result_test.parquet, exception: &#39;int&#39; object has no attribute &#39;columns&#39;
 </pre>
 </div>
 </div>
@@ -489,231 +476,6 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 This component also writes results in parquet format, by default.
 See `PandasConverter` in `core.data_conversion` for details on the data
 conversion performed.</code></pre>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Pipeline">Pipeline<a class="anchor-link" href="#Pipeline"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<blockquote><p>Base <a href="/core.block_types.html#Pipeline"><code>Pipeline</code></a> class. For specific pipelines see <code>core.pipeline</code> module</p>
-</blockquote>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h3 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L387" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Pipeline</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
-</blockquote>
-
-<pre><code>Pipeline composed of a list of components that run sequentially.
-
-During training, the components of the list are trained one after the other,
-where one component is fed the result of transforming the data with the list
-of components located before in the pipeline.
-
-The `Pipeline` class is a subclass of `SamplingComponent`, which itself is a
-subclass of `Component`. This provides the functionality of `Component`
-to any implemented pipeline, such as logging the messages, loading / saving the
-results, and convert the data format so that it can work as part of other
-pipelines with potentially other data formats.
-
-Being a subclass of `SamplingComponent`, the `transform` method
-receives an input data  `X` that contains both data and labels.
-
-Furthermore, the Pipeline constructor sets `separate_labels=False` by default,
-which means that the `fit` method also receives an input data `X` that contains
-not only data but also labels. This is necessary because some of the components in
-the pipeline might be of class `SamplingComponent`, and such components
-need the input data `X` to contain labels when calling `transform` (and note that
-this method is called when calling `fit` on a pipeline, since we do `fit_transform`
-on all the components except for the last one)</code></pre>
-
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L412" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-
-<pre><code>Assigns attributes and calls parent constructor.
-
-Parameters
-----------
-separate_labels: bool, optional
-    whether or not the fit method receives the labels in a separate `y` vector
-    or in the same input `X`, as an additional variable. See description of
-    Pipeline class for more details.</code></pre>
-
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="construct_diagram" class="doc_header"><code>construct_diagram</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L463" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>construct_diagram</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>, <strong><code>include_url</code></strong>=<em><code>False</code></em>, <strong><code>port</code></strong>=<em><code>4000</code></em>, <strong><code>project</code></strong>=<em><code>'block_types'</code></em>)</p>
-</blockquote>
-
-<pre><code>Construct diagram of the pipeline components, data flow and dimensionality.
-
-By default, we use test data to show the number of observations
-in the output of each component. This can be changed passing
-`training_data_flag=True`</code></pre>
-
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_summary" class="doc_header"><code>show_summary</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L516" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_summary</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
-</blockquote>
-
-<pre><code>Show list of pipeline components, data flow and dimensionality.
-
-By default, we use test data to show the number of observations
-in the output of each component. This can be changed passing
-`training_data_flag=True`</code></pre>
-
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L504" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>training_data_flag</code></strong>=<em><code>None</code></em>)</p>
-</blockquote>
-
-<pre><code>Show statistics about results obtained by each component.
-
-By default, this is shown on test data, although this can change setting
-`training_data_flag=True`</code></pre>
-
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="assert_equal" class="doc_header"><code>assert_equal</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L545" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>assert_equal</code>(<strong><code>path_reference_results</code></strong>, <strong><code>assert_equal_func</code></strong>=<em><code>assert_frame_equal</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-
-<pre><code>Compare results stored in current run against reference results stored in given path.</code></pre>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L587" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Pipeline"><code>Pipeline</code></a></p>
-</blockquote>
-
-<pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
-
-See `Pipeline` class for an explanation of using `separate_labels=False`</code></pre>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L609" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-
-<pre><code>Creates a pipeline object given its class `pipeline_class`
-
-Parameters
-----------
-pipeline_class : class or str
-    Name of the pipeline class used for creating the object.
-    This can be either of type string or class.</code></pre>
 
 </div>
 
