@@ -49,12 +49,33 @@ class Pipeline (SamplingComponent):
 
         self.components = []
 
-        # we need to create pipeline before calling super().__init__(), since the constructor of Component calls
-        # a method that is overriden in Pipeline, and this method makes use of components field
+        # we need to call super().__init__() *after* having creating the `components` field,
+        # that since the constructor of Component calls a method that is overriden in Pipeline,
+        # and this method makes use of the mentioned `components` field
         super().__init__ (separate_labels = separate_labels,
                           **kwargs)
 
         self.set_training_data_flag(False)
+
+
+    def register_components (self, *ms):
+        """
+        Registering component in `self.components` list.
+
+        Every time that a new component is set as an attribute of the pipeline,
+        this component is added to the list `self.components`. Same
+        mechanism as the one used by pytorch's `nn.Module`
+        """
+        self.components += ms
+
+    def __setattr__(self, k, v):
+        """
+        See register_components
+        """
+        super().__setattr__(k, v)
+
+        if isinstance(v, Component):
+            self.register_components(v)
 
     def _fit (self, X, y=None):
         """
@@ -170,6 +191,10 @@ class Pipeline (SamplingComponent):
             component.assert_equal (path_reference_results, assert_equal_func=assert_equal_func, **kwargs)
         self.logger.info ('both pipelines give the same results')
         print ('both pipelines give the same results')
+
+    def load_estimators (self):
+        for component in self.components:
+            component.data_io.load_estimator ()
 
     # *************************
     # setters
