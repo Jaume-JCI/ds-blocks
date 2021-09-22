@@ -46,11 +46,13 @@ class Pipeline (SamplingComponent):
             or in the same input `X`, as an additional variable. See description of
             Pipeline class for more details.
         """
-
-        self.components = []
+        if not hasattr (self, 'components'):
+            self.components = []
+        if not hasattr (self, 'finalized_component_list'):
+            self.finalized_component_list = False
 
         # we need to call super().__init__() *after* having creating the `components` field,
-        # that since the constructor of Component calls a method that is overriden in Pipeline,
+        # since the constructor of Component calls a method that is overriden in Pipeline,
         # and this method makes use of the mentioned `components` field
         super().__init__ (separate_labels = separate_labels,
                           **kwargs)
@@ -66,7 +68,11 @@ class Pipeline (SamplingComponent):
         this component is added to the list `self.components`. Same
         mechanism as the one used by pytorch's `nn.Module`
         """
-        self.components += ms
+        if not hasattr(self, 'components'):
+            self.components = []
+            self.finalized_component_list = False
+        if not self.finalized_component_list:
+            self.components += ms
 
     def __setattr__(self, k, v):
         """
@@ -76,6 +82,18 @@ class Pipeline (SamplingComponent):
 
         if isinstance(v, Component):
             self.register_components(v)
+
+    def add_component (self, component):
+        if not hasattr(self, 'finalized_component_list'):
+            self.finalized_component_list = False
+        finalized_component_list = self.finalized_component_list
+        self.finalized_component_list = False
+        self.register_components(component)
+        self.finalized_component_list = finalized_component_list
+
+    def set_components (self, *components):
+        self.components = components
+        self.finalized_component_list = True
 
     def _fit (self, X, y=None):
         """
@@ -194,7 +212,10 @@ class Pipeline (SamplingComponent):
 
     def load_estimators (self):
         for component in self.components:
-            component.data_io.load_estimator ()
+            if callable(getattr(component, 'load_estimators', None)):
+                component.load_estimators ()
+            else:
+                component.data_io.load_estimator ()
 
     # *************************
     # setters
