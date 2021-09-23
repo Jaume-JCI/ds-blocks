@@ -258,7 +258,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     # exposing some data_io and data_converters methods
     # ********************************
     def load_estimator (self):
-        self.estimator = self.data_io.load_estimator ()
+        estimator = self.data_io.load_estimator ()
+        if estimator is not None:
+            self.estimator = estimator
 
     # ********************************
     # setters
