@@ -255,6 +255,12 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.logger.info (f'equal results\n')
 
     # ********************************
+    # exposing some data_io and data_converters methods
+    # ********************************
+    def load_estimator (self):
+        self.estimator = self.data_io.load_estimator ()
+
+    # ********************************
     # setters
     # ********************************
     def set_training_data_flag (self, training_data_flag):

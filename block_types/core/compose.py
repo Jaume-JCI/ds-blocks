@@ -210,12 +210,9 @@ class Pipeline (SamplingComponent):
         self.logger.info ('both pipelines give the same results')
         print ('both pipelines give the same results')
 
-    def load_estimators (self):
+    def load_estimator (self):
         for component in self.components:
-            if callable(getattr(component, 'load_estimators', None)):
-                component.load_estimators ()
-            else:
-                component.data_io.load_estimator ()
+            component.load_estimator ()
 
     # *************************
     # setters
