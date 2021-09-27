@@ -49,6 +49,12 @@ nb_path: "nbs/core.block_types.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Transform-method-called-with-different-aliases">Transform method called with different aliases<a class="anchor-link" href="#Transform-method-called-with-different-aliases"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -56,38 +62,65 @@ nb_path: "nbs/core.block_types.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># (transform, apply and __call__)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># (transform, predict, apply,  __call__)</span>
 <span class="k">class</span> <span class="nc">MyTransform</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_transform</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
 
 <span class="n">my_transform</span> <span class="o">=</span> <span class="n">MyTransform</span><span class="p">()</span>
 <span class="k">assert</span> <span class="n">my_transform</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform</span><span class="o">.</span><span class="n">predict</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 <span class="k">assert</span> <span class="n">my_transform</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 <span class="k">assert</span> <span class="n">my_transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 
 <span class="c1"># test that we can implement _apply and use all the aliases </span>
-<span class="c1"># (transform, apply and __call__)</span>
+<span class="c1"># (transform, predict, apply and __call__)</span>
 <span class="k">class</span> <span class="nc">MyTransform2</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_apply</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
 
 <span class="n">my_transform2</span> <span class="o">=</span> <span class="n">MyTransform2</span><span class="p">()</span>
 <span class="k">assert</span> <span class="n">my_transform2</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform2</span><span class="o">.</span><span class="n">predict</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 <span class="k">assert</span> <span class="n">my_transform2</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 <span class="k">assert</span> <span class="n">my_transform2</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 
+<span class="c1"># test that we can implement _predict and use all the aliases </span>
+<span class="c1"># (transform, predict, apply and __call__)</span>
+<span class="k">class</span> <span class="nc">MyTransform3</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_predict</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="n">my_transform3</span> <span class="o">=</span> <span class="n">MyTransform3</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">my_transform3</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform3</span><span class="o">.</span><span class="n">predict</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform3</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<span class="k">assert</span> <span class="n">my_transform3</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 
 <span class="c1"># test that an exception is raised if neither _tranform nor _apply are defined</span>
-<span class="k">class</span> <span class="nc">MyTransform3</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MyTransform4</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_wrong_method</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
  
-<span class="n">my_transform3</span> <span class="o">=</span> <span class="n">MyTransform3</span><span class="p">()</span>
+<span class="n">my_transform4</span> <span class="o">=</span> <span class="n">MyTransform4</span> <span class="p">()</span>
 
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="n">my_transform3</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">my_transform4</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    
+
+<span class="c1"># test that an exception is raised if more than one alias is implemented</span>
+<span class="k">class</span> <span class="nc">MyTransform5</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_predict</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+    <span class="k">def</span> <span class="nf">_transform</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
+ 
+<span class="n">my_transform5</span> <span class="o">=</span> <span class="n">MyTransform5</span> <span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="n">my_transform5</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -103,10 +136,19 @@ nb_path: "nbs/core.block_types.ipynb"
 <pre>applying my_transform transform
 applying my_transform transform
 applying my_transform transform
+applying my_transform transform
+applying my_transform2 transform
 applying my_transform2 transform
 applying my_transform2 transform
 applying my_transform2 transform
 applying my_transform3 transform
+applying my_transform3 transform
+applying my_transform3 transform
+applying my_transform3 transform
+applying my_transform4 transform
+applying my_transform5 transform
+/anaconda/envs/athena_old/lib/python3.7/site-packages/sklearn/base.py:197: FutureWarning: From version 0.24, get_params will raise an AttributeError if a parameter cannot be retrieved as an instance attribute. Previously it would return None.
+  FutureWarning)
 </pre>
 </div>
 </div>
@@ -117,6 +159,56 @@ applying my_transform3 transform
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Calling-predict-is-handy-when-the-result-is-a-single-array-of-predictions">Calling <code>predict</code> is handy when the result is a single array of predictions<a class="anchor-link" href="#Calling-predict-is-handy-when-the-result-is-a-single-array-of-predictions"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="k">class</span> <span class="nc">MyTransform</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span>
+                <span class="n">data_converter</span><span class="o">=</span><span class="n">PandasConverter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_predict</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+
+    <span class="n">my_transform</span> <span class="o">=</span> <span class="n">MyTransform</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">],</span><span class="s1">&#39;b&#39;</span><span class="p">:[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]})</span>
+
+    <span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">my_transform</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> 
+                                  <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">36</span><span class="p">]})</span>
+                                 <span class="p">)</span>
+
+    <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">my_transform</span><span class="o">.</span><span class="n">predict</span> <span class="p">(</span><span class="n">df</span><span class="p">),</span> 
+                                      <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">36</span><span class="p">]})</span>
+                                     <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="The-transform-method-and-its-aliases-can-be-called-with-multiple-inputs">The <code>transform</code> method and its aliases can be called with multiple inputs<a class="anchor-link" href="#The-transform-method-and-its-aliases-can-be-called-with-multiple-inputs"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -186,7 +278,7 @@ applying my_transform2 transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L35" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
+<h3 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L37" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -199,7 +291,7 @@ applying my_transform2 transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L37" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>__init__</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Initialize attributes and fields.
@@ -232,7 +324,7 @@ verbose : int, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="fit" class="doc_header"><code>fit</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L119" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>fit</code>(<strong><code>X</code></strong>, <strong><code>y</code></strong>=<em><code>None</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="fit" class="doc_header"><code>fit</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L121" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>fit</code>(<strong><code>X</code></strong>, <strong><code>y</code></strong>=<em><code>None</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 
 <pre><code>Estimates the parameters of the component based on given data X and labels y.
@@ -248,7 +340,7 @@ is False.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="transform" class="doc_header"><code>transform</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L143" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>transform</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="transform" class="doc_header"><code>transform</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L145" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>transform</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Transforms the data X and returns the transformed data.
@@ -264,12 +356,8 @@ is False.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="predict" class="doc_header"><code>predict</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L160" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>predict</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="predict" class="doc_header"><code>predict</code><a href="functools.py#L371" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>predict</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
-
-<pre><code>Predicts binary labels and returns result.
-
-Uses previously stored predictions if found in disk and overwrite is False.</code></pre>
 
 </div>
 
@@ -279,7 +367,7 @@ Uses previously stored predictions if found in disk and overwrite is False.</cod
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L204" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L212" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics of transformed data.
@@ -327,7 +415,7 @@ training_data_flag: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L293" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L301" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -366,7 +454,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L314" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L322" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -402,7 +490,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L339" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L347" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -435,7 +523,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L354" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L362" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -468,7 +556,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L370" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L378" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.

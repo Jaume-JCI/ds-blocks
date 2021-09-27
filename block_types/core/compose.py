@@ -107,7 +107,7 @@ class Pipeline (SamplingComponent):
         self.components[-1].fit (X, y)
         # self.set_training_data_flag (False)
 
-    def _predict (self, X):
+    def _transform (self, X):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
@@ -117,8 +117,6 @@ class Pipeline (SamplingComponent):
             X = component.transform (X)
 
         return X
-
-    _transform = _predict
 
     def construct_diagram (self, training_data_flag=None, include_url=False, port=4000, project='block_types'):
         """

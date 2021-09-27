@@ -4,17 +4,19 @@ __all__ = ['Component', 'SamplingComponent', 'SklearnComponent', 'PickleSaverCom
            'OneClassSklearnComponent', 'PandasComponent']
 
 # Cell
+from functools import partialmethod
+from typing import Optional
+import copy
+import pickle
+from pathlib import Path
+
 from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
 import joblib
-import pickle
-from pathlib import Path
 from IPython.display import display
-from typing import Optional
-import copy
 
 try:
     from graphviz import *
@@ -140,35 +142,47 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.logger.info (f'loaded pre-trained {self.name}')
         return self
 
-    def transform (self, *X, load=True, save=True):
+    def transform (self, *X, load=True, save=True, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
         Uses the previously transformed data if it's found in disk and overwrite
         is False.
         """
-        if callable(getattr(self, '_apply', None)):
-            result_func = self._apply
-        elif callable(getattr(self, '_transform', None)):
-            result_func = self._transform
-        else:
-            AttributeError (f'{self.class_name} must have either _transform or _apply methods')
         self.logger.info (f'applying {self.name} transform')
-        result= self._compute_result (X, result_func, load=load, save=save)
+        result_func = self._determine_result_func ()
+        result = self._compute_result (X, result_func, load=load, save=save, **kwargs)
         return result
 
-    def predict (self, *X, load=True, save=True):
-        """
-        Predicts binary labels and returns result.
-
-        Uses previously stored predictions if found in disk and overwrite is False.
-        """
-        self.logger.info (f'applying {self.name} inference')
-        return self._compute_result (X, self._predict, new_columns=['prediction'], load=load, save=save)
+    def _determine_result_func (self):
+        implemented = []
+        if callable(getattr(self, '_apply', None)):
+            result_func = self._apply
+            implemented += [result_func]
+        if callable(getattr(self, '_transform', None)):
+            result_func = self._transform
+            implemented += [result_func]
+        if callable(getattr(self, '_predict', None)):
+            result_func = self._predict
+            implemented += [result_func]
+        if self.estimator is not None and callable(getattr(self.estimator, 'transform', None)):
+            result_func = self.estimator.transform
+            implemented += [result_func]
+        if self.estimator is not None and callable(getattr(self.estimator, 'predict', None)):
+            result_func = self.estimator.predict
+            implemented += [result_func]
+        if len (implemented) == 0:
+            raise AttributeError (f'{self.class_name} must have one of _transform, _apply, or _predict methods implemented\n'
+                                  f'Otherwise, self.estimator must have either predict or transform methods')
+        if len(implemented) > 1:
+            raise AttributeError (f'{self.class_name} must have only one of _transform, _apply, '
+                                  f'or _predict methods implemented => found: {implemented}')
+        return result_func
 
     # aliases for transform method
     __call__ = transform
     apply = transform
+    predict = partialmethod (transform, new_columns=['prediction'])
 
     def _compute_result (self, X, result_func, load=True, save=True, **kwargs):
         if len(X) == 1:
@@ -194,12 +208,6 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def _fit (self, X, y=None):
         if self.estimator is not None:
             self.estimator.fit (X, y)
-
-    def _transform (self, X):
-        if self.estimator is not None:
-            return self.estimator.transform (X)
-        else:
-            raise NotImplementedError ('estimator is None _transform method probably needs to be implemented in subclass')
 
     def show_result_statistics (self, result=None, training_data_flag=False) -> None:
         """
