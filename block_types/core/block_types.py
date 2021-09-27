@@ -118,7 +118,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.name = camel_to_snake (self.class_name)
 
-    def fit (self, X, y=None, load=True, save=True):
+    def fit_like (self, X, y=None, load=True, save=True, func=self._fit, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -133,14 +133,32 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         if previous_estimator is None:
             X, y = self.data_converter.convert_before_fitting (X, y)
-            self._fit (X, y)
+            if func=='_fit':
+                if len(kwargs) > 0:
+                    raise AttributeError (f'kwargs: {kwargs} not valid')
+                self._fit (X, y)
+            else:
+                result = self.__fit_transform (X, y, **kwargs)
             self.data_converter.convert_after_fitting (X)
             if save:
                 self.data_io.save_estimator ()
         else:
             self.estimator = previous_estimator
             self.logger.info (f'loaded pre-trained {self.name}')
-        return self
+        if func=='_fit':
+            return self
+        else:
+            return result
+
+    def __fit_transform (self, X, y, **kwargs):
+        if callable(getattr(self, '_fit_transform', None)):
+            return self._fit_transform (X, y, **kwargs)
+        else:
+            return self.fit (X, y).transform (X, **kwargs)
+
+    fit = partialmethod (fit_like, func='_fit')
+    fit_transform = partialmethod (fit_like, func='__fit_transform')
+    fit_predict = partialmethod (fit_like, func='__fit_transform')
 
     def transform (self, *X, load=True, save=True, **kwargs):
         """

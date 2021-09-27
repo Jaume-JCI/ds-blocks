@@ -101,11 +101,17 @@ class Pipeline (SamplingComponent):
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
+        self._fit_transform_except_last (X, y)
+        self.components[-1].fit (X, y)
+
+    def _fit_transform (self, X, y=None, **kwargs):
+        self._fit_transform_except_last (X, y, **kwargs)
+        return self.components[-1].fit_transform (X, y, **kwargs)
+
+    def _fit_transform_except_last (self, X, y, **kwargs):
         self.set_training_data_flag (True)
         for component in self.components[:-1]:
-            X = component.fit_transform (X, y)
-        self.components[-1].fit (X, y)
-        # self.set_training_data_flag (False)
+            X = component.fit_transform (X, y, **kwargs)
 
     def _transform (self, X):
         """Transform data with components of pipeline, and predict labels with last component.
@@ -377,3 +383,6 @@ def make_column_transformer (*transformers, **kwargs):
     column_transformer = _BaseColumnTransformer ()
     column_transformer.components = pipelines
     return column_transformer
+
+
+# Cell
