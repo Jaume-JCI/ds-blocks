@@ -101,18 +101,18 @@ class Pipeline (SamplingComponent):
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
-        self.set_training_data_flag (True)
+        #self.set_training_data_flag (True)
         for component in self.components[:-1]:
             X = component.fit_transform (X, y)
         self.components[-1].fit (X, y)
         # self.set_training_data_flag (False)
 
-    def _transform (self, X):
+    def _apply (self, X):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
-        self.set_training_data_flag (False)
+        #self.set_training_data_flag (False)
         for component in self.components:
             X = component.transform (X)
 
@@ -301,7 +301,7 @@ class ColumnSelector (Component):
         super().__init__ (**kwargs)
         self.columns = columns
 
-    def _transform (self, df):
+    def _apply (self, df):
         return df[self.columns]
 
 # Cell
@@ -324,7 +324,7 @@ class _BaseColumnTransformer (Pipeline):
             component.fit (df)
         return self
 
-    def _transform (self, df):
+    def _apply (self, df):
         dfs = []
         for component in self.components:
             dfs.append (component.transform (df))
@@ -341,7 +341,7 @@ class Identity (Component):
     def __init__ (self, **kwargs):
         super ().__init__ (**kwargs)
 
-    def _transform (self, X):
+    def _apply (self, X):
         return X
 
 def make_column_transformer_pipelines (*transformers, **kwargs):
