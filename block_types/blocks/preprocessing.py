@@ -28,7 +28,7 @@ class OneHotEncoder (PandasComponent):
         self.one_hot_encoder.fit (X)
         return self
 
-    def _transform (self, df):
+    def _apply (self, df):
         try:
             check_is_fitted (self.one_hot_encoder)
         except NotFittedError:

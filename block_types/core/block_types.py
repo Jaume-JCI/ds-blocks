@@ -118,7 +118,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.name = camel_to_snake (self.class_name)
 
-    def fit_like (self, X, y=None, load=True, save=True, func=self._fit, **kwargs):
+    def fit_like (self, X, y=None, load=True, save=True, func='_fit', **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -137,8 +137,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                 if len(kwargs) > 0:
                     raise AttributeError (f'kwargs: {kwargs} not valid')
                 self._fit (X, y)
+            elif func=='__fit_apply':
+                result = self.__fit_apply (X, y, **kwargs)
             else:
-                result = self.__fit_transform (X, y, **kwargs)
+                raise ValueError (f'function {func} not valid')
             self.data_converter.convert_after_fitting (X)
             if save:
                 self.data_io.save_estimator ()
@@ -150,17 +152,20 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             return result
 
-    def __fit_transform (self, X, y, **kwargs):
-        if callable(getattr(self, '_fit_transform', None)):
-            return self._fit_transform (X, y, **kwargs)
+    def __fit_apply (self, X, y, **kwargs):
+        if callable(getattr(self, '_fit_apply', None)):
+            return self._fit_apply (X, y, **kwargs)
         else:
-            return self.fit (X, y).transform (X, **kwargs)
+            return self.fit (X, y).apply (X, **kwargs)
 
     fit = partialmethod (fit_like, func='_fit')
-    fit_transform = partialmethod (fit_like, func='__fit_transform')
-    fit_predict = partialmethod (fit_like, func='__fit_transform')
+    fit_apply = partialmethod (fit_like, func='__fit_apply')
 
-    def transform (self, *X, load=True, save=True, **kwargs):
+    # aliases
+    fit_transform = fit_apply
+    fit_predict = fit_apply
+
+    def apply (self, *X, load=True, save=True, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
@@ -198,9 +203,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         return result_func
 
     # aliases for transform method
-    __call__ = transform
-    apply = transform
-    predict = partialmethod (transform, new_columns=['prediction'])
+    __call__ = apply
+    transform = apply
+    predict = partialmethod (apply, new_columns=['prediction'])
 
     def _compute_result (self, X, result_func, load=True, save=True, **kwargs):
         if len(X) == 1:
