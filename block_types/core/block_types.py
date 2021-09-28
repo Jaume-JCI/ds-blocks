@@ -118,7 +118,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.name = camel_to_snake (self.class_name)
 
-    def fit_like (self, X, y=None, load=True, save=True, func='_fit', **kwargs):
+    def fit_like (self, X, y=None, load=True, save=True, func='_fit',
+             validation_data=None, test_data=None, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -133,12 +134,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         if previous_estimator is None:
             X, y = self.data_converter.convert_before_fitting (X, y)
+            additional_data= self._add_validation_and_test (validation_data, test_data)
             if func=='_fit':
                 if len(kwargs) > 0:
                     raise AttributeError (f'kwargs: {kwargs} not valid')
-                self._fit (X, y)
+                self._fit (X, y, **additional_data)
             elif func=='__fit_apply':
-                result = self.__fit_apply (X, y, **kwargs)
+                result = self.__fit_apply (X, y, additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
             self.data_converter.convert_after_fitting (X)
@@ -152,14 +154,30 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             return result
 
-    def __fit_apply (self, X, y, **kwargs):
+    def __fit_apply (self, X, y, additional_data, **kwargs):
         if callable(getattr(self, '_fit_apply', None)):
-            return self._fit_apply (X, y, **kwargs)
+            return self._fit_apply (X, y, **additional_data, **kwargs)
         else:
-            return self.fit (X, y).apply (X, **kwargs)
+            return self.fit (X, y, **additional_data).apply (X, **kwargs)
 
     fit = partialmethod (fit_like, func='_fit')
     fit_apply = partialmethod (fit_like, func='__fit_apply')
+
+    def _add_validation_and_test (self, validation_data, test_data):
+        additional_data = {}
+        def add_data (data_tuple, split_name):
+            if data_tuple is not None:
+                if not isinstance(data_tuple, tuple):
+                    data_tuple = (data_tuple, )
+                newX = data_tuple[0]
+                newy = None if len(data_tuple) < 2 else data_tuple[1]
+                newX, newy = self.data_converter.convert_before_fitting (newX, newy)
+                additional_data[split_name] = (newX, newy)
+
+        add_data (validation_data, 'validation_data')
+        add_data (test_data, 'test_data')
+
+        return additional_data
 
     # aliases
     fit_transform = fit_apply
@@ -188,12 +206,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if callable(getattr(self, '_predict', None)):
             result_func = self._predict
             implemented += [result_func]
-        if self.estimator is not None and callable(getattr(self.estimator, 'transform', None)):
-            result_func = self.estimator.transform
-            implemented += [result_func]
-        if self.estimator is not None and callable(getattr(self.estimator, 'predict', None)):
-            result_func = self.estimator.predict
-            implemented += [result_func]
+        if len(implemented)==0:
+            if self.estimator is not None and callable(getattr(self.estimator, 'transform', None)):
+                result_func = self.estimator.transform
+                implemented += [result_func]
+            if self.estimator is not None and callable(getattr(self.estimator, 'predict', None)):
+                result_func = self.estimator.predict
+                implemented += [result_func]
         if len (implemented) == 0:
             raise AttributeError (f'{self.class_name} must have one of _transform, _apply, or _predict methods implemented\n'
                                   f'Otherwise, self.estimator must have either predict or transform methods')
