@@ -139,8 +139,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                 if len(kwargs) > 0:
                     raise AttributeError (f'kwargs: {kwargs} not valid')
                 self._fit (X, y, **additional_data)
-            elif func=='__fit_apply':
-                result = self.__fit_apply (X, y, additional_data, **kwargs)
+            elif func=='_fit_apply':
+                result = self._fit_apply (X, y=y, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
             self.data_converter.convert_after_fitting (X)
@@ -154,14 +154,18 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             return result
 
-    def __fit_apply (self, X, y, additional_data, **kwargs):
-        if callable(getattr(self, '_fit_apply', None)):
-            return self._fit_apply (X, y, **additional_data, **kwargs)
-        else:
-            return self.fit (X, y, **additional_data).apply (X, **kwargs)
-
     fit = partialmethod (fit_like, func='_fit')
-    fit_apply = partialmethod (fit_like, func='__fit_apply')
+
+    def fit_apply (self, X, y=None, load=True, save=True, func='_fit',
+                   validation_data=None, test_data=None, **kwargs):
+
+        if callable(getattr(self, '_fit_apply', None)):
+            return self.fit_like (X, y=y, load=load, save=save, func='_fit_apply',
+                                  validation_data=validation_data,
+                                  test_data=test_data, **kwargs)
+        else:
+            return self.fit (X, y=y, validation_data=validation_data,
+                             test_data=test_data).apply (X, load=load, save=save, **kwargs)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}

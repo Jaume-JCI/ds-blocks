@@ -250,24 +250,25 @@ class Pipeline (MultiComponent):
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
-        self._fit_apply_except_last (X, y)
+        X = self._fit_apply_except_last (X, y)
         self.components[-1].fit (X, y)
 
     def _fit_apply (self, X, y=None, **kwargs):
-        self._fit_apply_except_last (X, y, **kwargs)
-        return self.components[-1].fit_transform (X, y, **kwargs)
+        X = self._fit_apply_except_last (X, y, **kwargs)
+        return self.components[-1].fit_apply (X, y, **kwargs)
 
     def _fit_apply_except_last (self, X, y, **kwargs):
-        self.set_training_data_flag (True)
+        #self.set_training_data_flag (True)
         for component in self.components[:-1]:
-            X = component.fit_transform (X, y, **kwargs)
+            X = component.fit_apply (X, y, **kwargs)
+        return X
 
     def _apply (self, X):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
-        self.set_training_data_flag (False)
+        #self.set_training_data_flag (False)
         for component in self.components:
             X = component.transform (X)
 
@@ -405,6 +406,3 @@ def make_column_transformer (*transformers, **kwargs):
     column_transformer = _BaseColumnTransformer ()
     column_transformer.components = pipelines
     return column_transformer
-
-
-# Cell
