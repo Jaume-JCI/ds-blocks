@@ -415,7 +415,6 @@ class MultiSplitComponent (MultiComponent):
                   component=None,
                   fit_training_split = 'training_data',
                   fit_additional_splits = [],
-                  fit_additional_split_names = None,
                   apply_to_splits = ['training_data', 'validation_data', 'test_data'],
                   **kwargs):
         super().__init__ (**kwargs)
@@ -425,23 +424,15 @@ class MultiSplitComponent (MultiComponent):
 
         self.fit_training_split = fit_training_split
         self.fit_additional_splits = fit_additional_splits
-
-        # the following is needed in case the input data is a tuple instead of a dictionary
-        # in such case, fit_additional_splits should be a list of integer indices (to index the tuple)
-        # and fit_additional_split_names should be a list of string names (to index a dictionary)
-        # valid names are 'validation_data' and 'test_data'
-        self.fit_additional_split_names = (fit_additional_split_names if fit_additional_split_names is not None
-                                           else fit_additional_splits)
-
         self.apply_to_splits = apply_to_splits
 
     def _fit (self, X, y=None):
         component = self.components[0]
         additional_data = {}
-        for split, split_name in zip(self.fit_additional_splits, self.fit_additional_split_names):
-            additional_data[split_name] = X[split]
-            if split_name not in ['validation_data', 'test_data']:
-                raise ValueError (f'split {split_name} not valid')
+        for split in self.fit_additional_splits:
+            additional_data[split] = X[split]
+            if split not in ['validation_data', 'test_data']:
+                raise ValueError (f'split {split} not valid')
 
         component.fit(X[self.fit_training_split], y=y, **additional_data)
 
@@ -450,6 +441,5 @@ class MultiSplitComponent (MultiComponent):
         result = {}
         for split in self.apply_to_splits:
             result[split] = component.apply (X[split], **kwargs)
-        if type(X) is tuple:
-            result = tuple(result.values())
+
         return result
