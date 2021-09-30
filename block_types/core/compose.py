@@ -436,10 +436,11 @@ class MultiSplitComponent (MultiComponent):
 
         component.fit(X[self.fit_training_split], y=y, **additional_data)
 
-    def _apply (self, X, **kwargs):
+    def _apply (self, X, apply_to_splits = None, **kwargs):
+        apply_to_splits = self.apply_to_splits if apply_to_splits is None else apply_to_splits
         component = self.components[0]
         result = {}
-        for split in self.apply_to_splits:
+        for split in apply_to_splits:
             result[split] = component.apply (X[split], **kwargs)
 
         return result
