@@ -413,34 +413,51 @@ def make_column_transformer (*transformers, **kwargs):
 class MultiSplitComponent (MultiComponent):
     def __init__ (self,
                   component=None,
-                  fit_training_split = 'training_data',
-                  fit_additional_splits = [],
-                  apply_to_splits = ['training_data', 'validation_data', 'test_data'],
+                  fit_to = 'training_data',
+                  fit_additional = [],
+                  apply_to = ['training_data', 'validation_data', 'test_data'],
+                  raise_error_if_split_doesnot_exist=False,
+                  raise_warning_if_split_doesnot_exist=True,
                   **kwargs):
         super().__init__ (**kwargs)
         if component is not None:
             self.set_components (component)
             self.component = component
 
-        self.fit_training_split = fit_training_split
-        self.fit_additional_splits = fit_additional_splits
-        self.apply_to_splits = apply_to_splits
+        self.fit_to = fit_to
+        self.fit_additional = fit_additional
+        self.apply_to = apply_to
+        self.raise_error_if_split_doesnot_exist=raise_error_if_split_doesnot_exist
+        self.raise_warning_if_split_doesnot_exist=raise_warning_if_split_doesnot_exist
 
     def _fit (self, X, y=None):
         component = self.components[0]
         additional_data = {}
-        for split in self.fit_additional_splits:
-            additional_data[split] = X[split]
+        for split in self.fit_additional:
             if split not in ['validation_data', 'test_data']:
                 raise ValueError (f'split {split} not valid')
+            if split in X.keys():
+                additional_data[split] = X[split]
+            else:
+                self._issue_error_or_warning (split, X)
 
-        component.fit(X[self.fit_training_split], y=y, **additional_data)
+        component.fit(X[self.fit_to], y=y, **additional_data)
 
-    def _apply (self, X, apply_to_splits = None, **kwargs):
-        apply_to_splits = self.apply_to_splits if apply_to_splits is None else apply_to_splits
+    def _issue_error_or_warning (self, split, X):
+        message = f'split {split} not found in X keys ({X.keys()})'
+        if self.raise_error_if_split_doesnot_exist:
+            raise RuntimeError (message)
+        elif self.raise_warning_if_split_doesnot_exist:
+            warnings.warn (message)
+
+    def _apply (self, X, apply_to = None, **kwargs):
+        apply_to = self.apply_to if apply_to is None else apply_to
         component = self.components[0]
         result = {}
-        for split in apply_to_splits:
-            result[split] = component.apply (X[split], **kwargs)
+        for split in apply_to:
+            if split in X.keys():
+                result[split] = component.apply (X[split], **kwargs)
+            else:
+                self._issue_error_or_warning (split, X)
 
         return result

@@ -140,7 +140,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                     raise AttributeError (f'kwargs: {kwargs} not valid')
                 self._fit (X, y, **additional_data)
             elif func=='_fit_apply':
-                result = self._fit_apply (X, y=y, **additional_data, **kwargs)
+                fit_apply_func = self._determine_fit_apply_func ()
+                assert fit_apply_func is not None, ('object must have _fit_apply method or one of '
+                                                    'its aliases implemented when func="_fit_apply"')
+                result = fit_apply_func (X, y=y, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
             self.data_converter.convert_after_fitting (X)
@@ -159,7 +162,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def fit_apply (self, X, y=None, load=True, save=True, func='_fit',
                    validation_data=None, test_data=None, **kwargs):
 
-        if callable(getattr(self, '_fit_apply', None)):
+        if self._determine_fit_apply_func () is not None:
             return self.fit_like (X, y=y, load=load, save=save, func='_fit_apply',
                                   validation_data=validation_data,
                                   test_data=test_data, **kwargs)
@@ -169,14 +172,28 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
-        def add_data (data_tuple, split_name):
-            if data_tuple is not None:
-                if not isinstance(data_tuple, tuple):
-                    data_tuple = (data_tuple, )
-                newX = data_tuple[0]
-                newy = None if len(data_tuple) < 2 else data_tuple[1]
+        def add_data (data, split_name):
+            if data is not None:
+                if isinstance(data, tuple):
+                    if len(data) > 0:
+                        newX = data[0]
+                    else:
+                        self.logger.warning (f'empty {split_name}')
+                        newX = None
+                    if len(data) == 2:
+                        newy = data[1]
+                    elif len(data)==1:
+                        newy = None
+                    elif len(data)>2:
+                        raise ValueError (f'{split_name} must have at most 2 elements')
+                else:
+                    newX = data
+                    newy = None
                 newX, newy = self.data_converter.convert_before_fitting (newX, newy)
-                additional_data[split_name] = (newX, newy)
+                if newy is not None:
+                    additional_data[split_name] = (newX, newy)
+                else:
+                    additional_data[split_name] = newX
 
         add_data (validation_data, 'validation_data')
         add_data (test_data, 'test_data')
@@ -225,24 +242,48 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                                   f'or _predict methods implemented => found: {implemented}')
         return result_func
 
+    def _determine_fit_apply_func (self):
+        implemented = []
+        result_func = None
+        if callable(getattr(self, '_fit_apply', None)):
+            result_func = self._fit_apply
+            implemented += [result_func]
+        if callable(getattr(self, '_fit_transform', None)):
+            result_func = self._fit_transform
+            implemented += [result_func]
+        if callable(getattr(self, '_fit_predict', None)):
+            result_func = self._fit_predict
+            implemented += [result_func]
+        if len(implemented)==0:
+            if self.estimator is not None and callable(getattr(self.estimator, 'fit_transform', None)):
+                result_func = self.estimator.fit_transform
+                implemented += [result_func]
+            if self.estimator is not None and callable(getattr(self.estimator, 'fit_predict', None)):
+                result_func = self.estimator.fit_predict
+                implemented += [result_func]
+        if len(implemented) > 1:
+            raise AttributeError (f'{self.class_name} must have only one of fit_transform, fit_apply, '
+                                  f'or fit_predict methods implemented => found: {implemented}')
+        return result_func
+
     # aliases for transform method
     __call__ = apply
     transform = apply
-    predict = partialmethod (apply, new_columns=['prediction'])
+    predict = partialmethod (apply, converter_args=dict(new_columns=['prediction']))
 
-    def _compute_result (self, X, result_func, load=True, save=True, **kwargs):
+    def _compute_result (self, X, result_func, load=True, save=True, converter_args={}, **kwargs):
         if len(X) == 1:
             X = X[0]
         previous_result = None
         if load and not self.data_io.overwrite:
             previous_result = self.data_io.load_result()
         if previous_result is None:
-            X = self.data_converter.convert_before_transforming (X, **kwargs)
+            X = self.data_converter.convert_before_transforming (X, **converter_args)
             if type(X) is tuple:
-                result = result_func (*X)
+                result = result_func (*X, **kwargs)
             else:
-                result = result_func (X)
-            result = self.data_converter.convert_after_transforming (result, **kwargs)
+                result = result_func (X, **kwargs)
+            result = self.data_converter.convert_after_transforming (result, **converter_args)
             if save:
                 self.data_io.save_result (result)
         else:
