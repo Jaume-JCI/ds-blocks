@@ -109,22 +109,20 @@ class DataIO ():
     def __init__ (self,
                   component=None,
                   path_results=dflt.path_results,
-                  fitting_file_name = None,
+                  fitting_file_name=None,
                   fitting_file_extension='',
                   fitting_load_func=None,
                   fitting_save_func=None,
                   save_fitting=True,
 
                   result_file_extension='',
-                  result_file_name_training=None,
-                  result_file_name_test=None,
+                  result_file_name=None,
                   result_load_func=None,
                   result_save_func=None,
-                  save_training_result=True,
-                  save_test_result=True,
-                  save_result=True,
+                  save_splits=dflt.save_splits,
                   save=True,
                   load=True,
+                  split='whole',
                   overwrite=dflt.overwrite,
                   **kwargs):
         """
@@ -167,11 +165,8 @@ class DataIO ():
         result_file_extension : str or None, optional
             Extension of the file where the transformed data is saved.
             By default, no extension is used.
-        result_file_name_training : str or None, optional
-            Name of the file used for storing the transformed training data.
-            If not provided, it constructed based on the name of the component.
-        result_file_name_test : str or None, optional
-            Name of the file used for storing the transformed test data.
+        result_file_name : str or None, optional
+            Name of the file used for storing the transformed data.
             If not provided, it constructed based on the name of the component.
         result_load_func : function or None, optional
             Function used for loading the transformed data. By default, this
@@ -212,16 +207,14 @@ class DataIO ():
         self.result_save_func = result_save_func
 
         # saving / loading transformed training data
-        self.result_file_name_training = result_file_name_training
-        self.set_save_result_flag_training (save_training_result)
+        self.set_save_splits (save_splits)
 
         # saving / loading transformed test data
-        self.result_file_name_test = result_file_name_test
-        self.set_save_result_flag_test (save_test_result)
+        self.result_file_name = result_file_name
 
         # whether the transformation has been applied to training data (i.e., to be saved in training path)
         # or to test data (i.e,. to be saved in test path)
-        self.training_data_flag = False
+        self.split = split
 
         # whether existing files should be overwritten or not
         self.set_overwrite (overwrite)
@@ -230,9 +223,7 @@ class DataIO ():
         self.set_save (save)
         self.set_load (load)
 
-        self.path_result_file_training = None
         self.path_model_file = None
-        self.path_result_file_test = None
 
         if component is not None:
             self.setup (component)
@@ -257,22 +248,14 @@ class DataIO ():
             self.fitting_file_name = f'{self.component.name}_estimator{self.fitting_file_extension}'
 
         # configuration for saving / loading result of transforming training data
-        if self.result_file_name_training is None:
-            self.result_file_name_training = f'{self.component.name}_result_training{self.result_file_extension}'
-
-        # configuration for saving / loading result of transforming test data
-        if self.result_file_name_test is None:
-            self.result_file_name_test = f'{self.component.name}_result_test{self.result_file_extension}'
+        if self.result_file_name is None:
+            self.result_file_name = f'{self.component.name}_result{self.result_file_extension}'
 
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
-            self.path_result_file_training = self.path_results / self.result_file_name_training
-            self.path_model_file = self.path_results / self.fitting_file_name
-            self.path_result_file_test = self.path_results / self.result_file_name_test
+            self.path_model_file = self.path_results / 'models' / self.fitting_file_name
         else:
-            self.path_result_file_training = None
             self.path_model_file = None
-            self.path_result_file_test = None
 
     def load_estimator (self):
         """Load estimator parameters."""
@@ -284,45 +267,34 @@ class DataIO ():
         estimator = self.component.estimator if (self.component.estimator is not None) else self.component
         self._save (self.path_model_file, self.fitting_save_func, estimator, self.save_fitting)
 
-    def load_result (self):
+    def load_result (self, split=None):
         """
         Load transformed data.
 
         Transformed training data is loaded if self.training_data_flag=True,
         otherwise transformed test data is loaded.
         """
-        if self.training_data_flag:
-            return self.load_training_result ()
+        split = self.split if split is None else split
+        if self.path_results is not None:
+            path_result_file = self.path_results / split / self.result_file_name
         else:
-            return self.load_test_result ()
+            path_result_file = None
+        return self._load (path_result_file, self.result_load_func)
 
-    def load_training_result (self):
-        """Load transformed training data."""
-        return self._load (self.path_result_file_training, self.result_load_func)
-
-    def load_test_result (self):
-        """Load transformed test data."""
-        return self._load (self.path_result_file_test, self.result_load_func)
-
-    def save_result (self, result):
+    def save_result (self, result, split=None):
         """
         Save transformed data.
 
         Transformed training data is saved if self.training_data_flag=True,
         otherwise transformed test data is saved.
         """
-        if self.training_data_flag:
-            self.save_training_result (result)
+        split = self.split if split is None else split
+        if self.path_results is not None:
+            path_result_file = self.path_results / split / self.result_file_name
         else:
-            self.save_test_result (result)
+            path_result_file = None
 
-    def save_training_result (self, result):
-        """Save transformed training data."""
-        return self._save (self.path_result_file_training, self.result_save_func, result, self.save_result_flag_training)
-
-    def save_test_result (self, result):
-        """Save transformed test data."""
-        return self._save (self.path_result_file_test, self.result_save_func, result, self.save_result_flag_test)
+        self._save (path_result_file, self.result_save_func, result, self.save_splits.get(split, True))
 
     def _load (self, path, load_func):
         if (path is not None) and path.exists() and self.load:
@@ -335,7 +307,7 @@ class DataIO ():
         if (path is not None) and (save_func is not None) and save_flag and self.save:
             self.component.logger.debug (f'saving to {path}')
             # create parent directory if it does not exist
-            self.path_results.mkdir(parents=True, exist_ok=True)
+            path.parent.mkdir(parents=True, exist_ok=True)
             # save data using save_func
             try:
                 save_func (item, path)
@@ -345,20 +317,11 @@ class DataIO ():
     # ********************************
     # setters
     # ********************************
-    def set_training_data_flag (self, training_data_flag):
-        self.training_data_flag = training_data_flag
+    def set_split (self, split):
+        self.split = split
 
-    def set_save_result_flag_test (self, save_result_flag_test):
-        self.save_result_flag_test = save_result_flag_test
-
-    def set_save_result_flag_training (self, save_result_flag_training):
-        self.save_result_flag_training = save_result_flag_training
-
-    def set_save_result_flag (self, save_result_flag):
-        if self.training_data_flag:
-            self.save_result_flag_training = save_result_flag
-        else:
-            self.save_result_flag_test = save_result_flag
+    def set_save_splits (self, save_splits):
+        self.save_splits = save_splits
 
     def set_overwrite (self, overwrite):
         self.overwrite = overwrite
@@ -371,12 +334,8 @@ class DataIO ():
         self.path_result_file_training, self.path_model_file, self.path_result_file_test = None, None, None
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
-            if self.result_file_name_training is not None:
-                self.path_result_file_training = self.path_results / self.result_file_name_training
             if self.fitting_file_name is not None:
-                self.path_model_file = self.path_results / self.fitting_file_name
-            if self.result_file_name_test is not None:
-                self.path_result_file_test = self.path_results / self.result_file_name_test
+                self.path_model_file = self.path_results / 'models' / self.fitting_file_name
 
     # global saving and loading
     def set_save (self, save):

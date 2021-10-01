@@ -271,12 +271,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     transform = apply
     predict = partialmethod (apply, converter_args=dict(new_columns=['prediction']))
 
-    def _compute_result (self, X, result_func, load=True, save=True, converter_args={}, **kwargs):
+    def _compute_result (self, X, result_func, load=True, save=True, split=None,
+                         converter_args={}, **kwargs):
         if len(X) == 1:
             X = X[0]
         previous_result = None
         if load and not self.data_io.overwrite:
-            previous_result = self.data_io.load_result()
+            previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
             X = self.data_converter.convert_before_transforming (X, **converter_args)
             if type(X) is tuple:
@@ -285,7 +286,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                 result = result_func (X, **kwargs)
             result = self.data_converter.convert_after_transforming (result, **converter_args)
             if save:
-                self.data_io.save_result (result)
+                self.data_io.save_result (result, split=split)
         else:
             result = previous_result
             self.logger.info (f'loaded pre-computed result')
@@ -360,17 +361,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     # ********************************
     # setters
     # ********************************
-    def set_training_data_flag (self, training_data_flag):
-        self.data_io.set_training_data_flag (training_data_flag)
+    def set_split (self, split):
+        self.data_io.set_split (split)
 
-    def set_save_result_flag_test (self, save_result_flag_test):
-        self.data_io.set_save_result_flag_test (save_result_flag_test)
-
-    def set_save_result_flag_training (self, save_result_flag_training):
-        self.data_io.set_save_result_flag_training (save_result_flag_training)
-
-    def set_save_result_flag (self, save_result_flag):
-        self.data_io.set_save_result_flag (save_result_flag)
+    def set_save_splits (self, save_splits):
+        self.data_io.set_save_splits (save_splits)
 
     def set_overwrite (self, overwrite):
         self.data_io.set_overwrite (overwrite)

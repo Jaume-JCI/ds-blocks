@@ -41,7 +41,7 @@ class MultiComponent (SamplingComponent):
         super().__init__ (separate_labels = separate_labels,
                           **kwargs)
 
-        self.set_training_data_flag(False)
+        self.set_split ('whole')
 
 
     def register_components (self, *ms):
@@ -79,15 +79,15 @@ class MultiComponent (SamplingComponent):
         self.components = components
         self.finalized_component_list = True
 
-    def construct_diagram (self, training_data_flag=None, include_url=False, port=4000, project='block_types'):
+    def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
         """
         Construct diagram of the pipeline components, data flow and dimensionality.
 
         By default, we use test data to show the number of observations
         in the output of each component. This can be changed passing
-        `training_data_flag=True`
+        `split='train'`
         """
-        training_data_flag = self.get_training_data_flag (training_data_flag)
+        split = self.get_split (split)
 
         if include_url:
             base_url = f'http://localhost:{port}/{project}'
@@ -111,7 +111,7 @@ class MultiComponent (SamplingComponent):
                 URL = f'{base_url}/{component.model_plotter.get_module_path()}.html#{node_name}'
             f.node(node_name, URL=URL)
             f.edge(last_node_name, node_name, label=last_output)
-            output = component.model_plotter.get_edge_name(training_data_flag=training_data_flag)
+            output = component.model_plotter.get_edge_name(split=split)
 
         last_node_name = node_name
         node_name = 'output'
@@ -120,46 +120,46 @@ class MultiComponent (SamplingComponent):
 
         return f
 
-    def show_result_statistics (self, training_data_flag=None):
+    def show_result_statistics (self, split=None):
         """
         Show statistics about results obtained by each component.
 
         By default, this is shown on test data, although this can change setting
-        `training_data_flag=True`
+        `split='train'`
         """
-        training_data_flag = self.get_training_data_flag (training_data_flag)
+        split = self.get_split (split)
 
         for component in self.components:
-            component.show_result_statistics(training_data_flag=training_data_flag)
+            component.show_result_statistics(split=split)
 
-    def show_summary (self, training_data_flag=None):
+    def show_summary (self, split=None):
         """
         Show list of pipeline components, data flow and dimensionality.
 
         By default, we use test data to show the number of observations
         in the output of each component. This can be changed passing
-        `training_data_flag=True`
+        `split='train'`
         """
-        training_data_flag = self.get_training_data_flag (training_data_flag)
+        split = self.get_split (split)
 
         node_name = 'data'
         output = 'train / test'
 
         for i, component in enumerate(self.components):
             node_name = component.model_plotter.get_node_name()
-            output = component.model_plotter.get_edge_name(training_data_flag=training_data_flag)
+            output = component.model_plotter.get_edge_name(split=split)
             print (f'{"-"*100}')
             print (f'{i}: {node_name} => {output}')
 
 
-    def get_training_data_flag (self, training_data_flag=None):
-        if training_data_flag is None:
-            if self.data_io.training_data_flag is not None:
-                training_data_flag = self.data_io.training_data_flag
+    def get_split (self, split=None):
+        if split is None:
+            if self.data_io.split is not None:
+                split = self.data_io.split
             else:
-                training_data_flag = False
+                split = 'whole'
 
-        return training_data_flag
+        return split
 
     def assert_equal (self, path_reference_results, assert_equal_func=pd.testing.assert_frame_equal, **kwargs):
         """Compare results stored in current run against reference results stored in given path."""
@@ -176,25 +176,15 @@ class MultiComponent (SamplingComponent):
     # *************************
     # setters
     # *************************
-    def set_training_data_flag (self, training_data_flag):
-        super().set_training_data_flag (training_data_flag)
+    def set_split (self, split):
+        super().set_split (split)
         for component in self.components:
-            component.set_training_data_flag (training_data_flag)
+            component.set_split (split)
 
-    def set_save_result_flag_test (self, save_result_flag_test):
-        super().set_save_result_flag_test (save_result_flag_test)
+    def set_save_splits (self, save_splits):
+        super().set_save_splits (save_splits)
         for component in self.components:
-            component.set_save_result_flag_test (save_result_flag_test)
-
-    def set_save_result_flag_training (self, save_result_flag_training):
-        super().set_save_result_flag_training (save_result_flag_training)
-        for component in self.components:
-            component.set_save_result_flag_training (save_result_flag_training)
-
-    def set_save_result_flag (self, save_result_flag):
-        super().set_save_result_flag (save_result_flag)
-        for component in self.components:
-            component.set_save_result_flag (save_result_flag)
+            component.set_save_splits (save_splits)
 
     def set_overwrite (self, overwrite):
         super().set_overwrite (overwrite)
@@ -259,7 +249,6 @@ class Pipeline (MultiComponent):
         return self.components[-1].fit_apply (X, y, **kwargs)
 
     def _fit_apply_except_last (self, X, y, **kwargs):
-        #self.set_training_data_flag (True)
         for component in self.components[:-1]:
             X = component.fit_apply (X, y, **kwargs)
         return X
@@ -269,7 +258,6 @@ class Pipeline (MultiComponent):
 
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
-        #self.set_training_data_flag (False)
         for component in self.components:
             X = component.transform (X)
 
