@@ -47,7 +47,7 @@ nb_path: "nbs/core.compose.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L16" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -69,6 +69,120 @@ See `Pipeline` class.</code></pre>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h5 id="Loading-/-saving-all-results">Loading / saving all results<a class="anchor-link" href="#Loading-/-saving-all-results"> </a></h5>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span>
+<span class="kn">from</span> <span class="nn">block_types.core.utils</span> <span class="kn">import</span> <span class="n">PickleIO</span>
+<span class="kn">from</span> <span class="nn">block_types.utils.utils</span> <span class="kn">import</span> <span class="n">remove_previous_results</span>
+
+<span class="n">path_results</span> <span class="o">=</span> <span class="s1">&#39;multi_component_loading_saving&#39;</span>
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+
+<span class="c1"># 1. by setting components as attributes:</span>
+<span class="k">class</span> <span class="nc">NewComposition</span><span class="p">(</span><span class="n">MultiComponent</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">data_io</span> <span class="o">=</span> <span class="n">PickleIO</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_io</span><span class="o">=</span><span class="n">data_io</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr1</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">FunctionTransformer</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span>
+                             <span class="n">data_io</span><span class="o">=</span><span class="n">data_io</span><span class="p">,</span>
+                             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tr1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tr2</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">FunctionTransformer</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span>
+                             <span class="n">data_io</span><span class="o">=</span><span class="n">data_io</span><span class="p">,</span>
+                             <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tr2&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_apply</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr1</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+    
+<span class="n">composition1</span> <span class="o">=</span> <span class="n">NewComposition</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+<span class="n">result1</span> <span class="o">=</span> <span class="n">composition1</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">composition2</span> <span class="o">=</span> <span class="n">NewComposition</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+<span class="n">result2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">result1</span><span class="o">==</span><span class="n">result2</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="n">resut_tr1_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr1</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+<span class="n">resut_tr2_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr1_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr1</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr2_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr2</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole&#39;</span><span class="p">))</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;new_composition_result.pk&#39;</span><span class="p">,</span> <span class="s1">&#39;tr1_result.pk&#39;</span><span class="p">,</span> <span class="s1">&#39;tr2_result.pk&#39;</span><span class="p">]</span>
+
+<span class="n">composition1</span><span class="o">.</span><span class="n">set_split</span> <span class="p">(</span><span class="s1">&#39;validation&#39;</span><span class="p">)</span>
+<span class="n">result1b</span> <span class="o">=</span> <span class="n">composition1</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/validation&#39;</span><span class="p">))</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;new_composition_result.pk&#39;</span><span class="p">,</span> <span class="s1">&#39;tr1_result.pk&#39;</span><span class="p">,</span> <span class="s1">&#39;tr2_result.pk&#39;</span><span class="p">]</span>
+
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole&#39;</span><span class="p">)</span>
+
+<span class="n">resut_tr1_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr1</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;validation&#39;</span><span class="p">)</span>
+<span class="n">resut_tr2_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr1_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr1</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">resut_tr2_2</span> <span class="ow">is</span> <span class="kc">None</span>
+
+<span class="n">composition2</span><span class="o">.</span><span class="n">set_split</span><span class="p">(</span><span class="s1">&#39;validation&#39;</span><span class="p">)</span>
+<span class="n">resut_tr1_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr1</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+<span class="n">resut_tr2_2</span> <span class="o">=</span> <span class="n">composition2</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr1_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr1</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr2_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr2</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>applying new_composition transform
+applying tr1 transform
+applying tr2 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/whole/new_composition_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/whole/tr1_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/whole/tr2_result.pk
+applying tr1 transform
+applying tr2 transform
+applying new_composition transform
+applying tr1 transform
+applying tr2 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/validation/tr1_result.pk
+applying tr1 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/validation/tr1_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/multi_component_loading_saving/validation/tr2_result.pk
+applying tr1 transform
+applying tr2 transform
+</pre>
+</div>
+</div>
+
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -477,16 +591,17 @@ applying function_transformer transform
         <span class="bp">self</span><span class="o">.</span><span class="n">tr1</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-<span class="c1"># remove any previously stored files</span>
-<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span>
+<span class="c1"># remove any previously stored </span>
+<span class="n">path_results</span> <span class="o">=</span> <span class="s1">&#39;pipeline_loading_saving&#39;</span>
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">NewPipeline</span><span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="n">save_test_result</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">NewPipeline</span><span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">,</span> <span class="n">save_test_result</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">result1</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span><span class="mi">400</span><span class="p">,</span><span class="mi">500</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span> <span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span>
 
 <span class="k">del</span> <span class="n">pipeline</span> 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">NewPipeline</span><span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="n">save_test_result</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">NewPipeline</span><span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">,</span> <span class="n">save_test_result</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">load_estimator</span> <span class="p">()</span>
 <span class="nb">print</span> <span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">tr2</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span>
 <span class="n">result2</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">transform</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">300</span><span class="p">,</span><span class="mi">400</span><span class="p">,</span><span class="mi">500</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
@@ -494,7 +609,7 @@ applying function_transformer transform
 <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span> <span class="p">(</span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">)</span>
 
 <span class="c1"># remove stored files resulting from running the current test</span>
-<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">)</span>
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -513,8 +628,8 @@ fitting standard_scaler
 applying new_pipeline transform
 applying transform1 transform
 applying standard_scaler transform
-loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/transform1_estimator.pk
-loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/standard_scaler_estimator.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/pipeline_loading_saving/models/transform1_estimator.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/pipeline_loading_saving/models/standard_scaler_estimator.pk
 applying new_pipeline transform
 applying transform1 transform
 applying standard_scaler transform
@@ -554,7 +669,7 @@ applying standard_scaler transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L279" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L268" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Create `Pipeline` object of class `cls`, given `components` list.</code></pre>
@@ -634,7 +749,7 @@ applying function_transformer transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L286" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L275" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
@@ -673,7 +788,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L305" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L294" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -708,7 +823,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L327" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L316" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -778,7 +893,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L338" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L327" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -811,7 +926,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L364" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
+<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L353" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -848,7 +963,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L370" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L359" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -874,7 +989,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L377" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L366" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -898,7 +1013,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L391" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L380" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1344,55 +1459,6 @@ applying concat transform
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;this happens&#39;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/anaconda/envs/block_types/lib/python3.7/site-packages/ipykernel_launcher.py:1: UserWarning: this happens
-  &#34;&#34;&#34;Entry point for launching an IPython kernel.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -1401,7 +1467,7 @@ applying concat transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L413" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training_data'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training_data', 'validation_data', 'test_data']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L402" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training_data'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training_data', 'validation_data', 'test_data']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -1586,7 +1652,7 @@ test_data: [[100]
 <span class="n">result</span> <span class="o">=</span> <span class="n">multi_transform2</span><span class="o">.</span><span class="n">fit_transform</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">apply_to</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;test_data&#39;</span><span class="p">])</span>
 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span>
 
-<span class="c1">#check that we have an error</span>
+<span class="c1">#check that we have an error if we set the flag `raise_error_if_split_doesnot_exist=True`</span>
 <span class="n">multi_transform2</span><span class="o">.</span><span class="n">raise_error_if_split_doesnot_exist</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">multi_transform1</span><span class="o">.</span><span class="n">fit_transform</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">apply_to</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;training_data&#39;</span><span class="p">,</span> <span class="s1">&#39;validation_data&#39;</span><span class="p">])</span>
 <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
@@ -1613,6 +1679,21 @@ fitting multi_split_component
 fitting transform2
 applying multi_split_component transform
 applying transform2 transform
+fitting multi_split_component
+fitting transform1
+applying multi_split_component transform
+applying transform1 transform
+applying transform1 transform
+fitting multi_split_component
+/anaconda/envs/block_types/lib/python3.7/site-packages/ipykernel_launcher.py:40: UserWarning: split test_data not found in X keys (dict_keys([&#39;training_data&#39;, &#39;validation_data&#39;]))
+fitting transform2
+applying multi_split_component transform
+fitting multi_split_component
+fitting transform1
+applying multi_split_component transform
+applying transform1 transform
+applying transform1 transform
+fitting multi_split_component
 </pre>
 </div>
 </div>
@@ -1626,6 +1707,85 @@ applying transform2 transform
 test_data: [[100006]
  [200006]
  [300006]]
+validation_data: [[10006]
+ [20006]
+ [30006]]
+test_data: None
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">block_types.utils.utils</span> <span class="kn">import</span> <span class="n">remove_previous_results</span>
+<span class="kn">from</span> <span class="nn">block_types.core.utils</span> <span class="kn">import</span> <span class="n">PickleIO</span>
+
+<span class="n">path_results</span> <span class="o">=</span> <span class="s1">&#39;results_multi_split&#39;</span>
+
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">PickleSaverComponent</span> <span class="p">(</span><span class="n">FunctionTransformer</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;times2&#39;</span><span class="p">,</span>
+                <span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+
+<span class="n">multi_transform</span> <span class="o">=</span> <span class="n">MultiSplitComponent</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">tr</span><span class="p">,</span>
+                                       <span class="n">apply_to</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;validation_data&#39;</span><span class="p">,</span> <span class="s1">&#39;test_data&#39;</span><span class="p">],</span>
+                                       <span class="n">path_results</span> <span class="o">=</span> <span class="n">path_results</span><span class="p">,</span>
+                                       <span class="n">data_io</span><span class="o">=</span><span class="n">PickleIO</span> <span class="p">(</span><span class="n">path_results</span> <span class="o">=</span> <span class="n">path_results</span><span class="p">))</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">multi_transform</span> <span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">multi_transform2</span> <span class="o">=</span> <span class="n">MultiSplitComponent</span> <span class="p">(</span><span class="n">data_io</span><span class="o">=</span><span class="n">PickleIO</span> <span class="p">(</span><span class="n">path_results</span> <span class="o">=</span> <span class="n">path_results</span><span class="p">))</span>
+
+<span class="n">result2</span> <span class="o">=</span> <span class="n">multi_transform2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span> <span class="p">()</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">result2</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">==</span><span class="n">result2</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_results</span><span class="p">))</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;validation&#39;</span><span class="p">,</span> <span class="s1">&#39;whole&#39;</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;test_data&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;validation&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;validation_data&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/validation&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;times2_result.pk&#39;</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/test&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;times2_result.pk&#39;</span><span class="p">]</span>
+
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;multi_split_component_result.pk&#39;</span><span class="p">]</span>
+
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>applying multi_split_component transform
+applying times2 transform
+applying times2 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results_multi_split/whole/multi_split_component_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results_multi_split/test/times2_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results_multi_split/validation/times2_result.pk
 </pre>
 </div>
 </div>

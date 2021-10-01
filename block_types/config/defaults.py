@@ -13,7 +13,7 @@ file_format = 'parquet'
 overwrite = True
 verbose = 1
 
-save_splits = dict(train=True,
+save_splits = dict(training=True,
                   test=True,
-                  valid=True,
+                  validation=True,
                   whole=True)

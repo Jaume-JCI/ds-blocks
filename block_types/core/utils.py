@@ -178,10 +178,9 @@ class DataIO ():
             function used is `save_multi_index_parquet` (see above). The
             provided function must have the following signature:
             result_save_func (transformed_data, path_to_file)
-        save_training_result : bool, optional
-            If True, the transformed training data is saved.
-        save_test_result : bool, optional
-            If True, the transformed test data is saved.
+        save_splits : dict, optional
+            Dictionary mapping split names to booleans. Usual split names are 'test', 'validation', 'training'
+            For each split name, if True the transformed data is saved for that split.
         save : bool, optional
             If False, neither transformed data nor estimated parameters are saved,
             regardless of the other arguments.
@@ -355,15 +354,11 @@ class PandasIO (DataIO):
                   result_file_extension='.parquet',
                   result_load_func=pd.read_parquet,
                   result_save_func=save_multi_index_parquet,
-                  save_training_result=True,
-                  save_test_result=True,
                   **kwargs):
 
         super().__init__ (result_file_extension=result_file_extension,
                           result_load_func=result_load_func,
                           result_save_func=result_save_func,
-                          save_training_result=save_training_result,
-                          save_test_result=save_test_result,
                           **kwargs)
 
 # Cell
@@ -383,8 +378,6 @@ class PickleIO (DataIO):
                   result_file_extension='.pk',
                   result_load_func=joblib.load,
                   result_save_func=joblib.dump,
-                  save_training_result=True,
-                  save_test_result=True,
                   **kwargs):
 
         super().__init__ (fitting_file_extension=fitting_file_extension,
@@ -394,8 +387,6 @@ class PickleIO (DataIO):
                           result_file_extension=result_file_extension,
                           result_load_func=result_load_func,
                           result_save_func=result_save_func,
-                          save_training_result=save_training_result,
-                          save_test_result=save_test_result,
                           **kwargs)
 
 SklearnIO = PickleIO
@@ -409,8 +400,6 @@ class NoSaverIO (DataIO):
                   save_fitting=False,
                   result_load_func=None,
                   result_save_func=None,
-                  save_training_result=False,
-                  save_test_result=False,
                   **kwargs):
 
         super().__init__ (fitting_load_func=fitting_load_func,
@@ -418,8 +407,6 @@ class NoSaverIO (DataIO):
                           save_fitting=save_fitting,
                           result_load_func=result_load_func,
                           result_save_func=result_save_func,
-                          save_training_result=save_training_result,
-                          save_test_result=save_test_result,
                           **kwargs)
 
 # Cell

@@ -6,6 +6,7 @@ __all__ = ['MultiComponent', 'Pipeline', 'make_pipeline', 'pipeline_factory', 'P
 
 # Cell
 import pandas as pd
+import warnings
 
 from .block_types import Component, PandasComponent, SamplingComponent
 from .data_conversion import PandasConverter
@@ -444,7 +445,7 @@ class MultiSplitComponent (MultiComponent):
         result = {}
         for split in apply_to:
             if split in X.keys():
-                result[split] = component.apply (X[split], **kwargs)
+                result[split] = component.apply (X[split], split=split.replace('_data',''), **kwargs)
             else:
                 self._issue_error_or_warning (split, X)
 

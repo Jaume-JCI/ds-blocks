@@ -150,6 +150,8 @@ applying my_transform3 transform
 applying my_transform3 transform
 applying my_transform4 transform
 applying my_transform5 transform
+/anaconda/envs/block_types/lib/python3.7/site-packages/sklearn/base.py:197: FutureWarning: From version 0.24, get_params will raise an AttributeError if a parameter cannot be retrieved as an instance attribute. Previously it would return None.
+  FutureWarning)
 </pre>
 </div>
 </div>
@@ -441,6 +443,124 @@ test_data: None
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h5 id="saving-/-loading">saving / loading<a class="anchor-link" href="#saving-/-loading"> </a></h5>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">block_types.utils.utils</span> <span class="kn">import</span> <span class="n">remove_previous_results</span>
+
+<span class="n">path_results</span> <span class="o">=</span> <span class="s1">&#39;component_loading_saving&#39;</span>
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">Bunch</span>
+
+<span class="c1"># example with _fit_apply implemented</span>
+<span class="k">class</span> <span class="nc">Transform1</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="n">data_io</span> <span class="o">=</span> <span class="n">SklearnIO</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="nb">sum</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fit</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_apply</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">sum</span>
+    
+<span class="n">tr1</span> <span class="o">=</span> <span class="n">Transform1</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">tr1</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tr1</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">tr2</span> <span class="o">=</span> <span class="n">Transform1</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+<span class="n">tr2</span><span class="o">.</span><span class="n">load_estimator</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">tr2</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">sum</span> <span class="o">==</span> <span class="n">tr1</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">sum</span>
+
+<span class="n">result2</span> <span class="o">=</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span> <span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">result2</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">+</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;transform1_result.pk&#39;</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/models&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;transform1_estimator.pk&#39;</span><span class="p">]</span>
+
+<span class="n">result_b</span> <span class="o">=</span> <span class="n">tr1</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="n">result2b</span> <span class="o">=</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span> <span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">result_b</span><span class="o">==</span><span class="n">result2b</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/test&#39;</span><span class="p">)</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;transform1_result.pk&#39;</span><span class="p">]</span>
+
+<span class="n">result2b</span> <span class="o">=</span> <span class="n">tr2</span><span class="o">.</span><span class="n">data_io</span><span class="o">.</span><span class="n">load_result</span> <span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">result_b</span><span class="o">!=</span><span class="n">result2b</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>fitting transform1
+applying transform1 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/models/transform1_estimator.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/whole/transform1_result.pk
+applying transform1 transform
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/test/transform1_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/temp/block-types/results/whole/transform1_result.pk
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ls</span> <span class="n">results</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre><span class="ansi-blue-intense-fg ansi-bold">models</span>/  <span class="ansi-blue-intense-fg ansi-bold">test</span>/  <span class="ansi-blue-intense-fg ansi-bold">whole</span>/
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -536,7 +656,7 @@ is False.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L299" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L300" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics of transformed data.
@@ -584,7 +704,7 @@ training_data_flag: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L388" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L383" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -623,7 +743,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L409" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L404" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -659,7 +779,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L434" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L429" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -692,7 +812,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L449" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L444" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -725,7 +845,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L465" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L460" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
