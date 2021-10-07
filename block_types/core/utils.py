@@ -113,15 +113,19 @@ class DataIO ():
                   fitting_file_extension='',
                   fitting_load_func=None,
                   fitting_save_func=None,
-                  save_fitting=True,
+                  load_model=True,
+                  save_model=True,
 
                   result_file_extension='',
                   result_file_name=None,
                   result_load_func=None,
                   result_save_func=None,
                   save_splits=dflt.save_splits,
-                  save=True,
+                  load_result=True,
+                  save_result=True,
+
                   load=True,
+                  save=True,
                   split='whole',
                   overwrite=dflt.overwrite,
                   **kwargs):
@@ -198,7 +202,6 @@ class DataIO ():
         self.fitting_file_extension = fitting_file_extension
         self.fitting_load_func = fitting_load_func
         self.fitting_save_func = fitting_save_func
-        self.set_save_fitting (save_fitting)
 
         # saving / loading transformed data
         self.result_file_extension = result_file_extension
@@ -221,6 +224,10 @@ class DataIO ():
         # global saving and loading
         self.set_save (save)
         self.set_load (load)
+        self.set_save_model (save_model)
+        self.set_load_model (load_model)
+        self.set_save_result (save_result)
+        self.set_load_result (load_result)
 
         self.path_model_file = None
 
@@ -258,13 +265,15 @@ class DataIO ():
 
     def load_estimator (self):
         """Load estimator parameters."""
-        estimator = self._load (path=self.path_model_file, load_func=self.fitting_load_func)
+        estimator = self._load (path=self.path_model_file, load_func=self.fitting_load_func,
+                                load=self.load_model_flag)
         return estimator
 
     def save_estimator (self):
         """Save estimator parameters."""
         estimator = self.component.estimator if (self.component.estimator is not None) else self.component
-        self._save (self.path_model_file, self.fitting_save_func, estimator, self.save_fitting)
+        self._save (self.path_model_file, self.fitting_save_func, estimator,
+                    save=self.save_model_flag)
 
     def load_result (self, split=None):
         """
@@ -278,7 +287,7 @@ class DataIO ():
             path_result_file = self.path_results / split / self.result_file_name
         else:
             path_result_file = None
-        return self._load (path_result_file, self.result_load_func)
+        return self._load (path_result_file, self.result_load_func, load=self.load_result_flag)
 
     def save_result (self, result, split=None):
         """
@@ -292,18 +301,19 @@ class DataIO ():
             path_result_file = self.path_results / split / self.result_file_name
         else:
             path_result_file = None
+        save_flag = self.save_splits.get(split, True) and self.save_result_flag
+        self._save (path_result_file, self.result_save_func,
+                    result, save=save_flag)
 
-        self._save (path_result_file, self.result_save_func, result, self.save_splits.get(split, True))
-
-    def _load (self, path, load_func):
-        if (path is not None) and path.exists() and self.load:
+    def _load (self, path, load_func, load=True):
+        if (path is not None) and path.exists() and load:
             self.component.logger.info (f'loading from {path}')
             return load_func (path)
         else:
             return None
 
-    def _save (self, path, save_func, item, save_flag):
-        if (path is not None) and (save_func is not None) and save_flag and self.save:
+    def _save (self, path, save_func, item, save=True):
+        if (path is not None) and (save_func is not None) and save:
             self.component.logger.debug (f'saving to {path}')
             # create parent directory if it does not exist
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -325,9 +335,6 @@ class DataIO ():
     def set_overwrite (self, overwrite):
         self.overwrite = overwrite
 
-    def set_save_fitting (self, save_fitting):
-        self.save_fitting = save_fitting
-
     def set_path_results (self, path_results):
         self.path_results = path_results
         self.path_result_file_training, self.path_model_file, self.path_result_file_test = None, None, None
@@ -338,10 +345,28 @@ class DataIO ():
 
     # global saving and loading
     def set_save (self, save):
-        self.save = save
+        if not save:
+            self.set_save_model (False)
+            self.save_result_model (False)
+        self.save_flag = save
 
     def set_load (self, load):
-        self.load = load
+        if not load:
+            self.set_load_model (False)
+            self.set_load_result (False)
+        self.load_flag = load
+
+    def set_save_model (self, save):
+        self.save_model_flag = save
+
+    def set_load_model (self, load):
+        self.load_model_flag = load
+
+    def set_save_result (self, save):
+        self.save_result_flag = save
+
+    def set_load_result (self, load):
+        self.load_result_flag = load
 
 # Cell
 class PandasIO (DataIO):
@@ -397,14 +422,12 @@ class NoSaverIO (DataIO):
     def __init__ (self,
                   fitting_load_func=None,
                   fitting_save_func=None,
-                  save_fitting=False,
                   result_load_func=None,
                   result_save_func=None,
                   **kwargs):
 
         super().__init__ (fitting_load_func=fitting_load_func,
                           fitting_save_func=fitting_save_func,
-                          save_fitting=save_fitting,
                           result_load_func=result_load_func,
                           result_save_func=result_save_func,
                           **kwargs)

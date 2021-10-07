@@ -192,10 +192,25 @@ class MultiComponent (SamplingComponent):
         for component in self.components:
             component.set_overwrite (overwrite)
 
-    def set_save_fitting (self, save_fitting):
-        super().set_save_fitting (save_fitting)
+    def set_load_model (self, load_model):
+        super().set_load_model (load_model)
         for component in self.components:
-            component.set_save_fitting (save_fitting)
+            component.set_load_model (load_model)
+
+    def set_save_model (self, save_model):
+        super().set_save_model (save_model)
+        for component in self.components:
+            component.set_save_model (save_model)
+
+    def set_save_result (self, save_result):
+        super().set_save_result (save_result)
+        for component in self.components:
+            component.set_save_result (save_result)
+
+    def set_load_result (self, load_result):
+        super().set_load_result (load_result)
+        for component in self.components:
+            component.set_load_result (load_result)
 
 # Cell
 class Pipeline (MultiComponent):
@@ -402,9 +417,9 @@ def make_column_transformer (*transformers, **kwargs):
 class MultiSplitComponent (MultiComponent):
     def __init__ (self,
                   component=None,
-                  fit_to = 'training_data',
+                  fit_to = 'training',
                   fit_additional = [],
-                  apply_to = ['training_data', 'validation_data', 'test_data'],
+                  apply_to = ['training', 'validation', 'test'],
                   raise_error_if_split_doesnot_exist=False,
                   raise_warning_if_split_doesnot_exist=True,
                   **kwargs):
@@ -420,17 +435,19 @@ class MultiSplitComponent (MultiComponent):
         self.raise_warning_if_split_doesnot_exist=raise_warning_if_split_doesnot_exist
 
     def _fit (self, X, y=None):
+        if not isinstance(X, dict):
+            X = {self.fit_to: X}
         component = self.components[0]
         additional_data = {}
         for split in self.fit_additional:
-            if split not in ['validation_data', 'test_data']:
+            if split not in ['validation', 'test']:
                 raise ValueError (f'split {split} not valid')
             if split in X.keys():
-                additional_data[split] = X[split]
+                additional_data[f'{split}_data'] = X[split]
             else:
                 self._issue_error_or_warning (split, X)
 
-        component.fit(X[self.fit_to], y=y, **additional_data)
+        component.fit(X[self.fit_to], y=y, split='training', **additional_data)
 
     def _issue_error_or_warning (self, split, X):
         message = f'split {split} not found in X keys ({X.keys()})'
@@ -441,12 +458,22 @@ class MultiSplitComponent (MultiComponent):
 
     def _apply (self, X, apply_to = None, **kwargs):
         apply_to = self.apply_to if apply_to is None else apply_to
+        apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
+        if not isinstance(X, dict):
+            key = apply_to[0] if len(apply_to)==1 else 'test'
+            X = {key: X}
+            input_not_dict = True
+        else:
+            input_not_dict = False
+
         component = self.components[0]
         result = {}
         for split in apply_to:
             if split in X.keys():
-                result[split] = component.apply (X[split], split=split.replace('_data',''), **kwargs)
+                result[split] = component.apply (X[split], split=split, **kwargs)
             else:
                 self._issue_error_or_warning (split, X)
 
+        if input_not_dict:
+            result = result[key]
         return result
