@@ -618,7 +618,7 @@ verbose : int, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="fit" class="doc_header"><code>fit</code><a href="functools.py#L371" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>fit</code>(<strong><code>X</code></strong>, <strong><code>y</code></strong>=<em><code>None</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong><code>func</code></strong>=<em><code>'_fit'</code></em>, <strong><code>validation_data</code></strong>=<em><code>None</code></em>, <strong><code>test_data</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="fit" class="doc_header"><code>fit</code><a href="functools.py#L371" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>fit</code>(<strong><code>X</code></strong>, <strong><code>y</code></strong>=<em><code>None</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong><code>split</code></strong>=<em><code>None</code></em>, <strong><code>func</code></strong>=<em><code>'_fit'</code></em>, <strong><code>validation_data</code></strong>=<em><code>None</code></em>, <strong><code>test_data</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -629,7 +629,7 @@ verbose : int, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="transform" class="doc_header"><code>transform</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L207" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>transform</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="transform" class="doc_header"><code>transform</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L220" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>transform</code>(<strong>*<code>X</code></strong>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Transforms the data X and returns the transformed data.
@@ -656,7 +656,7 @@ is False.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L300" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="show_result_statistics" class="doc_header"><code>show_result_statistics</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L324" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>show_result_statistics</code>(<strong><code>result</code></strong>=<em><code>None</code></em>, <strong><code>training_data_flag</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 
 <pre><code>Show statistics of transformed data.
@@ -704,7 +704,7 @@ training_data_flag: bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L383" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L420" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -743,7 +743,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L404" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L441" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -779,7 +779,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L429" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L466" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -812,7 +812,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L444" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h3 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L481" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -845,7 +845,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L460" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h3 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L497" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.

@@ -669,7 +669,7 @@ applying standard_scaler transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L268" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L283" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Create `Pipeline` object of class `cls`, given `components` list.</code></pre>
@@ -749,7 +749,7 @@ applying function_transformer transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L275" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L290" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
@@ -788,7 +788,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L294" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L309" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -823,7 +823,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L316" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L331" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -893,7 +893,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L327" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L342" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -926,7 +926,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L353" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
+<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L368" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -963,7 +963,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L359" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L374" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -989,7 +989,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L366" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L381" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1013,7 +1013,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L380" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L395" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1467,7 +1467,7 @@ applying concat transform
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L402" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L417" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.

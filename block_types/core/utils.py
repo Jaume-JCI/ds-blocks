@@ -347,7 +347,7 @@ class DataIO ():
     def set_save (self, save):
         if not save:
             self.set_save_model (False)
-            self.save_result_model (False)
+            self.set_save_result (False)
         self.save_flag = save
 
     def set_load (self, load):
