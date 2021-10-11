@@ -25,7 +25,7 @@ except:
 
 # block_types
 from .data_conversion import PandasConverter
-from ..config import defaults as dflt
+from ..config import bt_defaults as dflt
 from ..utils.utils import set_logger
 
 # Cell

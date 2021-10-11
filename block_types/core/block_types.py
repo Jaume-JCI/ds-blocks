@@ -29,7 +29,6 @@ from .data_conversion import DataConverter, NoConverter, PandasConverter
 from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter
 from .utils import camel_to_snake
-from ..config import defaults as dflt
 from ..utils.utils import set_logger
 
 # Cell

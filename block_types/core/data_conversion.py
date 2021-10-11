@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 #block-types
-from ..config import defaults as dflt
+from ..config import bt_defaults as dflt
 from ..utils.utils import set_logger
 
 class DataConverter ():

@@ -11,7 +11,7 @@ import shutil
 from pathlib import Path
 
 # block-types
-import block_types.config.defaults as dflt
+import block_types.config.bt_defaults as dflt
 
 def make_reproducible ():
     """

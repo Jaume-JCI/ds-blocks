@@ -3,12 +3,12 @@
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
-         "path_results": "config.defaults.ipynb",
-         "path_data": "config.defaults.ipynb",
-         "file_format": "config.defaults.ipynb",
-         "overwrite": "config.defaults.ipynb",
-         "verbose": "config.defaults.ipynb",
-         "save_splits": "config.defaults.ipynb",
+         "path_results": "config.bt_defaults.ipynb",
+         "path_data": "config.bt_defaults.ipynb",
+         "file_format": "config.bt_defaults.ipynb",
+         "overwrite": "config.bt_defaults.ipynb",
+         "verbose": "config.bt_defaults.ipynb",
+         "save_splits": "config.bt_defaults.ipynb",
          "Component": "core.block_types.ipynb",
          "SamplingComponent": "core.block_types.ipynb",
          "SklearnComponent": "core.block_types.ipynb",
@@ -54,7 +54,7 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "set_tf_loglevel": "utils.utils.ipynb"}
 
 modules = ["blocks/preprocessing.py",
-           "config/defaults.py",
+           "config/bt_defaults.py",
            "core/block_types.py",
            "core/compose.py",
            "core/data_conversion.py",
