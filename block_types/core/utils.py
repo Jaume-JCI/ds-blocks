@@ -222,14 +222,12 @@ class DataIO ():
         self.set_overwrite (overwrite)
 
         # global saving and loading
+        self.set_save (save)
+        self.set_load (load)
         self.set_save_model (save_model)
         self.set_load_model (load_model)
         self.set_save_result (save_result)
         self.set_load_result (load_result)
-
-        # important
-        self.set_save (save)
-        self.set_load (load)
 
         self.path_model_file = None
 
@@ -267,14 +265,12 @@ class DataIO ():
 
     def load_estimator (self):
         """Load estimator parameters."""
-        if not self.load_flag: self.load_model_flag=False
         estimator = self._load (path=self.path_model_file, load_func=self.fitting_load_func,
                                 load=self.load_model_flag)
         return estimator
 
     def save_estimator (self):
         """Save estimator parameters."""
-        if not self.save_flag: self.save_model_flag=False
         estimator = self.component.estimator if (self.component.estimator is not None) else self.component
         self._save (self.path_model_file, self.fitting_save_func, estimator,
                     save=self.save_model_flag)
@@ -287,7 +283,6 @@ class DataIO ():
         otherwise transformed test data is loaded.
         """
         split = self.split if split is None else split
-        if not self.load_flag: self.load_result_flag=False
         if self.path_results is not None:
             path_result_file = self.path_results / split / self.result_file_name
         else:
@@ -302,7 +297,6 @@ class DataIO ():
         otherwise transformed test data is saved.
         """
         split = self.split if split is None else split
-        if not self.save_flag: self.save_result_flag=False
         if self.path_results is not None:
             path_result_file = self.path_results / split / self.result_file_name
         else:
@@ -351,28 +345,28 @@ class DataIO ():
 
     # global saving and loading
     def set_save (self, save):
+        self.save_flag = save
         if not save:
             self.set_save_model (False)
             self.set_save_result (False)
-        self.save_flag = save
 
     def set_load (self, load):
+        self.load_flag = load
         if not load:
             self.set_load_model (False)
             self.set_load_result (False)
-        self.load_flag = load
 
     def set_save_model (self, save):
-        self.save_model_flag = save
+        self.save_model_flag = save if self.save_flag else False
 
     def set_load_model (self, load):
-        self.load_model_flag = load
+        self.load_model_flag = load if self.load_flag else False
 
     def set_save_result (self, save):
-        self.save_result_flag = save
+        self.save_result_flag = save if self.save_flag else False
 
     def set_load_result (self, load):
-        self.load_result_flag = load
+        self.load_result_flag = load if self.load_flag else False
 
 # Cell
 class PandasIO (DataIO):
