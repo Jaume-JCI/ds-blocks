@@ -90,7 +90,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         # data converter
         if data_converter is None:
-            self.data_converter = NoConverter ()
+            # TODO: have DataConverter store a reference to component, and use the logger from that reference.
+            self.data_converter = NoConverter (logger=logger,
+                                               verbose=verbose,
+                                               **kwargs)
         else:
             self.data_converter = data_converter
 
@@ -129,7 +132,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.original_split = self.data_io.split
             self.set_split (split)
 
-        self.logger.info (f'fitting {self.name} on split {self.data_io.split}')
+        self.logger.info (f'fitting {self.name} (using {self.data_io.split} data)')
 
         previous_estimator = None
         if load and not self.data_io.overwrite:
@@ -290,7 +293,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.original_split = self.data_io.split
             self.set_split (split)
 
-        self.logger.info (f'applying {self.name} on split {self.data_io.split}')
+        self.logger.info (f'applying {self.name} (on {self.data_io.split} data)')
 
         if len(X) == 1:
             X = X[0]
