@@ -38,11 +38,6 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def __init__ (self,
                   estimator=None,
                   name: Optional[str] = None,
-                  data_converter: Optional[DataConverter] = None,
-                  data_io: Optional[DataIO] = None,
-                  model_plotter: Optional[ModelPlotter] = None,
-                  logger=None,
-                  verbose: int = 0,
                   **kwargs):
 
         """
@@ -69,14 +64,54 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             Verbosity, 0: warning or critical, 1: info, 2: debug.
         """
 
+        # name of current component, for logging and plotting purposes
+        self._determine_component_name (name, estimator)
+
+        # obtain dictionary of config params from kwargs
+        config = self.obtain_config_params (**kwargs)
+
+        self._init (estimator, **config)
+
+    def obtain_config_params (self, **kwargs):
+        """Overwrites parameters in kwargs with those found in a dictionary of the same name
+        given to this component.
+
+        Checks if there is a parameter whose name is the name of the class or the name given
+        to this component. In that case, it overwrites the parameters in kwargs with those
+        found in that dictionary. The parameters in kwargs can be used as *global* parameters
+        for multiple components, while parameters specific of one component can be set using
+        a dictionary with the name of that component. See example below.
+        """
+        if kwargs.get(self.class_name) is not None:
+            k = self.class_name
+        elif kwargs.get(self.name) is not None:
+            k = self.name
+        else:
+            k = None
+
+        if k is not None:
+            config = kwargs.copy()
+            config.update (config[k])
+        else:
+            config = kwargs
+
+        return config
+
+    def _init (self,
+               estimator=None,
+               data_converter: Optional[DataConverter] = None,
+               data_io: Optional[DataIO] = None,
+               model_plotter: Optional[ModelPlotter] = None,
+               logger=None,
+               verbose: int = 0,
+               **kwargs):
+
         # logger used to display messages
         if logger is None:
             self.logger = set_logger ('block_types', verbose=verbose)
         else:
             self.logger = logger
 
-        # name of current component, for logging and plotting purposes
-        self._determine_component_name (name, estimator)
 
         # object that manages loading / saving
         if data_io is None:

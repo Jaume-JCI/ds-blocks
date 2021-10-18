@@ -325,6 +325,12 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="DataIO-class">DataIO class<a class="anchor-link" href="#DataIO-class"> </a></h2>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -343,7 +349,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DataIO" class="doc_header"><code>class</code> <code>DataIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L108" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataIO</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>path_results</code></strong>=<em><code>None</code></em>, <strong><code>fitting_file_name</code></strong>=<em><code>None</code></em>, <strong><code>fitting_file_extension</code></strong>=<em><code>''</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>load_model</code></strong>=<em><code>True</code></em>, <strong><code>save_model</code></strong>=<em><code>True</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>''</code></em>, <strong><code>result_file_name</code></strong>=<em><code>None</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_splits</code></strong>=<em><code>{'training': True, 'test': True, 'validation': True, 'whole': True}</code></em>, <strong><code>load_result</code></strong>=<em><code>True</code></em>, <strong><code>save_result</code></strong>=<em><code>True</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong><code>split</code></strong>=<em><code>'whole'</code></em>, <strong><code>overwrite</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="DataIO" class="doc_header"><code>class</code> <code>DataIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L108" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataIO</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -354,7 +360,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L109" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>__init__</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>path_results</code></strong>=<em><code>None</code></em>, <strong><code>fitting_file_name</code></strong>=<em><code>None</code></em>, <strong><code>fitting_file_extension</code></strong>=<em><code>''</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>load_model</code></strong>=<em><code>True</code></em>, <strong><code>save_model</code></strong>=<em><code>True</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>''</code></em>, <strong><code>result_file_name</code></strong>=<em><code>None</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong><code>save_splits</code></strong>=<em><code>{'training': True, 'test': True, 'validation': True, 'whole': True}</code></em>, <strong><code>load_result</code></strong>=<em><code>True</code></em>, <strong><code>save_result</code></strong>=<em><code>True</code></em>, <strong><code>load</code></strong>=<em><code>True</code></em>, <strong><code>save</code></strong>=<em><code>True</code></em>, <strong><code>split</code></strong>=<em><code>'whole'</code></em>, <strong><code>overwrite</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h3 id="__init__" class="doc_header"><code>__init__</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L109" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>__init__</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Initialize common attributes and fields.
@@ -429,7 +435,7 @@ overwrite : bool, optional
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="setup" class="doc_header"><code>setup</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L239" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>setup</code>(<strong><code>component</code></strong>=<em><code>None</code></em>)</p>
+<h3 id="setup" class="doc_header"><code>setup</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L246" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>setup</code>(<strong><code>component</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Initialize remaining fields given `component` from which data is saved/loaded.
@@ -448,7 +454,7 @@ SklearnIO subclass)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="load_estimator" class="doc_header"><code>load_estimator</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L266" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>load_estimator</code>()</p>
+<h3 id="load_estimator" class="doc_header"><code>load_estimator</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L278" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>load_estimator</code>()</p>
 </blockquote>
 
 <pre><code>Load estimator parameters.</code></pre>
@@ -461,7 +467,7 @@ SklearnIO subclass)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="save_estimator" class="doc_header"><code>save_estimator</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L272" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>save_estimator</code>()</p>
+<h3 id="save_estimator" class="doc_header"><code>save_estimator</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L284" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>save_estimator</code>()</p>
 </blockquote>
 
 <pre><code>Save estimator parameters.</code></pre>
@@ -474,7 +480,7 @@ SklearnIO subclass)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="load_result" class="doc_header"><code>load_result</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L278" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>load_result</code>(<strong><code>split</code></strong>=<em><code>None</code></em>)</p>
+<h3 id="load_result" class="doc_header"><code>load_result</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L290" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>load_result</code>(<strong><code>split</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Load transformed data.
@@ -490,7 +496,7 @@ otherwise transformed test data is loaded.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="save_result" class="doc_header"><code>save_result</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L292" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>save_result</code>(<strong><code>result</code></strong>, <strong><code>split</code></strong>=<em><code>None</code></em>)</p>
+<h3 id="save_result" class="doc_header"><code>save_result</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L304" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>save_result</code>(<strong><code>result</code></strong>, <strong><code>split</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 <pre><code>Save transformed data.
@@ -525,7 +531,7 @@ otherwise transformed test data is saved.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasIO" class="doc_header"><code>class</code> <code>PandasIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L372" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasIO</code>(<strong><code>result_file_extension</code></strong>=<em><code>'.parquet'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>read_parquet</code></em>, <strong><code>result_save_func</code></strong>=<em><code>save_multi_index_parquet</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h2 id="PandasIO" class="doc_header"><code>class</code> <code>PandasIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L384" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasIO</code>(<strong><code>result_file_extension</code></strong>=<em><code>'.parquet'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>read_parquet</code></em>, <strong><code>result_save_func</code></strong>=<em><code>save_multi_index_parquet</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>Saves results in parquet format by default.
@@ -560,7 +566,7 @@ Results are supposed to be in Pandas DataFrame format.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PickleIO" class="doc_header"><code>class</code> <code>PickleIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L390" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PickleIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h2 id="PickleIO" class="doc_header"><code>class</code> <code>PickleIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L402" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PickleIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that uses pickle format for saving / loading the estimator.
@@ -596,7 +602,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="SklearnIO" class="doc_header"><code>class</code> <code>SklearnIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L390" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h3 id="SklearnIO" class="doc_header"><code>class</code> <code>SklearnIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L402" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>SklearnIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that uses pickle format for saving / loading the estimator.
@@ -632,7 +638,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L420" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>NoSaverIO</code>(<strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
+<h3 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L432" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>NoSaverIO</code>(<strong><code>fitting_load_func</code></strong>=<em><code>None</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>None</code></em>, <strong><code>result_load_func</code></strong>=<em><code>None</code></em>, <strong><code>result_save_func</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that does not load or save anything.</code></pre>
@@ -671,7 +677,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h3 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L436" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h3 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L448" class="source_link" style="float:right">[source]</a></h3><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Helper class that provides information about the component used for plotting the pipeline diagram.</code></pre>
@@ -704,7 +710,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L484" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
+<h2 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/utils.py#L496" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
 </blockquote>
 
 <pre><code>Convert CamelCase to snake_case.

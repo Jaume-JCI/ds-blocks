@@ -108,27 +108,7 @@ def load_keras_model (path, **kwargs):
 class DataIO ():
     def __init__ (self,
                   component=None,
-                  path_results=dflt.path_results,
-                  fitting_file_name=None,
-                  fitting_file_extension='',
-                  fitting_load_func=None,
-                  fitting_save_func=None,
-                  load_model=True,
-                  save_model=True,
-
-                  result_file_extension='',
-                  result_file_name=None,
-                  result_load_func=None,
-                  result_save_func=None,
-                  save_splits=dflt.save_splits,
-                  load_result=True,
-                  save_result=True,
-
-                  load=True,
-                  save=True,
-                  split='whole',
-                  overwrite=dflt.overwrite,
-                  **kwargs):
+                 **kwargs):
         """
         Initialize common attributes and fields.
 
@@ -195,6 +175,38 @@ class DataIO ():
             If True, any existing file with the same name is overwritten.
         """
 
+        self.component = component
+        if component is not None:
+            config = self.component.obtain_config_params (**kwargs)
+            self._init (**config)
+            self.setup (component)
+        else:
+            self._init (**kwargs)
+            self._initial_kwargs = kwargs
+
+    def _init (self,
+               path_results=dflt.path_results,
+               fitting_file_name=None,
+               fitting_file_extension='',
+               fitting_load_func=None,
+               fitting_save_func=None,
+               load_model=True,
+               save_model=True,
+
+               result_file_extension='',
+               result_file_name=None,
+               result_load_func=None,
+               result_save_func=None,
+               save_splits=dflt.save_splits,
+               load_result=True,
+               save_result=True,
+
+               load=True,
+               save=True,
+               split='whole',
+               overwrite=dflt.overwrite,
+               **kwargs):
+
         self.path_results = path_results
 
         # saving / loading estimator parameters
@@ -231,11 +243,6 @@ class DataIO ():
 
         self.path_model_file = None
 
-        if component is not None:
-            self.setup (component)
-        else:
-            self.component = None
-
     def setup (self, component=None):
         """
         Initialize remaining fields given `component` from which data is saved/loaded.
@@ -248,6 +255,11 @@ class DataIO ():
         """
 
         self.component = component
+
+        if hasattr(self, '_config'):
+            config = self.component.obtain_config_params (**self._initial_kwargs)
+            self._init (**config)
+            del self._initial_kwargs
 
         # configuration for saving / loading fitted estimator
         if self.fitting_file_name is None:
