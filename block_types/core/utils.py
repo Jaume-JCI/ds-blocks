@@ -256,7 +256,7 @@ class DataIO ():
 
         self.component = component
 
-        if hasattr(self, '_config'):
+        if hasattr(self, '_initial_kwargs'):
             config = self.component.obtain_config_params (**self._initial_kwargs)
             self._init (**config)
             del self._initial_kwargs
