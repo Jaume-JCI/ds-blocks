@@ -109,9 +109,11 @@ def argnames(f, frame=False):
     return code.co_varnames[:code.co_argcount+code.co_kwonlyargcount]
 
 # Cell
-def _store_attr(self, anno, **attrs):
+def _store_attr(self, anno, overwrite=False, **attrs):
     stored = getattr(self, '__stored_args__', None)
     for n,v in attrs.items():
+        if not overwrite and hasattr(self, n):
+            continue
         if n in anno: v = anno[n](v)
         setattr(self, n, v)
         if stored is not None: stored[n] = v

@@ -73,7 +73,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self._determine_component_name (name, estimator)
 
         # store __init__ attrs into `self`
-        replace_attr_and_store (base_class=Component)
+        replace_attr_and_store (base_class=Component, but='name')
 
         if self.logger is None:
             self.logger = set_logger ('block_types', verbose=verbose)
