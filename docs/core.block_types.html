@@ -53,7 +53,7 @@ nb_path: "nbs/core.block_types.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L36" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
+<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L36" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -148,6 +148,41 @@ nb_path: "nbs/core.block_types.ipynb"
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path_results</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Intermediate</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Final</span> <span class="p">(</span><span class="n">Intermediate</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">9</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">4</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">6</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">Final</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">10</span><span class="p">]})</span>
+<span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">7</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">10</span><span class="p">]</span>
+
+<span class="c1"># only attributes specific of Final are replaced.</span>
+<span class="c1"># trying to replace attributes specific of Intermediate </span>
+<span class="c1"># does not work</span>
+<span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">Intermediate</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+<span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">7</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -635,7 +670,7 @@ applying transform1 (on whole data)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L457" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L441" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -691,7 +726,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L478" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L462" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -744,7 +779,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L503" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L487" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -794,7 +829,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L518" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L502" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -844,7 +879,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L534" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L518" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.

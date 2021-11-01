@@ -51,7 +51,10 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "make_reproducible": "utils.utils.ipynb",
          "set_logger": "utils.utils.ipynb",
          "remove_previous_results": "utils.utils.ipynb",
-         "set_tf_loglevel": "utils.utils.ipynb"}
+         "set_tf_loglevel": "utils.utils.ipynb",
+         "argnames": "utils.utils.ipynb",
+         "obtain_class_specific_attrs": "utils.utils.ipynb",
+         "replace_attr_and_store": "utils.utils.ipynb"}
 
 modules = ["blocks/preprocessing.py",
            "config/bt_defaults.py",

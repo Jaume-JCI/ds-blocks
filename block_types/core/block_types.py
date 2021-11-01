@@ -29,7 +29,7 @@ from .data_conversion import DataConverter, NoConverter, PandasConverter
 from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter
 from .utils import camel_to_snake
-from ..utils.utils import set_logger
+from ..utils.utils import set_logger, replace_attr_and_store
 
 # Cell
 
@@ -38,6 +38,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def __init__ (self,
                   estimator=None,
                   name: Optional[str] = None,
+                  data_converter: Optional[DataConverter] = None,
+                  data_io: Optional[DataIO] = None,
+                  model_plotter: Optional[ModelPlotter] = None,
+                  logger=None,
+                  verbose: int = 0,
                   **kwargs):
 
         """
@@ -67,20 +72,41 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # name of current component, for logging and plotting purposes
         self._determine_component_name (name, estimator)
 
-        # obtain dictionary of config params from kwargs
-        config = self.obtain_config_params (**kwargs)
+        # store __init__ attrs into `self`
+        replace_attr_and_store (base_class=Component)
 
-        self._init (estimator, **config)
+        if self.logger is None:
+            self.logger = set_logger ('block_types', verbose=verbose)
+
+        # object that manages loading / saving
+        if self.data_io is None:
+            self.data_io = DataIO (component=self, **kwargs)
+        else:
+            self.data_io = copy.copy(self.data_io)
+            self.data_io.setup (self)
+
+        # data converter
+        if self.data_converter is None:
+            # TODO: have DataConverter store a reference to component, and use the logger from that reference.
+            self.data_converter = NoConverter (logger=self.logger,
+                                               verbose=self.verbose,
+                                               **kwargs)
+
+        # plotting model component
+        if self.model_plotter is None:
+            self.model_plotter = ModelPlotter (component=self, **kwargs)
+        else:
+            self.model_plotter.set_component (self)
 
     def obtain_config_params (self, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
-        given to this component.
+        as the component.
 
         Checks if there is a parameter whose name is the name of the class or the name given
         to this component. In that case, it overwrites the parameters in kwargs with those
         found in that dictionary. The parameters in kwargs can be used as *global* parameters
-        for multiple components, while parameters specific of one component can be set using
-        a dictionary with the name of that component. See example below.
+        for multiple components, while parameters specific of one component can be overwritten
+        using a dictionary with the name of that component. See example below.
         """
         if kwargs.get(self.class_name) is not None:
             k = self.class_name
@@ -96,48 +122,6 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             config = kwargs
 
         return config
-
-    def _init (self,
-               estimator=None,
-               data_converter: Optional[DataConverter] = None,
-               data_io: Optional[DataIO] = None,
-               model_plotter: Optional[ModelPlotter] = None,
-               logger=None,
-               verbose: int = 0,
-               **kwargs):
-
-        # logger used to display messages
-        if logger is None:
-            self.logger = set_logger ('block_types', verbose=verbose)
-        else:
-            self.logger = logger
-
-
-        # object that manages loading / saving
-        if data_io is None:
-            self.data_io = DataIO (component=self, **kwargs)
-        else:
-            self.data_io = copy.copy(data_io)
-            self.data_io.setup (self)
-
-        # estimator (ML model)
-        self.estimator = estimator
-
-        # data converter
-        if data_converter is None:
-            # TODO: have DataConverter store a reference to component, and use the logger from that reference.
-            self.data_converter = NoConverter (logger=logger,
-                                               verbose=verbose,
-                                               **kwargs)
-        else:
-            self.data_converter = data_converter
-
-        # plotting model component
-        if model_plotter is None:
-            self.model_plotter = ModelPlotter (component=self, **kwargs)
-        else:
-            self.model_plotter = model_plotter
-            self.model_plotter.set_component (self)
 
     def _determine_component_name (self, name: Optional[str], estimator) -> None:
         """
