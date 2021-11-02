@@ -139,13 +139,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.name = camel_to_snake (self.class_name)
 
-    def fit_like (self, X, y=None, load=True, save=True, split=None,
+    def fit_like (self, X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
-        Uses the previously fitted parameters if they're found in disk and overwrite
-        is False.
+        Uses the previously fitted parameters if they're found in disk and load
+        is True.
         """
         if split is not None:
             self.original_split = self.data_io.split
@@ -154,7 +154,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.logger.info (f'fitting {self.name} (using {self.data_io.split} data)')
 
         previous_estimator = None
-        if load and not self.data_io.overwrite:
+        if self.data_io.can_load_model (load):
             previous_estimator = self.data_io.load_estimator()
 
         if previous_estimator is None:
@@ -172,7 +172,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             else:
                 raise ValueError (f'function {func} not valid')
             self.data_converter.convert_after_fitting (X)
-            if save:
+            if self.data_io.can_save_model (save):
                 self.data_io.save_estimator ()
         else:
             self.estimator = previous_estimator
@@ -188,9 +188,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
     fit = partialmethod (fit_like, func='_fit')
 
-    def fit_apply (self, X, y=None, load_model=True, save_model=True, load_result=True, save_result=True,
-                   func='_fit', validation_data=None, test_data=None,
-                   **kwargs):
+    def fit_apply (self, X, y=None, load_model=None, save_model=None,
+                   load_result=None, save_result=None, func='_fit',
+                   validation_data=None, test_data=None, **kwargs):
 
         if self._determine_fit_apply_func () is not None:
             return self.fit_like (X, y=y,
@@ -200,9 +200,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             return self.fit (X, y=y,
                              load=load_model, save=save_model,
-                             validation_data=validation_data, test_data=test_data).apply (X, load=load_result,
-                                                                                          save=save_result,
-                                                                                          **kwargs)
+                             validation_data=validation_data,
+                             test_data=test_data).apply (X, load=load_result,
+                                                         save=save_result, **kwargs)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
@@ -238,12 +238,12 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def apply (self, *X, load=True, save=True, **kwargs):
+    def apply (self, *X, load=None, save=None, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
-        Uses the previously transformed data if it's found in disk and overwrite
-        is False.
+        Uses the previously transformed data if it's found in disk and load
+        is True.
         """
 
         result_func = self._determine_result_func ()
@@ -305,7 +305,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     transform = apply
     predict = partialmethod (apply, converter_args=dict(new_columns=['prediction']))
 
-    def _compute_result (self, X, result_func, load=True, save=True, split=None,
+    def _compute_result (self, X, result_func, load=None, save=None, split=None,
                          converter_args={}, **kwargs):
 
         if split is not None:
@@ -317,7 +317,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if len(X) == 1:
             X = X[0]
         previous_result = None
-        if load and not self.data_io.overwrite:
+        if self.data_io.can_load_result (load):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
             X = self.data_converter.convert_before_transforming (X, **converter_args)
@@ -326,7 +326,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             else:
                 result = result_func (X, **kwargs)
             result = self.data_converter.convert_after_transforming (result, **converter_args)
-            if save:
+            if self.data_io.can_save_result (save, split):
                 self.data_io.save_result (result, split=split)
         else:
             result = previous_result
@@ -411,9 +411,6 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
     def set_save_splits (self, save_splits):
         self.data_io.set_save_splits (save_splits)
-
-    def set_overwrite (self, overwrite):
-        self.data_io.set_overwrite (overwrite)
 
     def set_save_model (self, save_model):
         self.data_io.set_save_model (save_model)

@@ -187,11 +187,6 @@ class MultiComponent (SamplingComponent):
         for component in self.components:
             component.set_save_splits (save_splits)
 
-    def set_overwrite (self, overwrite):
-        super().set_overwrite (overwrite)
-        for component in self.components:
-            component.set_overwrite (overwrite)
-
     def set_load_model (self, load_model):
         super().set_load_model (load_model)
         for component in self.components:

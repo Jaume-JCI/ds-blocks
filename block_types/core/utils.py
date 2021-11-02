@@ -171,8 +171,6 @@ class DataIO ():
         load: bool, optional
             If False, neither transformed data nor estimated parameters are loaded,
             regardless of the other arguments.
-        overwrite : bool, optional
-            If True, any existing file with the same name is overwritten.
         """
 
         self.component = component
@@ -204,7 +202,6 @@ class DataIO ():
                load=True,
                save=True,
                split='whole',
-               overwrite=dflt.overwrite,
                **kwargs):
 
         self.path_results = path_results
@@ -229,9 +226,6 @@ class DataIO ():
         # whether the transformation has been applied to training data (i.e., to be saved in training path)
         # or to test data (i.e,. to be saved in test path)
         self.split = split
-
-        # whether existing files should be overwritten or not
-        self.set_overwrite (overwrite)
 
         # global saving and loading
         self.set_save (save)
@@ -277,15 +271,16 @@ class DataIO ():
 
     def load_estimator (self):
         """Load estimator parameters."""
-        estimator = self._load (path=self.path_model_file, load_func=self.fitting_load_func,
-                                load=self.load_model_flag)
+        estimator = self._load (path=self.path_model_file,
+                                load_func=self.fitting_load_func)
         return estimator
 
     def save_estimator (self):
         """Save estimator parameters."""
-        estimator = self.component.estimator if (self.component.estimator is not None) else self.component
-        self._save (self.path_model_file, self.fitting_save_func, estimator,
-                    save=self.save_model_flag)
+        estimator = (self.component.estimator if
+                     (self.component.estimator is not None) else
+                     self.component)
+        self._save (self.path_model_file, self.fitting_save_func, estimator)
 
     def load_result (self, split=None):
         """
@@ -299,7 +294,7 @@ class DataIO ():
             path_result_file = self.path_results / split / self.result_file_name
         else:
             path_result_file = None
-        return self._load (path_result_file, self.result_load_func, load=self.load_result_flag)
+        return self._load (path_result_file, self.result_load_func)
 
     def save_result (self, result, split=None):
         """
@@ -313,19 +308,33 @@ class DataIO ():
             path_result_file = self.path_results / split / self.result_file_name
         else:
             path_result_file = None
-        save_flag = self.save_splits.get(split, True) and self.save_result_flag
         self._save (path_result_file, self.result_save_func,
-                    result, save=save_flag)
+                    result)
 
-    def _load (self, path, load_func, load=True):
-        if (path is not None) and path.exists() and load:
+    def can_load_model (self, load=None):
+        return load if load is not None else (self.load_flag and self.load_model_flag)
+
+    def can_load_result (self, load=None):
+        return load if load is not None else (self.load_flag and self.load_result_flag)
+
+    def can_save_model (self, save=None):
+        return save if save is not None else (self.save_flag and self.save_model_flag)
+
+    def can_save_result (self, save=None, split=None):
+        split = self.split if split is None else split
+        return save if save is not None else (self.save_flag and
+                                              self.save_result_flag and
+                                              self.save_splits.get(split, True))
+
+    def _load (self, path, load_func):
+        if (path is not None) and path.exists():
             self.component.logger.info (f'loading from {path}')
             return load_func (path)
         else:
             return None
 
-    def _save (self, path, save_func, item, save=True):
-        if (path is not None) and (save_func is not None) and save:
+    def _save (self, path, save_func, item):
+        if (path is not None) and (save_func is not None):
             self.component.logger.debug (f'saving to {path}')
             # create parent directory if it does not exist
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -343,9 +352,6 @@ class DataIO ():
 
     def set_save_splits (self, save_splits):
         self.save_splits = save_splits
-
-    def set_overwrite (self, overwrite):
-        self.overwrite = overwrite
 
     def set_path_results (self, path_results):
         self.path_results = path_results
