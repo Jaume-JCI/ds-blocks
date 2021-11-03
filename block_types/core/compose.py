@@ -7,10 +7,17 @@ __all__ = ['MultiComponent', 'Pipeline', 'make_pipeline', 'pipeline_factory', 'P
 # Cell
 import pandas as pd
 import warnings
+from sklearn.utils import Bunch
 
 from .block_types import Component, PandasComponent, SamplingComponent
 from .data_conversion import PandasConverter
 from .utils import PandasIO
+
+# Cell
+def _set_hierarchy_level (component, hierarchy_level):
+    if (not hasattr (component, 'hierarchy_level') or
+           (component.hierarchy_level < hierarchy_level)):
+            component.hierarchy_level = hierarchy_level
 
 # Cell
 class MultiComponent (SamplingComponent):
@@ -79,6 +86,23 @@ class MultiComponent (SamplingComponent):
     def set_components (self, *components):
         self.components = components
         self.finalized_component_list = True
+
+    def gather_descendants (self, hierarchy_level=0):
+        if not hasattr (self, 'allc'):
+            self.allc = Bunch ()
+        if not hasattr (self, 'alln'):
+            self.alln = Bunch ()
+        _set_hierarchy_level (self, hierarchy_level)
+        for component in self.components:
+            self.allc[component.class_name] = component
+            self.alln[component.name] = component
+            if isinstance(component, MultiComponent):
+                component.gather_descendants (hierarchy_level+1)
+                self.allc.update(component.allc)
+                self.alln.update(component.alln)
+            else:
+                _set_hierarchy_level (component, hierarchy_level+1)
+
 
     def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
         """
@@ -373,6 +397,7 @@ class Identity (Component):
     def _apply (self, X):
         return X
 
+# Cell
 def make_column_transformer_pipelines (*transformers, **kwargs):
     pipelines = []
     for name, transformer, columns in transformers:
