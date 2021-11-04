@@ -88,21 +88,36 @@ class MultiComponent (SamplingComponent):
         self.finalized_component_list = True
 
     def gather_descendants (self, hierarchy_level=0):
-        if not hasattr (self, 'allc'):
-            self.allc = Bunch ()
-        if not hasattr (self, 'alln'):
-            self.alln = Bunch ()
+        if not hasattr (self, 'cls'):
+            self.cls = Bunch ()
+        if not hasattr (self, 'obj'):
+            self.obj = Bunch ()
         _set_hierarchy_level (self, hierarchy_level)
         for component in self.components:
-            self.allc[component.class_name] = component
-            self.alln[component.name] = component
+            self._insert_descendant (self.cls, component, component.class_name)
+            self._insert_descendant (self.obj, component, component.name)
             if isinstance(component, MultiComponent):
                 component.gather_descendants (hierarchy_level+1)
-                self.allc.update(component.allc)
-                self.alln.update(component.alln)
+                for name in component.cls:
+                    self._insert_descendant (self.cls, component.cls[name], name)
+                for name in component.obj:
+                    self._insert_descendant (self.obj, component.obj[name], name)
             else:
                 _set_hierarchy_level (component, hierarchy_level+1)
 
+    def _insert_descendant (self, cmp_dict, component, name):
+        if name in cmp_dict:
+            if not isinstance(cmp_dict[name], list):
+                cmp_dict[name] = [cmp_dict[name]]
+            if isinstance(component, list):
+                cmp_dict[name].extend(component)
+            else:
+                cmp_dict[name].append(component)
+        else:
+            if isinstance(component, list):
+                cmp_dict[name] = component.copy()
+            else:
+                cmp_dict[name] = component
 
     def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
         """
