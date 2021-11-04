@@ -52,7 +52,7 @@ class MultiComponent (SamplingComponent):
         self.set_split ('whole')
 
 
-    def register_components (self, *ms):
+    def register_components (self, *components):
         """
         Registering component in `self.components` list.
 
@@ -64,7 +64,7 @@ class MultiComponent (SamplingComponent):
             self.components = []
             self.finalized_component_list = False
         if not self.finalized_component_list:
-            self.components += ms
+            self.components += components
 
     def __setattr__(self, k, v):
         """
@@ -74,6 +74,7 @@ class MultiComponent (SamplingComponent):
 
         if isinstance(v, Component):
             self.register_components(v)
+            v.nick_name = k
 
     def add_component (self, component):
         if not hasattr(self, 'finalized_component_list'):
@@ -83,30 +84,52 @@ class MultiComponent (SamplingComponent):
         self.register_components(component)
         self.finalized_component_list = finalized_component_list
 
+        component.nick_name = component.name
+        if not hasattr(self, component.name):
+            self.__setattr__ (component.name, component)
+
     def set_components (self, *components):
         self.components = components
         self.finalized_component_list = True
+        for component in components:
+            component.nick_name = component.name
+            if not hasattr(self, component.name):
+                self.__setattr__ (component.name, component)
 
-    def gather_descendants (self, hierarchy_level=0, root=''):
+    def clear_descendants (self):
+        self.cls = Bunch ()
+        self.obj = Bunch ()
+        self.full_obj = Bunch ()
+        self.full_cls = Bunch ()
+        for component in self.components:
+            if isinstance(component, MultiComponent):
+                component.clear_descendants ()
+
+    def gather_descendants (self, hierarchy_level=0, root='', nick_name=True):
         if not hasattr (self, 'cls'):
             self.cls = Bunch ()
-        if not hasattr (self, 'obj'):
             self.obj = Bunch ()
-        if not hasattr (self, 'full_obj'):
             self.full_obj = Bunch ()
-        if not hasattr (self, 'full_cls'):
             self.full_cls = Bunch ()
+
         _set_hierarchy_level (self, hierarchy_level)
-        self.hierarchy_path = f'{root}{self.name}'
+        if hasattr(self, 'nick_name'):
+            name = self.nick_name if nick_name else self.name
+        else:
+            name = self.name
+        self.hierarchy_path = f'{root}{name}'
         for component in self.components:
             self._insert_descendant (self.cls, component, component.class_name)
             self._insert_descendant (self.obj, component, component.name)
 
-            component_hierarchy_path = f'{self.hierarchy_path}.{component.name}'
+            name = component.nick_name if nick_name else component.name
+            component_hierarchy_path = f'{self.hierarchy_path}.{name}'
             self._insert_descendant (self.full_cls, component_hierarchy_path, component.class_name)
             self._insert_descendant (self.full_obj, component_hierarchy_path, component.name)
             if isinstance(component, MultiComponent):
-                component.gather_descendants (hierarchy_level+1, f'{self.hierarchy_path}.')
+                component.gather_descendants (hierarchy_level=hierarchy_level+1,
+                                              root=f'{self.hierarchy_path}.',
+                                              nick_name=nick_name)
                 for name in component.cls:
                     self._insert_descendant (self.cls, component.cls[name], name)
                     self._insert_descendant (self.full_cls, component.full_cls[name], name)
