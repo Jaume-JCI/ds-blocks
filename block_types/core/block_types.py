@@ -29,7 +29,7 @@ from .data_conversion import DataConverter, NoConverter, PandasConverter
 from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter
 from .utils import camel_to_snake
-from ..utils.utils import set_logger, replace_attr_and_store
+from ..utils.utils import set_logger, replace_attr_and_store, get_specific_dict_param
 
 # Cell
 
@@ -108,12 +108,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         for multiple components, while parameters specific of one component can be overwritten
         using a dictionary with the name of that component. See example below.
         """
-        if kwargs.get(self.class_name) is not None:
-            k = self.class_name
-        elif kwargs.get(self.name) is not None:
-            k = self.name
-        else:
-            k = None
+        k = get_specific_dict_param (self, **kwargs)
 
         if k is not None:
             config = kwargs.copy()

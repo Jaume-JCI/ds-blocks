@@ -52,6 +52,7 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "remove_previous_results": "utils.utils.ipynb",
          "set_tf_loglevel": "utils.utils.ipynb",
          "argnames": "utils.utils.ipynb",
+         "get_specific_dict_param": "utils.utils.ipynb",
          "obtain_class_specific_attrs": "utils.utils.ipynb",
          "replace_attr_and_store": "utils.utils.ipynb"}
 
