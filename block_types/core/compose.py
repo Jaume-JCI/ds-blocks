@@ -5,6 +5,7 @@ __all__ = ['MultiComponent', 'Pipeline', 'make_pipeline', 'pipeline_factory', 'P
            'MultiSplitComponent']
 
 # Cell
+import warnings
 import pandas as pd
 import warnings
 from sklearn.utils import Bunch
@@ -74,6 +75,9 @@ class MultiComponent (SamplingComponent):
 
         if isinstance(v, Component):
             self.register_components(v)
+            if hasattr(v, 'nick_name'):
+                self.logger.warning (f'{v} already has a nick_name: {v.nick_name}')
+                warnings.warn (f'{v} already has a nick_name: {v.nick_name}')
             v.nick_name = k
 
     def add_component (self, component):
@@ -84,6 +88,9 @@ class MultiComponent (SamplingComponent):
         self.register_components(component)
         self.finalized_component_list = finalized_component_list
 
+        if hasattr(component, 'nick_name'):
+            self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
+            warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
         component.nick_name = component.name
         if not hasattr(self, component.name):
             self.__setattr__ (component.name, component)
@@ -92,6 +99,9 @@ class MultiComponent (SamplingComponent):
         self.components = components
         self.finalized_component_list = True
         for component in components:
+            if hasattr(component, 'nick_name'):
+                self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
+                warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
             component.nick_name = component.name
             if not hasattr(self, component.name):
                 self.__setattr__ (component.name, component)
