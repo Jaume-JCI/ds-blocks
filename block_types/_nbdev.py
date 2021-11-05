@@ -54,6 +54,7 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "argnames": "utils.utils.ipynb",
          "get_specific_dict_param": "utils.utils.ipynb",
          "obtain_class_specific_attrs": "utils.utils.ipynb",
+         "get_hierarchy_level": "utils.utils.ipynb",
          "replace_attr_and_store": "utils.utils.ipynb"}
 
 modules = ["blocks/preprocessing.py",
