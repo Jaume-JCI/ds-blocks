@@ -164,7 +164,8 @@ def obtain_class_specific_attrs (self, **kwargs):
 # Cell
 def get_hierarchy_level (base_class=object):
     stack = inspect.stack()
-    hierarchy_level=-1
+    hierarchy_level=0
+    last_type = None
     for frame_number in range(1, len(stack)):
         fr = sys._getframe(frame_number)
         fr_stack = stack[frame_number]
@@ -174,10 +175,13 @@ def get_hierarchy_level (base_class=object):
         args = argnames(fr, True)
         if len(args) > 0:
             self = fr.f_locals[args[0]]
+            if last_type is None:
+                last_type = type(self)
             if ((fr_stack.function == '__init__') and
                 isinstance(self, base_class) and
-                (fr_stack.code_context[0].find('super().__init__') < 0)):
+                (type(self) != last_type) ):
                 hierarchy_level += 1
+                last_type = type(self)
     return hierarchy_level
 
 # Cell
@@ -201,6 +205,7 @@ def replace_attr_and_store (names=None, but='', store_args=None,
     """
     frame_number=1
     stack = inspect.stack()
+    original_type = None
     while True:
         fr = sys._getframe(frame_number)
         fr_stack = stack[frame_number]
@@ -215,7 +220,10 @@ def replace_attr_and_store (names=None, but='', store_args=None,
                     break
                 if fr_stack.function != '__init__':
                     break
-                if (fr_stack.code_context[0].find('super().__init__') < 0):
+                if original_type is None:
+                    original_type = type(self)
+
+                if type(self) != original_type:
                     break
             else:
                 break
