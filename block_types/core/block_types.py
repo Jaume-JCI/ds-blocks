@@ -27,7 +27,7 @@ except:
 # block_types
 from .data_conversion import DataConverter, NoConverter, PandasConverter
 from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
-from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter
+from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter, Profiler
 from .utils import camel_to_snake
 from ..utils.utils import (set_logger,
                                      replace_attr_and_store,
@@ -105,6 +105,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.model_plotter.set_component (self)
 
+        # profiling computational cost
+        self.profiler = Profiler (self, **kwargs)
+
     def obtain_config_params (self, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
         as the component.
@@ -149,6 +152,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         Uses the previously fitted parameters if they're found in disk and load
         is True.
         """
+        self.profiler.start_timer ()
+
         if split is not None:
             self.original_split = self.data_io.split
             self.set_split (split)
@@ -179,6 +184,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.estimator = previous_estimator
             self.logger.info (f'loaded pre-trained {self.name}')
+
+        self.profiler.finish_timer (method=func, split=self.data_io.split)
 
         if split is not None:
             self.set_split (self.original_split)
@@ -247,7 +254,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         Uses the previously transformed data if it's found in disk and load
         is True.
         """
-
+        self.profiler.start_timer ()
         result_func = self._determine_result_func ()
         result = self._compute_result (X, result_func, load=load, save=save, **kwargs)
         return result
@@ -334,6 +341,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             result = previous_result
             self.logger.info (f'loaded pre-computed result')
 
+        self.profiler.finish_timer ('apply', self.data_io.split)
         if split is not None:
             self.set_split (self.original_split)
 

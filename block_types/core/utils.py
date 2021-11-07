@@ -16,6 +16,7 @@ import pyarrow as pa
 import joblib
 import pickle
 from IPython.display import display
+import time
 
 try:
     from graphviz import *
