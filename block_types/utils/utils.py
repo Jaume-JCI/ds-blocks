@@ -119,7 +119,6 @@ def _store_attr(self, overwrite=False, **attrs):
         if stored is not None: stored[n] = v
 
 # Cell
-
 def get_specific_dict_param (self, **kwargs):
     if (hasattr(self, 'name') and
         kwargs.get(self.name) is not None and
@@ -129,14 +128,16 @@ def get_specific_dict_param (self, **kwargs):
         kwargs.get(self.class_name) is not None and
         isinstance(kwargs[self.class_name], dict)):
         k = self.class_name
-    elif (hasattr(self, 'hierarchy_level') and
-        kwargs.get(f'level_{self.hierarchy_level}') is not None and
-        isinstance(kwargs[f'level_{self.hierarchy_level}'], dict)):
-        k = f'level_{self.hierarchy_level}'
     elif (hasattr(self, 'group') and
         kwargs.get(self.group) is not None and
         isinstance(kwargs[self.group], dict)):
         k = self.group
+    elif (hasattr(self, 'hierarchy_level') and
+        kwargs.get('levels') is not None and
+        isinstance(kwargs['levels'], dict) and
+        'until' in kwargs['levels'] and
+        self.hierarchy_level <= kwargs['levels']['until']):
+        k = 'levels'
     else:
         k = None
 
