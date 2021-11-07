@@ -46,13 +46,6 @@ nb_path: "nbs/core.compose.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
 <div class="output_wrapper">
 <div class="output">
 
@@ -60,7 +53,7 @@ nb_path: "nbs/core.compose.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L24" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L18" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -255,8 +248,6 @@ See `Pipeline` class.</code></pre>
 
 <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span><span class="n">intermediate</span><span class="o">.</span><span class="n">cls</span><span class="p">[</span><span class="n">sorted_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span><span class="o">==</span><span class="p">[</span><span class="n">Component</span><span class="p">,</span><span class="n">Component</span><span class="p">]</span>
 
-<span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">second_intermediate</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">second_component</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">2</span>
-
 <span class="c1"># **********************************************</span>
 <span class="c1"># full hierarchical paths</span>
 <span class="c1"># **********************************************</span>
@@ -334,7 +325,7 @@ See `Pipeline` class.</code></pre>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">Intermediate</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;first_intermediate&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="n">Intermediate</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;second_intermediate&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gather_descendants</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gather_descendants</span><span class="p">(</span><span class="n">nick_name</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">higher</span> <span class="o">=</span> <span class="n">Higher</span><span class="p">()</span>
 
@@ -379,7 +370,6 @@ See `Pipeline` class.</code></pre>
 
 <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span><span class="n">intermediate</span><span class="o">.</span><span class="n">cls</span><span class="p">[</span><span class="n">sorted_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span><span class="o">==</span><span class="p">[</span><span class="n">Component</span><span class="p">,</span><span class="n">Component</span><span class="p">]</span>
 
-<span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">second_intermediate</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">first_intermediate_second_component</span><span class="o">.</span><span class="n">hierarchy_level</span><span class="o">==</span><span class="mi">2</span>
 
 <span class="c1"># **********************************************</span>
 <span class="c1"># full hierarchical paths</span>
@@ -437,6 +427,139 @@ See `Pipeline` class.</code></pre>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Passing-parameters-specific-of-hierarchy-level">Passing parameters specific of hierarchy level<a class="anchor-link" href="#Passing-parameters-specific-of-hierarchy-level"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="k">class</span> <span class="nc">Intermediate</span> <span class="p">(</span><span class="n">MultiComponent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">Component</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;first_component&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="n">Component</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;second_component&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Higher</span> <span class="p">(</span><span class="n">MultiComponent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">Intermediate</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;first_intermediate&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="n">Intermediate</span> <span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;second_intermediate&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gather_descendants</span><span class="p">()</span>
+
+<span class="n">higher</span> <span class="o">=</span> <span class="n">Higher</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">3</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">higher</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">higher</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">6</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="mi">10</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">level</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="mi">10</span>
+<span class="p">)</span>
+<span class="n">higher</span> <span class="o">=</span> <span class="n">Higher</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">level_0</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">5</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">level</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="mi">10</span>
+<span class="p">)</span>
+<span class="n">higher</span> <span class="o">=</span> <span class="n">Higher</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">level_1</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">higher</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">5</span> <span class="ow">and</span> <span class="n">higher</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">10</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Pipeline">Pipeline<a class="anchor-link" href="#Pipeline"> </a></h2>
 </div>
 </div>
@@ -452,7 +575,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L294" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L284" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -570,22 +693,6 @@ on all the components except for the last one)</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[[306212]
- [406212]
- [506212]]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -627,20 +734,6 @@ on all the components except for the last one)</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[3317 4417 5517]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -672,20 +765,6 @@ on all the components except for the last one)</code></pre>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>8
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -725,20 +804,6 @@ on all the components except for the last one)</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>8 2
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -768,20 +833,6 @@ on all the components except for the last one)</code></pre>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>10 3
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -860,21 +911,6 @@ on all the components except for the last one)</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[4.]
-[4.]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -895,7 +931,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L361" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L351" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Create `Pipeline` object of class `cls`, given `components` list.</code></pre>
@@ -937,20 +973,6 @@ on all the components except for the last one)</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>8
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -971,7 +993,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L368" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L358" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
@@ -1016,7 +1038,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L387" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L377" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -1063,7 +1085,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L409" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L399" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1125,7 +1147,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L420" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L410" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1164,7 +1186,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L446" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
+<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L436" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -1207,7 +1229,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L452" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L442" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1246,7 +1268,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L460" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L450" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1270,7 +1292,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L474" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L464" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1334,83 +1356,6 @@ See `Pipeline` class.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cont2</th>
-      <th>cont4</th>
-      <th>cont2_bis</th>
-      <th>cat_1</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>6</td>
-      <td>26</td>
-      <td>10</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>7</td>
-      <td>27</td>
-      <td>12</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>8</td>
-      <td>28</td>
-      <td>14</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>9</td>
-      <td>29</td>
-      <td>16</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>10</td>
-      <td>30</td>
-      <td>18</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -1435,83 +1380,6 @@ See `Pipeline` class.</code></pre>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cont1</th>
-      <th>cont4</th>
-      <th>cont2</th>
-      <th>cat_1</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>26</td>
-      <td>5</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>27</td>
-      <td>6</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>28</td>
-      <td>7</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>29</td>
-      <td>8</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>30</td>
-      <td>9</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -1556,89 +1424,6 @@ See `Pipeline` class.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>c1_times100</th>
-      <th>c2_times100</th>
-      <th>c2_times1000</th>
-      <th>cont2</th>
-      <th>cat_1</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>3505</td>
-      <td>13525</td>
-      <td>135025</td>
-      <td>10</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>3506</td>
-      <td>13526</td>
-      <td>135026</td>
-      <td>12</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3507</td>
-      <td>13527</td>
-      <td>135027</td>
-      <td>14</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>3508</td>
-      <td>13528</td>
-      <td>135028</td>
-      <td>16</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>3509</td>
-      <td>13529</td>
-      <td>135029</td>
-      <td>18</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -1659,7 +1444,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L496" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L486" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -1775,25 +1560,6 @@ See `Pipeline` class.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>validation_data: [[10]
- [20]
- [30]]
-test_data: [[100]
- [200]
- [300]]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -1822,37 +1588,6 @@ test_data: [[100]
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>validation_data: [[10006]
- [20006]
- [30006]]
-test_data: [[100006]
- [200006]
- [300006]]
-validation_data: [[10006]
- [20006]
- [30006]]
-test_data: None
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/anaconda/envs/block_types/lib/python3.7/site-packages/ipykernel_launcher.py:42: UserWarning: split test not found in X keys (dict_keys([&#39;training&#39;, &#39;validation&#39;]))
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 

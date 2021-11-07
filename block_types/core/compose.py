@@ -15,12 +15,6 @@ from .data_conversion import PandasConverter
 from .utils import PandasIO
 
 # Cell
-def _set_hierarchy_level (component, hierarchy_level):
-    if (not hasattr (component, 'hierarchy_level') or
-           (component.hierarchy_level < hierarchy_level)):
-            component.hierarchy_level = hierarchy_level
-
-# Cell
 class MultiComponent (SamplingComponent):
     """
     Component containing a list of components inside.
@@ -115,14 +109,13 @@ class MultiComponent (SamplingComponent):
             if isinstance(component, MultiComponent):
                 component.clear_descendants ()
 
-    def gather_descendants (self, hierarchy_level=0, root='', nick_name=True):
+    def gather_descendants (self, root='', nick_name=True):
         if not hasattr (self, 'cls'):
             self.cls = Bunch ()
             self.obj = Bunch ()
             self.full_obj = Bunch ()
             self.full_cls = Bunch ()
 
-        _set_hierarchy_level (self, hierarchy_level)
         if hasattr(self, 'nick_name'):
             name = self.nick_name if nick_name else self.name
         else:
@@ -137,8 +130,7 @@ class MultiComponent (SamplingComponent):
             self._insert_descendant (self.full_cls, component_hierarchy_path, component.class_name)
             self._insert_descendant (self.full_obj, component_hierarchy_path, component.name)
             if isinstance(component, MultiComponent):
-                component.gather_descendants (hierarchy_level=hierarchy_level+1,
-                                              root=f'{self.hierarchy_path}.',
+                component.gather_descendants (root=f'{self.hierarchy_path}.',
                                               nick_name=nick_name)
                 for name in component.cls:
                     self._insert_descendant (self.cls, component.cls[name], name)
@@ -146,8 +138,6 @@ class MultiComponent (SamplingComponent):
                 for name in component.obj:
                     self._insert_descendant (self.obj, component.obj[name], name)
                     self._insert_descendant (self.full_obj, component.full_obj[name], name)
-            else:
-                _set_hierarchy_level (component, hierarchy_level+1)
 
     def _insert_descendant (self, cmp_dict, component, name):
         if name in cmp_dict:

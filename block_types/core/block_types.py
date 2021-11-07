@@ -29,7 +29,10 @@ from .data_conversion import DataConverter, NoConverter, PandasConverter
 from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter
 from .utils import camel_to_snake
-from ..utils.utils import set_logger, replace_attr_and_store, get_specific_dict_param
+from ..utils.utils import (set_logger,
+                                     replace_attr_and_store,
+                                     get_specific_dict_param,
+                                     get_hierarchy_level)
 
 # Cell
 
@@ -38,6 +41,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def __init__ (self,
                   estimator=None,
                   name: Optional[str] = None,
+                  group: str = 'group_0',
                   data_converter: Optional[DataConverter] = None,
                   data_io: Optional[DataIO] = None,
                   model_plotter: Optional[ModelPlotter] = None,
@@ -71,6 +75,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         # name of current component, for logging and plotting purposes
         self._determine_component_name (name, estimator)
+
+        # obtain hierarchy_level
+        self.hierarchy_level = get_hierarchy_level (base_class=Component)
 
         # store __init__ attrs into `self`
         replace_attr_and_store (base_class=Component, but='name')
