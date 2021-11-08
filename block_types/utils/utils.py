@@ -188,7 +188,9 @@ def get_hierarchy_level (base_class=object):
 # Cell
 def replace_attr_and_store (names=None, but='', store_args=None,
                             recursive=True, base_class=object,
-                            replace_generic_attr=True, **attrs):
+                            replace_generic_attr=True,
+                            overwrite_name=True,
+                            **attrs):
     """
     Replaces generic attributes and stores them into attrs in `self`.
 
@@ -242,6 +244,9 @@ def replace_attr_and_store (names=None, but='', store_args=None,
         if isinstance(but,str): but = re.split(', *', but)
         attrs = {k:v for k,v in attrs.items() if k not in but}
         _store_attr(self, **attrs)
+        if overwrite_name and ('name' in class_specific_attrs or 'class_name' in class_specific_attrs):
+            new_attrs = {k:class_specific_attrs[k] for k in ['name', 'class_name'] if k in class_specific_attrs}
+            _store_attr(self, overwrite=True, **new_attrs)
 
         if not recursive:
             break

@@ -153,6 +153,16 @@ class MultiComponent (SamplingComponent):
             else:
                 cmp_dict[name] = component
 
+    def gather_times (self):
+        dfs = [self.profiler.retrieve_times ()]
+        for component in self.components:
+            if isinstance(component, MultiComponent):
+                dfs.append(component.gather_times ())
+            else:
+                dfs.append(component.profiler.retrieve_times ())
+        dfs = self.profiler.combine_times (dfs)
+        return dfs
+
     def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
         """
         Construct diagram of the pipeline components, data flow and dimensionality.

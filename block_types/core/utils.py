@@ -2,20 +2,22 @@
 
 __all__ = ['save_csv', 'save_parquet', 'save_multi_index_parquet', 'save_keras_model', 'save_csv_gz', 'read_csv',
            'read_csv_gz', 'load_keras_model', 'DataIO', 'PandasIO', 'PickleIO', 'SklearnIO', 'NoSaverIO',
-           'ModelPlotter', 'camel_to_snake']
+           'ModelPlotter', 'Profiler', 'camel_to_snake']
 
 # Cell
 from pathlib import Path
 import re
 from functools import partialmethod
+import time
+import pickle
+from IPython.display import display
 from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
+from sklearn.utils import Bunch
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
 import joblib
-import pickle
-from IPython.display import display
 
 try:
     from graphviz import *
@@ -497,6 +499,58 @@ class ModelPlotter ():
 
     def get_module_path (self):
         return self.diagram_module_path
+
+# Cell
+class Profiler ():
+    def __init__ (self, component, do_profiling=True, **kwargs):
+        self.component = component
+        self.name = component.name
+        if hasattr(component, 'hierarchy_level'):
+            self.hierarchy_level = component.hierarchy_level
+        else:
+            self.hierarchy_level = 0
+        self.do_profiling=do_profiling
+        self.times = Bunch(sum=pd.DataFrame (),
+                          max=pd.DataFrame (),
+                          min=pd.DataFrame (),
+                          number=pd.DataFrame ())
+
+    def start_timer (self):
+        self.time = time.time()
+
+    def finish_timer (self, method, split):
+        if method.startswith('_'):
+            method = method[1:]
+        total_time = time.time() - self.time
+        df=self.times['sum']
+        if method in df.index and split in df.columns:
+            df.loc[method, split] += total_time
+            self.times['number'].loc[method, split] += 1
+            self.times['max'].loc[method, split] = max(self.times['max'].loc[method, split], total_time)
+            self.times['min'].loc[method, split] = min(self.times['min'].loc[method, split], total_time)
+        else:
+            df.loc[method, split] = total_time
+            self.times['number'].loc[method, split] = 1
+            self.times['max'].loc[method, split] = total_time
+            self.times['min'].loc[method, split] = total_time
+    def retrieve_times (self):
+        retrieved_times = Bunch()
+        for k in self.times:
+            df = self.times[k]
+            columns = pd.MultiIndex.from_product([list(df.columns),list(df.index)])
+            index = pd.MultiIndex.from_product([[self.hierarchy_level], [self.name]])
+            df = pd.DataFrame (index=index,
+                               columns = columns, data=df.values.reshape(1,-1))
+            retrieved_times[k] = df
+        retrieved_times['avg'] = retrieved_times['sum'] / retrieved_times['number']
+        return retrieved_times
+
+    def combine_times (self, df_list):
+        df_dict = Bunch()
+        for k in df_list[0].keys():
+            df_dict[k] = pd.concat([x[k] for x in df_list])
+            df_dict[k] = df_dict[k].sort_index()
+        return df_dict
 
 # Cell
 def camel_to_snake (name):
