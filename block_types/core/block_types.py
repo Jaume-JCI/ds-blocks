@@ -25,14 +25,21 @@ except:
     imported_graphviz = False
 
 # block_types
-from .data_conversion import DataConverter, NoConverter, PandasConverter
-from .utils import save_csv, save_parquet, save_multi_index_parquet, save_keras_model, save_csv_gz, read_csv, read_csv_gz
+from .data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
+from .utils import (save_csv,
+                                    save_parquet,
+                                    save_multi_index_parquet,
+                                    save_keras_model,
+                                    save_csv_gz,
+                                    read_csv,
+                                    read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter, Profiler
 from .utils import camel_to_snake
 from ..utils.utils import (set_logger,
                                      replace_attr_and_store,
                                      get_specific_dict_param,
                                      get_hierarchy_level)
+import block_types.config.bt_defaults as dflt
 
 # Cell
 
@@ -46,7 +53,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   data_io: Optional[DataIO] = None,
                   model_plotter: Optional[ModelPlotter] = None,
                   logger=None,
-                  verbose: int = 0,
+                  verbose: int = dflt.verbose,
+                  name_logger:str = dflt.name_logger,
                   **kwargs):
 
         """
@@ -82,8 +90,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # store __init__ attrs into `self`
         replace_attr_and_store (base_class=Component)
 
+        # obtain class-specific kwargs
+        kwargs = self.obtain_config_params (**kwargs)
+
         if self.logger is None:
-            self.logger = set_logger ('block_types', verbose=verbose)
+            self.logger = set_logger (self.name_logger, verbose=self.verbose)
 
         # object that manages loading / saving
         if self.data_io is None:
@@ -95,10 +106,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # data converter
         if self.data_converter is None:
             # TODO: have DataConverter store a reference to component, and use the logger from that reference.
-            self.data_converter = NoConverter (logger=self.logger,
-                                               verbose=self.verbose,
-                                               **kwargs)
-
+            self.data_converter = NoConverter (**kwargs)
+        else:
+            self.data_converter = data_converter_factory (self.data_converter,
+                                                          **kwargs)
         # plotting model component
         if self.model_plotter is None:
             self.model_plotter = ModelPlotter (component=self, **kwargs)
@@ -125,6 +136,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             config.update (config[k])
         else:
             config = kwargs
+
+        config.update(verbose=self.verbose,
+                      logger=self.logger)
 
         return config
 
@@ -412,6 +426,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         estimator = self.data_io.load_estimator ()
         if estimator is not None:
             self.estimator = estimator
+
+    def load_result (self, split=None):
+        return self.data_io.load_result (split=split)
 
     # ********************************
     # setters

@@ -122,11 +122,11 @@ result2io = dict(
     pandas=dict(result_load_func=pd.read_parquet,
                 result_save_func=save_multi_index_parquet,
                 result_file_extension='.parquet'),
-    pickle=dict(fitting_load_func=joblib.load,
-                 fitting_save_func=joblib.dump,
+    pickle=dict(result_load_func=joblib.load,
+                 result_save_func=joblib.dump,
                  result_file_extension='.pk'),
-    default=dict(fitting_load_func=joblib.load,
-                 fitting_save_func=joblib.dump,
+    default=dict(result_load_func=joblib.load,
+                 result_save_func=joblib.dump,
                  result_file_extension='.pk')
 )
 
@@ -293,11 +293,11 @@ class DataIO ():
             self.fitting_save_func = estimator2io[self.estimator_io]['fitting_save_func']
 
         if self.result_file_extension is None:
-            self.result_file_extension = estimator2io[self.result_io]['result_file_extension']
+            self.result_file_extension = result2io[self.result_io]['result_file_extension']
         if self.result_load_func is None:
-            self.result_load_func = estimator2io[self.result_io]['result_load_func']
+            self.result_load_func = result2io[self.result_io]['result_load_func']
         if self.result_save_func is None:
-            self.result_save_func = estimator2io[self.result_io]['result_save_func']
+            self.result_save_func = result2io[self.result_io]['result_save_func']
 
         # configuration for saving / loading fitted estimator
         if self.fitting_file_name is None:
