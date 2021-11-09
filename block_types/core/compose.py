@@ -69,10 +69,13 @@ class MultiComponent (SamplingComponent):
 
         if isinstance(v, Component):
             self.register_components(v)
-            if hasattr(v, 'nick_name'):
-                self.logger.warning (f'{v} already has a nick_name: {v.nick_name}')
-                warnings.warn (f'{v} already has a nick_name: {v.nick_name}')
-            v.nick_name = k
+            if not hasattr(self, v.name):
+                super().__setattr__(v.name, v)
+            if not self.finalized_component_list:
+                if hasattr(v, 'nick_name'):
+                    self.logger.warning (f'{v} already has a nick_name: {v.nick_name}')
+                    warnings.warn (f'{v} already has a nick_name: {v.nick_name}')
+                v.nick_name = k
 
     def add_component (self, component):
         if not hasattr(self, 'finalized_component_list'):
@@ -87,7 +90,7 @@ class MultiComponent (SamplingComponent):
             warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
         component.nick_name = component.name
         if not hasattr(self, component.name):
-            self.__setattr__ (component.name, component)
+            super().__setattr__ (component.name, component)
 
     def set_components (self, *components):
         self.components = components
@@ -98,7 +101,7 @@ class MultiComponent (SamplingComponent):
                 warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
             component.nick_name = component.name
             if not hasattr(self, component.name):
-                self.__setattr__ (component.name, component)
+                super().__setattr__ (component.name, component)
 
     def clear_descendants (self):
         self.cls = Bunch ()
@@ -503,15 +506,6 @@ class MultiSplitComponent (MultiComponent):
                   raise_warning_if_split_doesnot_exist=True,
                   **kwargs):
         super().__init__ (**kwargs)
-        if component is not None:
-            self.set_components (component)
-            self.component = component
-
-        self.fit_to = fit_to
-        self.fit_additional = fit_additional
-        self.apply_to = apply_to
-        self.raise_error_if_split_doesnot_exist=raise_error_if_split_doesnot_exist
-        self.raise_warning_if_split_doesnot_exist=raise_warning_if_split_doesnot_exist
 
     def _fit (self, X, y=None):
         if not isinstance(X, dict):
@@ -535,11 +529,11 @@ class MultiSplitComponent (MultiComponent):
         elif self.raise_warning_if_split_doesnot_exist:
             warnings.warn (message)
 
-    def _apply (self, X, apply_to = None, **kwargs):
+    def _apply (self, X, apply_to = None, output_not_dict=False, split=None, **kwargs):
         apply_to = self.apply_to if apply_to is None else apply_to
         apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
         if not isinstance(X, dict):
-            key = apply_to[0] if len(apply_to)==1 else 'test'
+            key = apply_to[0] if len(apply_to)==1 else split if split is not None else 'test'
             X = {key: X}
             input_not_dict = True
         else:
@@ -555,4 +549,6 @@ class MultiSplitComponent (MultiComponent):
 
         if input_not_dict:
             result = result[key]
+        elif output_not_dict and len(result)==1:
+            result = list(result.items())[0][1]
         return result
