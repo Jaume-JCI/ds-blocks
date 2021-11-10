@@ -17,6 +17,7 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 import joblib
 from IPython.display import display
+from deepdiff import DeepDiff
 
 try:
     from graphviz import *
@@ -33,7 +34,8 @@ from .utils import (save_csv,
                                     save_csv_gz,
                                     read_csv,
                                     read_csv_gz)
-from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO, ModelPlotter, Profiler
+from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
+from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake
 from ..utils.utils import (set_logger,
                                      replace_attr_and_store,
@@ -118,6 +120,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         # profiling computational cost
         self.profiler = Profiler (self, **kwargs)
+
+        # comparing results against other implementations of this component
+        self.comparator = Comparator (self, **kwargs)
 
     def obtain_config_params (self, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
@@ -390,34 +395,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             if callable(getattr(df, 'describe', None)):
                 display (df.describe())
 
-    def assert_equal (self, path_reference_results: str, assert_equal_func=pd.testing.assert_frame_equal, **kwargs):
-        """
-        Check whether the transformed data is the same as the reference data stored in given path.
 
-        Parameters
-        ----------
-        path_reference_results: str
-            Path where reference results are stored. The path does not include the
-            file name, since this is stored as a field of data_io.
-        assert_equal_func: function, optional
-            Function used to check whether the values are the same. By defaut,
-            `pd.testing.assert_frame_equal` is used, which assumes the data type is
-            DataFrame.
-
-        """
-        type_result = 'training' if self.data_io.training_data_flag else 'test'
-        self.logger.info (f'comparing {type_result} results for {self.class_name}')
-
-        self.logger.info (f'loading...')
-        current_results = self.data_io.load_result ()
-        if self.data_io.training_data_flag:
-            path_to_reference_file = Path(path_reference_results) / self.data_io.result_file_name_training
-        else:
-            path_to_reference_file = Path(path_reference_results) / self.data_io.result_file_name_test
-        reference_results = self.data_io._load (path_to_reference_file, self.data_io.result_load_func)
-        self.logger.info (f'comparing...')
-        assert_equal_func (current_results, reference_results, **kwargs)
-        self.logger.info (f'equal results\n')
 
     # ********************************
     # exposing some data_io and data_converters methods
@@ -427,8 +405,12 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if estimator is not None:
             self.estimator = estimator
 
-    def load_result (self, split=None):
-        return self.data_io.load_result (split=split)
+    def load_result (self, split=None, path_results=None):
+        return self.data_io.load_result (split=split, path_results=path_results)
+
+    def assert_equal (self, item1, item2=None, split=None, raise_error=True, **kwargs):
+        return self.comparator.assert_equal (item1, item2=item2, split=split,
+                                             raise_error=raise_error, **kwargs)
 
     # ********************************
     # setters

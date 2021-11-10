@@ -248,13 +248,34 @@ class MultiComponent (SamplingComponent):
 
         return split
 
-    def assert_equal (self, path_reference_results, assert_equal_func=pd.testing.assert_frame_equal, **kwargs):
+    def assert_all_equal (self, path_reference_results, raise_error=False, recursive=True,
+                          max_recursion=None, current_recursion=0, **kwargs):
         """Compare results stored in current run against reference results stored in given path."""
-
+        self.logger.info ('comparing results from this pipeline and reference pipeline')
+        is_equal = True
+        non_equal_components = []
+        end_recursion = max_recursion is not None and current_recursion > max_recursion
         for component in self.components:
-            component.assert_equal (path_reference_results, assert_equal_func=assert_equal_func, **kwargs)
-        self.logger.info ('both pipelines give the same results')
-        print ('both pipelines give the same results')
+            if isinstance(component, MultiComponent) and recursive and not end_recursion:
+                this_equal = component.assert_all_equal (path_reference_results,
+                                                        recursive=recursive,
+                                                        raise_error=raise_error,
+                                                        current_recursion=current_recursion+1,
+                                                        **kwargs)
+            else:
+                this_equal = component.assert_equal (path_reference_results,
+                                                    raise_error=raise_error,
+                                                    **kwargs)
+            if not this_equal:
+                non_equal_components.append(component.name)
+            is_equal = this_equal and is_equal
+
+        if not is_equal:
+            self.logger.warning (f'Results are different in components {non_equal_components}')
+        else:
+            self.logger.info ('both pipelines give the same results')
+
+        return is_equal
 
     def load_estimator (self):
         for component in self.components:

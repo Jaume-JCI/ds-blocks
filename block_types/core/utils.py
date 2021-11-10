@@ -2,7 +2,7 @@
 
 __all__ = ['save_csv', 'save_parquet', 'save_multi_index_parquet', 'save_keras_model', 'save_csv_gz', 'read_csv',
            'read_csv_gz', 'load_keras_model', 'estimator2io', 'result2io', 'DataIO', 'PandasIO', 'PickleIO',
-           'SklearnIO', 'NoSaverIO', 'ModelPlotter', 'Profiler', 'camel_to_snake']
+           'SklearnIO', 'NoSaverIO', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake']
 
 # Cell
 from pathlib import Path
@@ -326,7 +326,7 @@ class DataIO ():
                      self.component)
         self._save (self.path_model_file, self.fitting_save_func, estimator)
 
-    def load_result (self, split=None):
+    def load_result (self, split=None, path_results=None):
         """
         Load transformed data.
 
@@ -334,8 +334,9 @@ class DataIO ():
         otherwise transformed test data is loaded.
         """
         split = self.split if split is None else split
-        if self.path_results is not None:
-            path_result_file = self.path_results / split / self.result_file_name
+        path_results = self.path_results if path_results is None else Path(path_results).resolve()
+        if path_results is not None:
+            path_result_file = path_results / split / self.result_file_name
         else:
             path_result_file = None
         return self._load (path_result_file, self.result_load_func)
@@ -589,6 +590,103 @@ class Profiler ():
             df_dict[k] = pd.concat([x[k] for x in df_list])
             df_dict[k] = df_dict[k].sort_index()
         return df_dict
+
+# Cell
+class Comparator ():
+    def __init__ (self, component, **kwargs):
+        self.component = component
+        self.logger = component.logger
+        self.name = component.name
+        self.data_io = component.data_io
+
+    def compare (self, left, right, message='', rtol=1e-07, atol=0, **kwargs):
+        if not type(left)==type(right):
+            return f'{message}{type(left)}!={type(right)}'
+        if isinstance(left, tuple) or isinstance(left, list):
+            try:
+                left = np.array(left, dtype=float)
+                right = np.array(right, dtype=float)
+            except ValueError:
+                for i, (x, y) in enumerate(zip(left, right)):
+                    result = self.compare (x, y, message + f'[{i}] ', rtol=rtol, atol=atol, **kwargs)
+                    if len(result) > 0:
+                        return result
+                return ''
+        elif isinstance (left, dict):
+            if sorted(left.keys()) != sorted(right.keys()):
+                return f'{message}{sorted(left.keys())}!={sorted(right.keys())}'
+            for k in left:
+                result = self.compare (left[k], right[k], message + f'[{k}] ', rtol=rtol, atol=atol,
+                                       **kwargs)
+                if len(result) > 0:
+                    return result
+            return ''
+
+        if isinstance (left, np.ndarray):
+            try:
+                np.testing.assert_allclose (left, right, rtol=rtol, atol=atol)
+                return ''
+            except AssertionError as e:
+                return message + str(e)
+        elif isinstance (left, pd.DataFrame):
+            try:
+                pd.testing.assert_frame_equal (left, right)
+                return ''
+            except AssertionError as e:
+                return message + str(e)
+        elif isinstance (left, str):
+            if left != right:
+                return message + f'{left}!={right}'
+            else:
+                return ''
+        elif np.isscalar (left) and np.isreal (left):
+            if np.isclose (left, right, rtol=rtol, atol=atol):
+                return ''
+            else:
+                return message + f'{left} not close to {right}'
+        else:
+            if left != right:
+                return message + f'{left}!={right}'
+            else:
+                return ''
+        return ''
+
+    def assert_equal (self, item1, item2=None, split=None, raise_error=True, **kwargs):
+        """
+        Check whether the transformed data is the same as the reference data stored in given path.
+
+        Parameters
+        ----------
+        path_reference_results: str
+            Path where reference results are stored. The path does not include the
+            file name, since this is stored as a field of data_io.
+        assert_equal_func: function, optional
+            Function used to check whether the values are the same. By defaut,
+            `pd.testing.assert_frame_equal` is used, which assumes the data type is
+            DataFrame.
+
+        """
+        self.logger.info (f'comparing results for {self.name}')
+        if item2 is None:
+            item2 = item1
+            self.logger.info (f'loading our results...')
+            item1 = self.data_io.load_result (split=split)
+        elif type(item1) is str:
+            self.logger.info (f'loading others results...')
+            item1 = self.data_io.load_result (split=split, path_results=item1)
+        if type(item2) is str:
+            item2 = self.data_io.load_result (split=split, path_results=item2)
+        difference = self.compare (item1, item2, **kwargs)
+        if len(difference) == 0:
+            self.logger.info (f'Results are equal.\n')
+            if not raise_error:
+                return True
+        else:
+            if raise_error:
+                raise AssertionError (f'Results are different: {difference}')
+            else:
+                self.logger.warning (f'Results are different: {difference}')
+                return False
 
 # Cell
 def camel_to_snake (name):
