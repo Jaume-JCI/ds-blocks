@@ -17,7 +17,6 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 import joblib
 from IPython.display import display
-from deepdiff import DeepDiff
 
 try:
     from graphviz import *
