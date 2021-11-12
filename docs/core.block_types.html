@@ -53,7 +53,7 @@ nb_path: "nbs/core.block_types.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L39" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>group</code></strong>:<code>str</code>=<em><code>'group_0'</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
+<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L48" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>group</code></strong>:<code>str</code>=<em><code>'group_0'</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>name_logger</code></strong>:<code>str</code>=<em><code>'log'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -94,7 +94,10 @@ nb_path: "nbs/core.block_types.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># test obtain_config_params method</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">block_types.config.bt_defaults</span> <span class="k">as</span> <span class="nn">dflt</span>
+
+<span class="c1"># **********************************************************************</span>
+<span class="c1"># test obtain_config_params method</span>
 <span class="c1"># **********************************************************************</span>
 <span class="n">tr</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sky&#39;</span><span class="p">)</span>
 <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">first</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -103,7 +106,8 @@ nb_path: "nbs/core.block_types.ipynb"
               <span class="n">sky</span><span class="o">=</span><span class="nb">dict</span> <span class="p">(</span><span class="n">second</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
              <span class="p">)</span>
 <span class="n">config_r</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">obtain_config_params</span> <span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">config_r</span><span class="o">==</span><span class="p">{</span><span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;third&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;sky&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}}</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">set_logger</span> <span class="p">(</span><span class="n">dflt</span><span class="o">.</span><span class="n">name_logger</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">dflt</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">config_r</span><span class="o">==</span><span class="p">{</span><span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;third&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;sky&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span> <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="n">dflt</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="s1">&#39;logger&#39;</span><span class="p">:</span> <span class="n">logger</span><span class="p">}</span>
 <span class="k">assert</span> <span class="n">config</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;third&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;sky&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;second&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}}</span>
 
 <span class="c1"># **********************************************************************</span>
@@ -770,6 +774,109 @@ applying transform1 (on whole data)
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="assert_equal">assert_equal<a class="anchor-link" href="#assert_equal"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">block_types.utils.utils</span> <span class="kn">import</span> <span class="n">remove_previous_results</span>
+
+<span class="n">path_results</span> <span class="o">=</span> <span class="s1">&#39;assert_equal&#39;</span>
+<span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MyTransform</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">different</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                          <span class="n">result_io</span><span class="o">=</span><span class="s1">&#39;pandas&#39;</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_fit</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="nb">sum</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_generate_noise</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span>
+            <span class="k">if</span> <span class="n">noise</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span><span class="o">/</span><span class="mi">10</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">noise</span>
+        
+    <span class="k">def</span> <span class="nf">_apply</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">],[</span><span class="mf">3.0</span><span class="p">,</span><span class="mf">4.0</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_noise</span> <span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">different</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">+</span><span class="mi">10</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">10.0</span><span class="p">,</span><span class="mf">20.0</span><span class="p">],[</span><span class="mf">30.0</span><span class="p">,</span><span class="mf">40.0</span><span class="p">]])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_noise</span> <span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vector</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)],</span>
+                      <span class="n">array</span><span class="o">=</span><span class="n">x</span><span class="o">+</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    
+<span class="n">tr</span> <span class="o">=</span> <span class="n">MyTransform</span> <span class="p">()</span>
+<span class="n">tr2</span><span class="o">=</span> <span class="n">MyTransform</span> <span class="p">()</span>
+<span class="n">tr</span><span class="o">.</span><span class="n">assert_equal</span> <span class="p">(</span><span class="n">tr</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tr2</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">significant_digits</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">MyTransform</span> <span class="p">(</span><span class="n">noise</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tr2</span><span class="o">=</span> <span class="n">MyTransform</span> <span class="p">(</span><span class="n">noise</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tr</span><span class="o">.</span><span class="n">assert_equal</span> <span class="p">(</span><span class="n">tr</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tr2</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">significant_digits</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    
+<span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">MyTransform</span> <span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">different</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tr2</span><span class="o">=</span> <span class="n">MyTransform</span> <span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">tr</span><span class="o">.</span><span class="n">assert_equal</span> <span class="p">(</span><span class="n">tr</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tr2</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    
+<span class="n">result</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">assert_equal</span> <span class="p">(</span><span class="n">tr</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tr2</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>applying my_transform (on whole data)
+applying my_transform (on whole data)
+comparing results for my_transform
+applying my_transform (on whole data)
+applying my_transform (on whole data)
+comparing results for my_transform
+applying my_transform (on whole data)
+applying my_transform (on whole data)
+comparing results for my_transform
+Results are different: [sequence] [2] [data] DataFrame.iloc[:, 0] (column name=&#34;a&#34;) are different
+
+DataFrame.iloc[:, 0] (column name=&#34;a&#34;) values are different (100.0 %)
+[index]: [0, 1]
+[left]:  [11.000000000015538, 13.000000000015536]
+[right]: [1.0000000000271916, 3.0000000000271916]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SamplingComponent">SamplingComponent<a class="anchor-link" href="#SamplingComponent"> </a></h2>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -781,7 +888,7 @@ applying transform1 (on whole data)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L457" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L452" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -812,23 +919,6 @@ the data and in the labels. See `PandasConverter` class in
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -837,7 +927,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L478" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L473" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -862,23 +952,12 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="NoSaverComponent">NoSaverComponent<a class="anchor-link" href="#NoSaverComponent"> </a></h2>
 </div>
 </div>
-
 </div>
-    {% endraw %}
-
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -890,7 +969,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L503" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L498" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -912,23 +991,12 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="OneClassSklearnComponent">OneClassSklearnComponent<a class="anchor-link" href="#OneClassSklearnComponent"> </a></h2>
 </div>
 </div>
-
 </div>
-    {% endraw %}
-
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -940,7 +1008,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L518" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L513" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -962,23 +1030,12 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="PandasComponent">PandasComponent<a class="anchor-link" href="#PandasComponent"> </a></h2>
 </div>
 </div>
-
 </div>
-    {% endraw %}
-
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -990,7 +1047,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L534" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L529" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -1012,23 +1069,6 @@ conversion performed.</code></pre>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 </div>
     {% endraw %}

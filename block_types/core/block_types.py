@@ -189,14 +189,17 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             if func=='_fit':
                 if len(kwargs) > 0:
                     raise AttributeError (f'kwargs: {kwargs} not valid')
+                self.profiler.start_no_overhead_timer ()
                 self._fit (X, y, **additional_data)
             elif func=='_fit_apply':
                 fit_apply_func = self._determine_fit_apply_func ()
                 assert fit_apply_func is not None, ('object must have _fit_apply method or one of '
                                                     'its aliases implemented when func="_fit_apply"')
+                self.profiler.start_no_overhead_timer ()
                 result = fit_apply_func (X, y=y, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
+            self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
             self.data_converter.convert_after_fitting (X)
             if self.data_io.can_save_model (save):
                 self.data_io.save_estimator ()
@@ -349,10 +352,12 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
             X = self.data_converter.convert_before_transforming (X, **converter_args)
+            self.profiler.start_no_overhead_timer ()
             if type(X) is tuple:
                 result = result_func (*X, **kwargs)
             else:
                 result = result_func (X, **kwargs)
+            self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
             result = self.data_converter.convert_after_transforming (result, **converter_args)
             if self.data_io.can_save_result (save, split):
                 self.data_io.save_result (result, split=split)

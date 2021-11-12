@@ -162,7 +162,7 @@ class MultiComponent (SamplingComponent):
             if isinstance(component, MultiComponent):
                 dfs.append(component.gather_times ())
             else:
-                dfs.append(component.profiler.retrieve_times ())
+                dfs.append(component.profiler.retrieve_times (is_leaf=True))
         dfs = self.profiler.combine_times (dfs)
         return dfs
 

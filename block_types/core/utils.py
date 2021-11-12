@@ -553,26 +553,45 @@ class Profiler ():
                           max=pd.DataFrame (),
                           min=pd.DataFrame (),
                           number=pd.DataFrame ())
+        keys = list(self.times.keys()).copy()
+        for k in keys:
+            self.times[f'novh_{k}']=pd.DataFrame ()
 
     def start_timer (self):
         self.time = time.time()
 
+    def start_no_overhead_timer (self):
+        self.no_overhead_time = time.time()
+
     def finish_timer (self, method, split):
+        self._finish_timer (method, split, suffix='', measured_time=self.time)
+
+    def finish_no_overhead_timer (self, method, split):
+        self._finish_timer (method, split, suffix='novh_', measured_time=self.no_overhead_time)
+
+    def _finish_timer (self, method, split, suffix='', measured_time=None):
         if method.startswith('_'):
             method = method[1:]
-        total_time = time.time() - self.time
-        df=self.times['sum']
+        total_time = time.time() - measured_time
+        df=self.times[f'{suffix}sum']
         if method in df.index and split in df.columns:
             df.loc[method, split] += total_time
-            self.times['number'].loc[method, split] += 1
-            self.times['max'].loc[method, split] = max(self.times['max'].loc[method, split], total_time)
-            self.times['min'].loc[method, split] = min(self.times['min'].loc[method, split], total_time)
+            self.times[f'{suffix}number'].loc[method, split] += 1
+            self.times[f'{suffix}max'].loc[method, split] = max(self.times[f'{suffix}max'].loc[method, split], total_time)
+            self.times[f'{suffix}min'].loc[method, split] = min(self.times[f'{suffix}min'].loc[method, split], total_time)
         else:
             df.loc[method, split] = total_time
-            self.times['number'].loc[method, split] = 1
-            self.times['max'].loc[method, split] = total_time
-            self.times['min'].loc[method, split] = total_time
-    def retrieve_times (self):
+            self.times[f'{suffix}number'].loc[method, split] = 1
+            self.times[f'{suffix}max'].loc[method, split] = total_time
+            self.times[f'{suffix}min'].loc[method, split] = total_time
+
+    def _compute_avg (self, df_sum, df_number):
+        df_avg = df_sum.copy()
+        columns = [c for c in df_avg.columns if c != ('leaf', '')]
+        df_avg[columns] = df_avg[columns] / df_number[columns]
+        return df_avg
+
+    def retrieve_times (self, is_leaf=False):
         retrieved_times = Bunch()
         for k in self.times:
             df = self.times[k]
@@ -580,8 +599,13 @@ class Profiler ():
             index = pd.MultiIndex.from_product([[self.hierarchy_level], [self.name]])
             df = pd.DataFrame (index=index,
                                columns = columns, data=df.values.reshape(1,-1))
+            df['leaf']=is_leaf
             retrieved_times[k] = df
-        retrieved_times['avg'] = retrieved_times['sum'] / retrieved_times['number']
+
+        retrieved_times['avg']= self._compute_avg (retrieved_times['sum'],
+                                                   retrieved_times['number'])
+        retrieved_times['novh_avg']= self._compute_avg (retrieved_times['novh_sum'],
+                                                        retrieved_times['novh_number'])
         return retrieved_times
 
     def combine_times (self, df_list):
@@ -589,6 +613,12 @@ class Profiler ():
         for k in df_list[0].keys():
             df_dict[k] = pd.concat([x[k] for x in df_list])
             df_dict[k] = df_dict[k].sort_index()
+        df_novh_avg = df_dict['novh_avg']
+        df_dict['no_overhead_total'] = df_novh_avg[df_novh_avg.leaf].sum(axis=0)
+
+        df_avg = self.retrieve_times ()['avg']
+        df_dict['overhead_total'] = df_avg -  df_dict['no_overhead_total']
+        df_dict['no_overhead_total'] = df_dict['no_overhead_total'].to_frame().T
         return df_dict
 
 # Cell
