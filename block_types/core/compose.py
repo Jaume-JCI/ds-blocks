@@ -385,7 +385,7 @@ class Pipeline (MultiComponent):
 def make_pipeline(*components, cls=Pipeline, **kwargs):
     """Create `Pipeline` object of class `cls`, given `components` list."""
     pipeline = cls (**kwargs)
-    pipeline.components = list(components)
+    pipeline.set_components(*components)
     return pipeline
 
 # Cell
@@ -433,12 +433,17 @@ class PandasPipeline (Pipeline):
 class ColumnSelector (Component):
     def __init__ (self,
                   columns=[],
+                  remainder=False,
                   **kwargs):
         super().__init__ (**kwargs)
         self.columns = columns
+        self.remainder = remainder
 
     def _apply (self, df):
-        return df[self.columns]
+        if self.remainder:
+            return df[[c for c in df.columns if c not in self.columns]]
+        else:
+            return df[self.columns]
 
 # Cell
 class Concat (Component):
@@ -454,23 +459,34 @@ class _BaseColumnTransformer (MultiComponent):
     def __init__ (self, **kwargs):
         super().__init__ (**kwargs)
         self.concat = Concat (**kwargs)
+        del self.concat.nick_name
+
+    def set_components (self, *components):
+        components = list(components)
+        components.append (self.concat)
+        super().set_components (*components)
 
     def _fit (self, df, y=None):
-        for component in self.components:
+        assert len(self.components) > 0
+        assert self.components[-1] is self.concat
+        for component in self.components[:-1]:
             component.fit (df)
         return self
 
     def _apply (self, df):
         dfs = []
-        for component in self.components:
+        assert len(self.components) > 0
+        assert self.components[-1] is self.concat
+        for component in self.components[:-1]:
             dfs.append (component.transform (df))
         df_result = self.concat.transform (*dfs)
         return df_result
 
 class ColumnTransformer (_BaseColumnTransformer):
-    def __init__ (self, *transformers, **kwargs):
-        self.components = make_column_transformer_pipelines (*transformers, **kwargs)
+    def __init__ (self, *transformers, remainder = 'drop', **kwargs):
         super().__init__ (**kwargs)
+        components = make_column_transformer_pipelines (*transformers, remainder=remainder, **kwargs)
+        super().set_components(*components)
 
 # Cell
 class Identity (Component):
@@ -481,38 +497,65 @@ class Identity (Component):
         return X
 
 # Cell
-def make_column_transformer_pipelines (*transformers, **kwargs):
-    pipelines = []
-    for name, transformer, columns in transformers:
-        if (type(transformer) is str) and transformer == 'passthrough':
+def _append_pipeline (pipelines, name, transformer, columns, remainder= False, **kwargs):
+    drop = False
+    if isinstance(transformer, str):
+        if transformer == 'passthrough':
             transformer = Identity (**kwargs)
-        pipeline = make_pipeline(ColumnSelector(columns, **kwargs),
+        elif transformer == 'drop':
+            drop = True
+        else:
+            raise ValueError (f'name {transformer} not recognized')
+
+    if not drop:
+        pipeline = make_pipeline(ColumnSelector(columns, remainder=remainder, **kwargs),
                                  transformer,
                                  name = name,
                                  **kwargs)
         pipelines.append (pipeline)
 
+def _get_transformer_name (transformer, columns):
+    columns_name = ''.join([x[0] for x in columns])
+    if len(columns_name) > 5:
+        columns_name = columns_name[:5]
+    if isinstance(transformer,str):
+        if transformer == 'passthrough':
+            transformer_name = 'pass'
+        elif transformer == 'drop':
+            transformer_name = 'drop'
+        else:
+            raise ValueError (f'name {transformer} not recognized')
+    elif hasattr(transformer, 'name'):
+        transformer_name = transformer.name
+    else:
+        transformer_name = transformer.__class__.__name__
+    name = f'{transformer_name}_{columns_name}'
+    return name
+
+def make_column_transformer_pipelines (*transformers, remainder='drop', **kwargs):
+    pipelines = []
+    all_columns = []
+    for name, transformer, columns in transformers:
+        _append_pipeline (pipelines, name, transformer, columns, **kwargs)
+        all_columns.extend(columns)
+
+    all_columns = list(set(all_columns))
+    name = _get_transformer_name (remainder, ['r','e','m'])
+    _append_pipeline (pipelines, name, remainder, all_columns, remainder=True, **kwargs)
+
     return pipelines
 
-
-def make_column_transformer (*transformers, **kwargs):
+def make_column_transformer (*transformers, remainder='drop', **kwargs):
     transformers_with_name = []
     for transformer, columns in transformers:
-        columns_name = ''.join([x[0] for x in columns])
-        if len(columns_name) > 5:
-            columns_name = columns_name[:5]
-        if (type(transformer) is str) and transformer == 'passthrough':
-            transformer_name = 'pass'
-        elif hasattr(transformer, 'name'):
-            transformer_name = transformer.name
-        else:
-            transformer_name = transformer.__class__.__name__
-        name = f'{transformer_name}_{columns_name}'
+        name = _get_transformer_name (transformer, columns)
         transformers_with_name.append ((name, transformer, columns))
 
-    pipelines = make_column_transformer_pipelines (*transformers_with_name, **kwargs)
+    pipelines = make_column_transformer_pipelines (*transformers_with_name,
+                                                   remainder=remainder,
+                                                   **kwargs)
     column_transformer = _BaseColumnTransformer ()
-    column_transformer.components = pipelines
+    column_transformer.set_components(*pipelines)
     return column_transformer
 
 
