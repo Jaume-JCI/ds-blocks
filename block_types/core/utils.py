@@ -209,7 +209,7 @@ class DataIO ():
             self._initial_kwargs = kwargs
 
     def _init (self,
-               path_results=dflt.path_results,
+               path_models=None,
                fitting_file_name=None,
                fitting_file_extension=None,
                fitting_load_func=None,
@@ -218,6 +218,7 @@ class DataIO ():
                load_model=True,
                save_model=True,
 
+               path_results=dflt.path_results,
                result_file_extension=None,
                result_file_name=None,
                result_load_func=None,
@@ -232,6 +233,7 @@ class DataIO ():
                split='whole',
                **kwargs):
 
+        self.path_models = path_models
         self.path_results = path_results
 
         # saving / loading estimator parameters
@@ -309,7 +311,14 @@ class DataIO ():
 
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
-            self.path_model_file = self.path_results / 'models' / self.fitting_file_name
+
+        if self.path_models is None:
+            self.path_models = self.path_results
+        else:
+            self.path_models = Path(self.path_models).resolve()
+
+        if self.path_models is not None:
+            self.path_model_file = self.path_models / 'models' / self.fitting_file_name
         else:
             self.path_model_file = None
 

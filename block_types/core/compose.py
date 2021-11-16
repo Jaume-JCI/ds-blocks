@@ -23,7 +23,10 @@ class MultiComponent (SamplingComponent):
 
     See `Pipeline` class.
     """
-    def __init__ (self, separate_labels = False, **kwargs):
+    def __init__ (self,
+                  separate_labels=False,
+                  warning_if_nick_name_exists=False,
+                  **kwargs):
         """Assigns attributes and calls parent constructor.
 
         Parameters
@@ -72,7 +75,7 @@ class MultiComponent (SamplingComponent):
             if not hasattr(self, v.name):
                 super().__setattr__(v.name, v)
             if not self.finalized_component_list:
-                if hasattr(v, 'nick_name'):
+                if hasattr(v, 'nick_name') and self.warning_if_nick_name_exists:
                     self.logger.warning (f'{v} already has a nick_name: {v.nick_name}')
                     warnings.warn (f'{v} already has a nick_name: {v.nick_name}')
                 v.nick_name = k
@@ -85,7 +88,7 @@ class MultiComponent (SamplingComponent):
         self.register_components(component)
         self.finalized_component_list = finalized_component_list
 
-        if hasattr(component, 'nick_name'):
+        if hasattr(component, 'nick_name') and self.warning_if_nick_name_exists:
             self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
             warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
         component.nick_name = component.name
@@ -96,7 +99,7 @@ class MultiComponent (SamplingComponent):
         self.components = components
         self.finalized_component_list = True
         for component in components:
-            if hasattr(component, 'nick_name'):
+            if hasattr(component, 'nick_name') and self.warning_if_nick_name_exists:
                 self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
                 warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
             component.nick_name = component.name
