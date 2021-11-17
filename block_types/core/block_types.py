@@ -103,6 +103,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         else:
             self.data_io = copy.copy(self.data_io)
             self.data_io.setup (self)
+        self.path_results = self.data_io.path_results
+        self.path_models = self.data_io.path_models
 
         # data converter
         if self.data_converter is None:
