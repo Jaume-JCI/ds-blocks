@@ -330,10 +330,8 @@ class DataIO ():
 
     def save_estimator (self):
         """Save estimator parameters."""
-        estimator = (self.component.estimator if
-                     (self.component.estimator is not None) else
-                     self.component)
-        self._save (self.path_model_file, self.fitting_save_func, estimator)
+        if self.component.estimator is not None:
+            self._save (self.path_model_file, self.fitting_save_func, self.component.estimator)
 
     def load_result (self, split=None, path_results=None):
         """
@@ -389,7 +387,7 @@ class DataIO ():
 
     def _save (self, path, save_func, item):
         if (path is not None) and (save_func is not None):
-            self.component.logger.debug (f'saving to {path}')
+            self.component.logger.info (f'saving to {path}')
             # create parent directory if it does not exist
             path.parent.mkdir(parents=True, exist_ok=True)
             # save data using save_func

@@ -11,6 +11,7 @@ import pickle
 from pathlib import Path
 
 from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
+from sklearn.utils import Bunch
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
@@ -163,6 +164,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.name = name
         else:
             self.name = camel_to_snake (self.class_name)
+
+    def create_estimator (self, **kwargs):
+        self.estimator = Bunch(**kwargs)
 
     def fit_like (self, X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None, **kwargs):
