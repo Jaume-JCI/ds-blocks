@@ -193,7 +193,8 @@ def get_hierarchy_level (base_class=object):
 def replace_attr_and_store (names=None, but='', store_args=None,
                             recursive=True, base_class=object,
                             replace_generic_attr=True,
-                            overwrite_name=True,
+                            overwrite_name=True, self=None,
+                            include_first=False,
                             **attrs):
     """
     Replaces generic attributes and stores them into attrs in `self`.
@@ -234,6 +235,14 @@ def replace_attr_and_store (names=None, but='', store_args=None,
                     break
             else:
                 break
+        else:
+            if self is not None:
+                if include_first:
+                    args = [self] + list(args)
+            elif len(args) > 0:
+                self = fr.f_locals[args[0]]
+            else:
+                raise RuntimeError ('self not found')
 
         if store_args is None: store_args = not hasattr(self,'__slots__')
         if store_args and not hasattr(self, '__stored_args__'): self.__stored_args__ = {}
