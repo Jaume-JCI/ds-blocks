@@ -28,7 +28,7 @@ except:
 # block_types
 from .data_conversion import PandasConverter
 from ..config import bt_defaults as dflt
-from ..utils.utils import set_logger
+from ..utils.utils import set_logger, get_logging_level
 
 # Cell
 def save_csv (df, path, **kwargs):
@@ -636,6 +636,12 @@ class Comparator ():
         self.name = component.name
         self.data_io = component.data_io
 
+    def compare_objects (self, left, right, message='', **kwargs):
+        if left != right:
+            return message + f'{left}!={right}'
+        else:
+            return ''
+
     def compare (self, left, right, message='', rtol=1e-07, atol=0, **kwargs):
         if not type(left)==type(right):
             return f'{message}{type(left)}!={type(right)}'
@@ -643,7 +649,7 @@ class Comparator ():
             try:
                 left = np.array(left, dtype=float)
                 right = np.array(right, dtype=float)
-            except ValueError:
+            except:
                 for i, (x, y) in enumerate(zip(left, right)):
                     result = self.compare (x, y, message + f'[{i}] ', rtol=rtol, atol=atol, **kwargs)
                     if len(result) > 0:
@@ -682,13 +688,11 @@ class Comparator ():
             else:
                 return message + f'{left} not close to {right}'
         else:
-            if left != right:
-                return message + f'{left}!={right}'
-            else:
-                return ''
+            return self.compare_objects (left, right, message=message, rtol=1e-07, atol=0, **kwargs)
         return ''
 
-    def assert_equal (self, item1, item2=None, split=None, raise_error=True, **kwargs):
+    def assert_equal (self, item1, item2=None, split=None, raise_error=True, verbose=None,
+                      **kwargs):
         """
         Check whether the transformed data is the same as the reference data stored in given path.
 
@@ -703,6 +707,8 @@ class Comparator ():
             DataFrame.
 
         """
+        if verbose is not None:
+            self.logger.setLevel(get_logging_level (verbose))
         self.logger.info (f'comparing results for {self.name}')
         if item2 is None:
             item2 = item1
@@ -717,12 +723,16 @@ class Comparator ():
         if len(difference) == 0:
             self.logger.info (f'Results are equal.\n')
             if not raise_error:
+                if verbose is not None:
+                    self.logger.setLevel(get_logging_level (self.component.verbose))
                 return True
         else:
             if raise_error:
-                raise AssertionError (f'Results are different: {difference}')
+                raise AssertionError (f'Component {self.name} => results are different: {difference}')
             else:
-                self.logger.warning (f'Results are different: {difference}')
+                self.logger.warning (f'Component {self.name} => results are different: {difference}')
+                if verbose is not None:
+                    self.logger.setLevel(get_logging_level (self.component.verbose))
                 return False
 
 # Cell

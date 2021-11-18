@@ -54,6 +54,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   data_converter: Optional[DataConverter] = None,
                   data_io: Optional[DataIO] = None,
                   model_plotter: Optional[ModelPlotter] = None,
+                  profiler: Optional[Profiler] = None,
+                  comparator: Optional[Comparator] = None,
                   logger=None,
                   verbose: int = dflt.verbose,
                   name_logger:str = dflt.name_logger,
@@ -121,10 +123,12 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.model_plotter.set_component (self)
 
         # profiling computational cost
-        self.profiler = Profiler (self, **kwargs)
+        if self.profiler is None:
+            self.profiler = Profiler (self, **kwargs)
 
         # comparing results against other implementations of this component
-        self.comparator = Comparator (self, **kwargs)
+        if self.comparator is None:
+            self.comparator = Comparator (self, **kwargs)
 
     def obtain_config_params (self, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name

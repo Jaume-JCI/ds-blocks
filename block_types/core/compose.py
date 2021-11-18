@@ -258,17 +258,20 @@ class MultiComponent (SamplingComponent):
         is_equal = True
         non_equal_components = []
         end_recursion = max_recursion is not None and current_recursion > max_recursion
+        if end_recursion:
+            return True
         for component in self.components:
             if isinstance(component, MultiComponent) and recursive and not end_recursion:
                 this_equal = component.assert_all_equal (path_reference_results,
-                                                        recursive=recursive,
-                                                        raise_error=raise_error,
-                                                        current_recursion=current_recursion+1,
-                                                        **kwargs)
+                                                         raise_error=raise_error,
+                                                         recursive=recursive,
+                                                         max_recursion=max_recursion,
+                                                         current_recursion=current_recursion+1,
+                                                         **kwargs)
             else:
                 this_equal = component.assert_equal (path_reference_results,
-                                                    raise_error=raise_error,
-                                                    **kwargs)
+                                                     raise_error=raise_error,
+                                                     **kwargs)
             if not this_equal:
                 non_equal_components.append(component.name)
             is_equal = this_equal and is_equal

@@ -682,46 +682,46 @@ See `Pipeline` class.</code></pre>
     <tr>
       <th>0</th>
       <th>higher</th>
-      <td>0.213450</td>
-      <td>0.109648</td>
+      <td>0.214162</td>
+      <td>0.111120</td>
       <td>False</td>
     </tr>
     <tr>
       <th rowspan="2" valign="top">1</th>
       <th>first</th>
-      <td>0.101376</td>
-      <td>0.051557</td>
+      <td>0.100405</td>
+      <td>0.052275</td>
       <td>False</td>
     </tr>
     <tr>
       <th>second</th>
-      <td>0.100301</td>
-      <td>0.051458</td>
+      <td>0.101129</td>
+      <td>0.051703</td>
       <td>False</td>
     </tr>
     <tr>
       <th rowspan="4" valign="top">2</th>
       <th>first_first_component</th>
-      <td>0.024377</td>
-      <td>0.012383</td>
+      <td>0.024314</td>
+      <td>0.012563</td>
       <td>True</td>
     </tr>
     <tr>
       <th>first_second_component</th>
-      <td>0.064911</td>
-      <td>0.032541</td>
+      <td>0.064153</td>
+      <td>0.032531</td>
       <td>True</td>
     </tr>
     <tr>
       <th>second_first_component</th>
-      <td>0.024092</td>
-      <td>0.012347</td>
+      <td>0.024329</td>
+      <td>0.012404</td>
       <td>True</td>
     </tr>
     <tr>
       <th>second_second_component</th>
-      <td>0.064172</td>
-      <td>0.032378</td>
+      <td>0.064277</td>
+      <td>0.032419</td>
       <td>True</td>
     </tr>
   </tbody>
@@ -776,8 +776,8 @@ See `Pipeline` class.</code></pre>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.160389</td>
-      <td>0.080303</td>
+      <td>0.160339</td>
+      <td>0.08031</td>
       <td>4.0</td>
     </tr>
   </tbody>
@@ -835,8 +835,8 @@ See `Pipeline` class.</code></pre>
     <tr>
       <th>0</th>
       <th>higher</th>
-      <td>0.053061</td>
-      <td>0.029345</td>
+      <td>0.053823</td>
+      <td>0.030809</td>
       <td>-4.0</td>
     </tr>
   </tbody>
@@ -905,6 +905,24 @@ See `Pipeline` class.</code></pre>
 <span class="n">result2</span> <span class="o">=</span> <span class="n">composition2</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="k">assert</span> <span class="ow">not</span> <span class="n">composition1</span><span class="o">.</span><span class="n">assert_all_equal</span> <span class="p">(</span><span class="n">path_results2</span><span class="p">)</span>
 
+<span class="c1"># *************************</span>
+<span class="c1"># check verbosity</span>
+<span class="c1"># *************************</span>
+<span class="n">composition1</span> <span class="o">=</span> <span class="n">NewComposition</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">******************************&#39;</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;******************************&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="n">composition1</span><span class="o">.</span><span class="n">assert_all_equal</span> <span class="p">(</span><span class="n">path_results2</span><span class="p">)</span>
+
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">******************************&#39;</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;not verbose&#39;</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;******************************&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="n">composition1</span><span class="o">.</span><span class="n">assert_all_equal</span> <span class="p">(</span><span class="n">path_results2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">composition1</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span> <span class="p">(</span><span class="s1">&#39;logger works again&#39;</span><span class="p">)</span>
+
+<span class="c1"># *************************</span>
+<span class="c1"># remove results</span>
+<span class="c1"># *************************</span>
 <span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
 <span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results2</span><span class="p">)</span>
 </pre></div>
@@ -919,7 +937,7 @@ See `Pipeline` class.</code></pre>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Results are different: 
+<pre>Component tr1 =&gt; results are different: 
 Not equal to tolerance rtol=1e-07, atol=0
 
 Mismatched elements: 3 / 3 (100%)
@@ -928,6 +946,45 @@ Max relative difference: 0.03225806
  x: array([3, 6, 9])
  y: array([3.1, 6.1, 9.1])
 Results are different in components [&#39;tr1&#39;]
+
+******************************
+verbose
+******************************
+comparing results from this pipeline and reference pipeline
+comparing results for tr1
+loading our results...
+loading from /home/jcidatascience/jaume/workspace/remote/block-types/multi_component_assert_equal/whole/tr1_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/block-types/multi_component_assert_equal_2/whole/tr1_result.pk
+Component tr1 =&gt; results are different: 
+Not equal to tolerance rtol=1e-07, atol=0
+
+Mismatched elements: 3 / 3 (100%)
+Max absolute difference: 0.1
+Max relative difference: 0.03225806
+ x: array([3, 6, 9])
+ y: array([3.1, 6.1, 9.1])
+comparing results for tr2
+loading our results...
+loading from /home/jcidatascience/jaume/workspace/remote/block-types/multi_component_assert_equal/whole/tr2_result.pk
+loading from /home/jcidatascience/jaume/workspace/remote/block-types/multi_component_assert_equal_2/whole/tr2_result.pk
+Results are equal.
+
+Results are different in components [&#39;tr1&#39;]
+
+******************************
+not verbose
+******************************
+comparing results from this pipeline and reference pipeline
+Component tr1 =&gt; results are different: 
+Not equal to tolerance rtol=1e-07, atol=0
+
+Mismatched elements: 3 / 3 (100%)
+Max absolute difference: 0.1
+Max relative difference: 0.03225806
+ x: array([3, 6, 9])
+ y: array([3.1, 6.1, 9.1])
+Results are different in components [&#39;tr1&#39;]
+logger works again
 </pre>
 </div>
 </div>
@@ -955,7 +1012,7 @@ Results are different in components [&#39;tr1&#39;]
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L321" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L324" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -1398,7 +1455,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L388" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L391" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Create `Pipeline` object of class `cls`, given `components` list.</code></pre>
@@ -1474,7 +1531,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L395" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L398" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
@@ -1519,7 +1576,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L414" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L417" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -1566,7 +1623,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L436" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong><code>remainder</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L439" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong><code>remainder</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1628,7 +1685,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L452" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L455" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1667,7 +1724,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L488" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
+<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L491" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -1710,7 +1767,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L495" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L498" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -1749,7 +1806,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L538" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L541" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1773,7 +1830,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L551" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L554" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -2546,7 +2603,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L566" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/compose.py#L569" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
