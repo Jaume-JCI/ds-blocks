@@ -254,6 +254,8 @@ def replace_attr_and_store (names=None, but='', store_args=None,
         if replace_generic_attr and 'kwargs' in fr.f_locals:
             class_specific_attrs = obtain_class_specific_attrs (self, **fr.f_locals['kwargs'])
             attrs.update(class_specific_attrs)
+        else:
+            class_specific_attrs={}
         if isinstance(but,str): but = re.split(', *', but)
         attrs = {k:v for k,v in attrs.items() if k not in but}
         _store_attr(self, **attrs)
