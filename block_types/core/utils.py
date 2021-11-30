@@ -2,7 +2,7 @@
 
 __all__ = ['save_csv', 'save_parquet', 'save_multi_index_parquet', 'save_keras_model', 'save_csv_gz', 'read_csv',
            'read_csv_gz', 'load_keras_model', 'estimator2io', 'result2io', 'DataIO', 'PandasIO', 'PickleIO',
-           'SklearnIO', 'NoSaverIO', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake']
+           'SklearnIO', 'NoSaverIO', 'data_io_factory', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake']
 
 # Cell
 from pathlib import Path
@@ -18,6 +18,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
 import joblib
+import copy
 
 try:
     from graphviz import *
@@ -407,11 +408,24 @@ class DataIO ():
 
     def set_path_results (self, path_results):
         self.path_results = path_results
-        self.path_result_file_training, self.path_model_file, self.path_result_file_test = None, None, None
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
-            if self.fitting_file_name is not None:
-                self.path_model_file = self.path_results / 'models' / self.fitting_file_name
+            if self.path_models is None:
+                self.set_path_models (path_results)
+        self.component.path_results = path_results
+
+    def set_path_models (self, path_models):
+        self.path_models = path_models
+        if self.path_models is not None:
+            self.path_models = Path(self.path_models).resolve()
+        else:
+            self.path_models = path_results
+        if self.path_models is not None and self.fitting_file_name is not None:
+            self.path_model_file = self.path_models / 'models' / self.fitting_file_name
+        else:
+            self.path_model_file = None
+        self.component.path_models = path_models
+
 
     # global saving and loading
     def set_save (self, save):
@@ -492,11 +506,28 @@ class NoSaverIO (DataIO):
     def __init__ (self,
                   load=False,
                   save=False,
+                  force_load=False,
+                  force_save=False,
                   **kwargs):
-
-        super().__init__ (load=load,
-                          save=save,
+        super().__init__ (load=force_load if force_load else False,
+                          save=force_save if force_save else False,
                           **kwargs)
+
+# Cell
+def data_io_factory (data_io, component=None, **kwargs):
+    if type(data_io) is str:
+        cls = eval(data_io)
+    elif type(data_io) is type:
+        cls = data_io
+    elif isinstance (data_io, DataIO):
+        data_io = copy.copy(data_io)
+        data_io.setup (component=component)
+        return data_io
+    else:
+        raise ValueError (f'invalid converter {data_io}, must be str, '
+                           'class or object instance of DataIO')
+    data_io = cls(component=component, **kwargs)
+    return data_io
 
 # Cell
 class ModelPlotter ():

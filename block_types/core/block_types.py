@@ -35,6 +35,7 @@ from .utils import (save_csv,
                                     read_csv,
                                     read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
+from .utils import data_io_factory
 from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake
 from ..utils.utils import (set_logger,
@@ -50,6 +51,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     def __init__ (self,
                   estimator=None,
                   name: Optional[str] = None,
+                  class_name: Optional[str] = None,
                   group: str = 'group_0',
                   data_converter: Optional[DataConverter] = None,
                   data_io: Optional[DataIO] = None,
@@ -86,7 +88,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         """
 
         # name of current component, for logging and plotting purposes
-        self._determine_component_name (name, estimator)
+        self._determine_component_name (name, estimator, class_name=class_name)
 
         # obtain hierarchy_level
         self.hierarchy_level = get_hierarchy_level (base_class=Component)
@@ -104,8 +106,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if self.data_io is None:
             self.data_io = DataIO (component=self, **kwargs)
         else:
-            self.data_io = copy.copy(self.data_io)
-            self.data_io.setup (self)
+            if 'data_io' in kwargs:
+                del kwargs['data_io']
+            self.data_io = data_io_factory (self.data_io, component=self, **kwargs)
+
         self.path_results = self.data_io.path_results
         self.path_models = self.data_io.path_models
 
@@ -114,6 +118,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             # TODO: have DataConverter store a reference to component, and use the logger from that reference.
             self.data_converter = NoConverter (**kwargs)
         else:
+            if 'data_converter' in kwargs:
+                del kwargs['data_converter']
             self.data_converter = data_converter_factory (self.data_converter,
                                                           **kwargs)
         # plotting model component
@@ -153,16 +159,19 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         return config
 
-    def _determine_component_name (self, name: Optional[str], estimator) -> None:
+    def _determine_component_name (self, name: str, estimator, class_name:Optional[str]=None) -> None:
         """
         Determines an appropriate name for the component if not provided by input.
 
         If not provided, it is inferred from the name of the estimator's class, or
         the name of the custom class defining the componet.
         """
-        self.class_name = self.__class__.__name__
-        if (self.class_name in __all__) and (estimator is not None):
-            self.class_name = estimator.__class__.__name__
+        if class_name is not None:
+            self.class_name = class_name
+        else:
+            self.class_name = self.__class__.__name__
+            if (self.class_name in __all__) and (estimator is not None):
+                self.class_name = estimator.__class__.__name__
 
         if name is not None:
             self.name = name
@@ -352,7 +361,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.original_split = self.data_io.split
             self.set_split (split)
 
-        self.logger.info (f'applying {self.name} (on {self.data_io.split} data)')
+        self.logger.debug (f'applying {self.name} (on {self.data_io.split} data)')
 
         if len(X) == 1:
             X = X[0]
@@ -508,15 +517,15 @@ class NoSaverComponent (Component):
     """Component that does not save any data."""
     def __init__ (self,
                   estimator=None,
-                  data_io=None,
+                  data_io=NoSaverIO,
                   **kwargs):
-
-        if data_io is None:
-            data_io = NoSaverIO (**kwargs)
 
         super().__init__ (estimator=estimator,
                           data_io=data_io,
                           **kwargs)
+
+        if not isinstance(self.data_io, NoSaverIO):
+            self.logger.warning ('NoSaverComponent has DataIO != NoSaverIO')
 
 # Cell
 class OneClassSklearnComponent (SklearnComponent):

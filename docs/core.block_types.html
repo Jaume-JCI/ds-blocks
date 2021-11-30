@@ -53,7 +53,7 @@ nb_path: "nbs/core.block_types.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L48" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>group</code></strong>:<code>str</code>=<em><code>'group_0'</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>profiler</code></strong>:<code>Optional</code>[<a href="/core.utils.html#Profiler"><code>Profiler</code></a>]=<em><code>None</code></em>, <strong><code>comparator</code></strong>:<code>Optional</code>[<a href="/core.utils.html#Comparator"><code>Comparator</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>name_logger</code></strong>:<code>str</code>=<em><code>'log'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
+<h2 id="Component" class="doc_header"><code>class</code> <code>Component</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L49" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Component</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>class_name</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>group</code></strong>:<code>str</code>=<em><code>'group_0'</code></em>, <strong><code>data_converter</code></strong>:<code>Optional</code>[<a href="/core.data_conversion.html#DataConverter"><code>DataConverter</code></a>]=<em><code>None</code></em>, <strong><code>data_io</code></strong>:<code>Optional</code>[<a href="/core.utils.html#DataIO"><code>DataIO</code></a>]=<em><code>None</code></em>, <strong><code>model_plotter</code></strong>:<code>Optional</code>[<a href="/core.utils.html#ModelPlotter"><code>ModelPlotter</code></a>]=<em><code>None</code></em>, <strong><code>profiler</code></strong>:<code>Optional</code>[<a href="/core.utils.html#Profiler"><code>Profiler</code></a>]=<em><code>None</code></em>, <strong><code>comparator</code></strong>:<code>Optional</code>[<a href="/core.utils.html#Comparator"><code>Comparator</code></a>]=<em><code>None</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>name_logger</code></strong>:<code>str</code>=<em><code>'log'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>ClassifierMixin</code></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -161,6 +161,12 @@ nb_path: "nbs/core.block_types.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="recursively-storing-attrs-across-class-hierarchy">recursively storing attrs across class hierarchy<a class="anchor-link" href="#recursively-storing-attrs-across-class-hierarchy"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -187,6 +193,17 @@ nb_path: "nbs/core.block_types.ipynb"
 <span class="c1"># does not work</span>
 <span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">Intermediate</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">7</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">Intermediate</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Final</span> <span class="p">(</span><span class="n">Intermediate</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group_1&#39;</span><span class="p">,</span> <span class="n">group_1</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span><span class="mi">60</span><span class="p">})</span>
+<span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">9</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">60</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -203,19 +220,39 @@ nb_path: "nbs/core.block_types.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Intermediate</span> <span class="p">(</span><span class="n">Component</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">Final</span> <span class="p">(</span><span class="n">Intermediate</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span> <span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="n">o</span> <span class="o">=</span> <span class="n">Final</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;group_1&#39;</span><span class="p">,</span> <span class="n">group_1</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span><span class="mi">60</span><span class="p">})</span>
-<span class="k">assert</span> <span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="o">==</span><span class="mi">9</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="o">==</span><span class="mi">10</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="o">==</span><span class="mi">60</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">h</span><span class="o">==</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">o</span><span class="o">.</span><span class="n">__stored_args__</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;estimator&#39;: None,
+ &#39;group&#39;: &#39;group_1&#39;,
+ &#39;data_converter&#39;: None,
+ &#39;data_io&#39;: None,
+ &#39;model_plotter&#39;: None,
+ &#39;profiler&#39;: None,
+ &#39;comparator&#39;: None,
+ &#39;logger&#39;: None,
+ &#39;verbose&#39;: 0,
+ &#39;name_logger&#39;: &#39;log&#39;,
+ &#39;x&#39;: 9,
+ &#39;y&#39;: 10,
+ &#39;z&#39;: 60,
+ &#39;h&#39;: [1, 2, 4]}</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -642,6 +679,10 @@ test_data: None
 <span class="n">tr1</span> <span class="o">=</span> <span class="n">Transform1</span> <span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">tr1</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">tr1</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">tr1</span> <span class="o">=</span> <span class="n">Transform1</span> <span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">tr1</span><span class="o">.</span><span class="n">fit</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tr1</span><span class="o">.</span><span class="n">apply</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -888,7 +929,7 @@ DataFrame.iloc[:, 0] (column name=&#34;a&#34;) values are different (100.0 %)
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L461" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SamplingComponent" class="doc_header"><code>class</code> <code>SamplingComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L470" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SamplingComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that makes use of labels in transform method.
@@ -927,7 +968,7 @@ the data and in the labels. See `PandasConverter` class in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L482" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="SklearnComponent" class="doc_header"><code>class</code> <code>SklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L491" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that saves estimator parameters in pickle format.
@@ -969,7 +1010,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L507" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="NoSaverComponent" class="doc_header"><code>class</code> <code>NoSaverComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L516" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>NoSaverIO</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -1008,7 +1049,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L522" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
+<h2 id="OneClassSklearnComponent" class="doc_header"><code>class</code> <code>OneClassSklearnComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L531" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneClassSklearnComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#SklearnComponent"><code>SklearnComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that uses only normal data (labelled with 0) for fitting parameters.</code></pre>
@@ -1047,7 +1088,7 @@ pickle format. See `SklearnIO` class in `core.utils`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L538" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
+<h2 id="PandasComponent" class="doc_header"><code>class</code> <code>PandasComponent</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/core/block_types.py#L547" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasComponent</code>(<strong><code>estimator</code></strong>=<em><code>None</code></em>, <strong><code>data_converter</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/core.block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.

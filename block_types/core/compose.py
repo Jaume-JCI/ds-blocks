@@ -10,9 +10,14 @@ import pandas as pd
 import warnings
 from sklearn.utils import Bunch
 
-from .block_types import Component, PandasComponent, SamplingComponent
+from .block_types import (Component,
+                                          PandasComponent,
+                                          SamplingComponent,
+                                          NoSaverComponent)
 from .data_conversion import PandasConverter
 from .utils import PandasIO
+from ..utils.utils import get_logging_level
+import block_types.config.bt_defaults as dflt
 
 # Cell
 class MultiComponent (SamplingComponent):
@@ -252,13 +257,15 @@ class MultiComponent (SamplingComponent):
         return split
 
     def assert_all_equal (self, path_reference_results, raise_error=False, recursive=True,
-                          max_recursion=None, current_recursion=0, **kwargs):
+                          max_recursion=None, current_recursion=0, verbose=None, **kwargs):
         """Compare results stored in current run against reference results stored in given path."""
-        self.logger.info ('comparing results from this pipeline and reference pipeline')
+        if verbose is not None:
+            self.logger.setLevel(get_logging_level (verbose))
         is_equal = True
         non_equal_components = []
         end_recursion = max_recursion is not None and current_recursion > max_recursion
         if end_recursion:
+            self.logger.setLevel(get_logging_level (self.verbose))
             return True
         for component in self.components:
             if isinstance(component, MultiComponent) and recursive and not end_recursion:
@@ -267,10 +274,12 @@ class MultiComponent (SamplingComponent):
                                                          recursive=recursive,
                                                          max_recursion=max_recursion,
                                                          current_recursion=current_recursion+1,
+                                                         verbose=verbose,
                                                          **kwargs)
             else:
                 this_equal = component.assert_equal (path_reference_results,
                                                      raise_error=raise_error,
+                                                     verbose=verbose,
                                                      **kwargs)
             if not this_equal:
                 non_equal_components.append(component.name)
@@ -280,6 +289,8 @@ class MultiComponent (SamplingComponent):
             self.logger.warning (f'Results are different in components {non_equal_components}')
         else:
             self.logger.info ('both pipelines give the same results')
+
+        self.logger.setLevel(get_logging_level (self.verbose))
 
         return is_equal
 
@@ -436,14 +447,20 @@ class PandasPipeline (Pipeline):
                           **kwargs)
 
 # Cell
-class ColumnSelector (Component):
+class ColumnSelector (NoSaverComponent):
     def __init__ (self,
                   columns=[],
                   remainder=False,
+                  verbose=dflt.verbose,
+                  force_verbose=False,
+                  logger=None,
                   **kwargs):
-        super().__init__ (**kwargs)
-        self.columns = columns
-        self.remainder = remainder
+        verbose = 0 if not force_verbose else verbose
+        if verbose==0:
+            logger=None
+        super().__init__ (verbose=verbose,
+                          logger=logger,
+                          **kwargs)
 
     def _apply (self, df):
         if self.remainder:
@@ -452,18 +469,26 @@ class ColumnSelector (Component):
             return df[self.columns]
 
 # Cell
-class Concat (Component):
+class Concat (NoSaverComponent):
     def __init__ (self,
+                  verbose=dflt.verbose,
+                  force_verbose=False,
+                  logger=None,
                   **kwargs):
-        super().__init__ (**kwargs)
+        verbose = 0 if not force_verbose else verbose
+        if verbose==0:
+            logger=None
+        super().__init__ (verbose=verbose,
+                          logger=logger,
+                          **kwargs)
 
     def _apply (self, *dfs):
         return pd.concat(list(dfs), axis=1)
 
 # Cell
 class _BaseColumnTransformer (MultiComponent):
-    def __init__ (self, **kwargs):
-        super().__init__ (**kwargs)
+    def __init__ (self, name=None, class_name=None, **kwargs):
+        super().__init__ (name=name, class_name=class_name, **kwargs)
         self.concat = Concat (**kwargs)
         del self.concat.nick_name
 
@@ -495,9 +520,18 @@ class ColumnTransformer (_BaseColumnTransformer):
         super().set_components(*components)
 
 # Cell
-class Identity (Component):
-    def __init__ (self, **kwargs):
-        super ().__init__ (**kwargs)
+class Identity (NoSaverComponent):
+    def __init__ (self,
+                  verbose=dflt.verbose,
+                  force_verbose=False,
+                  logger=None,
+                  **kwargs):
+        verbose = 0 if not force_verbose else verbose
+        if verbose==0:
+            logger=None
+        super().__init__ (verbose=verbose,
+                          logger=logger,
+                          **kwargs)
 
     def _apply (self, X):
         return X
@@ -514,10 +548,12 @@ def _append_pipeline (pipelines, name, transformer, columns, remainder= False, *
             raise ValueError (f'name {transformer} not recognized')
 
     if not drop:
+        config=kwargs.copy()
+        config.update({name:dict(data_io='NoSaverIO')})
         pipeline = make_pipeline(ColumnSelector(columns, remainder=remainder, **kwargs),
                                  transformer,
-                                 name = name,
-                                 **kwargs)
+                                 name=name,
+                                 **config)
         pipelines.append (pipeline)
 
 def _get_transformer_name (transformer, columns):
@@ -551,16 +587,16 @@ def make_column_transformer_pipelines (*transformers, remainder='drop', **kwargs
 
     return pipelines
 
-def make_column_transformer (*transformers, remainder='drop', **kwargs):
+def make_column_transformer (*transformers, remainder='drop', name=None, class_name=None, **kwargs):
     transformers_with_name = []
     for transformer, columns in transformers:
-        name = _get_transformer_name (transformer, columns)
-        transformers_with_name.append ((name, transformer, columns))
+        transformer_name = _get_transformer_name (transformer, columns)
+        transformers_with_name.append ((transformer_name, transformer, columns))
 
     pipelines = make_column_transformer_pipelines (*transformers_with_name,
                                                    remainder=remainder,
                                                    **kwargs)
-    column_transformer = _BaseColumnTransformer ()
+    column_transformer = _BaseColumnTransformer (name=name, class_name=class_name, **kwargs)
     column_transformer.set_components(*pipelines)
     return column_transformer
 
@@ -569,13 +605,27 @@ def make_column_transformer (*transformers, remainder='drop', **kwargs):
 class MultiSplitComponent (MultiComponent):
     def __init__ (self,
                   component=None,
+                  name=None,
+                  class_name=None,
                   fit_to = 'training',
                   fit_additional = [],
                   apply_to = ['training', 'validation', 'test'],
                   raise_error_if_split_doesnot_exist=False,
                   raise_warning_if_split_doesnot_exist=True,
                   **kwargs):
-        super().__init__ (**kwargs)
+        if class_name is None:
+            if hasattr(component, 'class_name'):
+                class_name = f'{component.class_name}MultiSplit'
+            else:
+                class_name = f'{component.__class__.__name__}MultiSplit'
+
+        if name is None:
+            if hasattr(component, 'name'):
+                name = f'{component.name}_multi_split'
+            else:
+                name = f'{component.__class__.__name__}_multi_split'
+
+        super().__init__ (name=name, class_name=class_name, **kwargs)
 
     def _fit (self, X, y=None):
         if not isinstance(X, dict):

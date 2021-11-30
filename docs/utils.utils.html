@@ -224,6 +224,12 @@ results as previous runs.</code></pre>
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="_store_attr">_store_attr<a class="anchor-link" href="#_store_attr"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -264,6 +270,12 @@ results as previous runs.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="obtain_class_specific_attrs">obtain_class_specific_attrs<a class="anchor-link" href="#obtain_class_specific_attrs"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -328,6 +340,12 @@ a dictionary with the name of that component. See example below.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="get_hierarchy_level">get_hierarchy_level<a class="anchor-link" href="#get_hierarchy_level"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -359,6 +377,12 @@ a dictionary with the name of that component. See example below.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="test-get_hierarchy_level">test get_hierarchy_level<a class="anchor-link" href="#test-get_hierarchy_level"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -408,6 +432,12 @@ a dictionary with the name of that component. See example below.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="replace_attr_and_store">replace_attr_and_store<a class="anchor-link" href="#replace_attr_and_store"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -419,7 +449,7 @@ a dictionary with the name of that component. See example below.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="replace_attr_and_store" class="doc_header"><code>replace_attr_and_store</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/utils/utils.py#L193" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>replace_attr_and_store</code>(<strong><code>names</code></strong>=<em><code>None</code></em>, <strong><code>but</code></strong>=<em><code>''</code></em>, <strong><code>store_args</code></strong>=<em><code>None</code></em>, <strong><code>recursive</code></strong>=<em><code>True</code></em>, <strong><code>base_class</code></strong>=<em><code>object</code></em>, <strong><code>replace_generic_attr</code></strong>=<em><code>True</code></em>, <strong><code>overwrite_name</code></strong>=<em><code>True</code></em>, <strong>**<code>attrs</code></strong>)</p>
+<h4 id="replace_attr_and_store" class="doc_header"><code>replace_attr_and_store</code><a href="https://github.com/Jaume-JCI/block_types/blob/main/block_types/utils/utils.py#L193" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>replace_attr_and_store</code>(<strong><code>names</code></strong>=<em><code>None</code></em>, <strong><code>but</code></strong>=<em><code>''</code></em>, <strong><code>store_args</code></strong>=<em><code>None</code></em>, <strong><code>recursive</code></strong>=<em><code>True</code></em>, <strong><code>base_class</code></strong>=<em><code>object</code></em>, <strong><code>replace_generic_attr</code></strong>=<em><code>True</code></em>, <strong><code>overwrite</code></strong>=<em><code>False</code></em>, <strong><code>overwrite_name</code></strong>=<em><code>True</code></em>, <strong><code>include_first</code></strong>=<em><code>False</code></em>, <strong>**<code>attrs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Replaces generic attributes and stores them into attrs in `self`.
@@ -453,6 +483,12 @@ function.</code></pre>
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="test-replace_attr_and_store">test replace_attr_and_store<a class="anchor-link" href="#test-replace_attr_and_store"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -499,6 +535,67 @@ function.</code></pre>
 
 <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">):</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">ab</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="test-replace_attr_and_store-without-recursiveness">test replace_attr_and_store without recursiveness<a class="anchor-link" href="#test-replace_attr_and_store-without-recursiveness"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">Bunch</span>
+
+<span class="k">def</span> <span class="nf">f</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">Bunch</span> <span class="p">()</span>
+    <span class="n">replace_attr_and_store</span> <span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span> <span class="n">include_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">estimator</span>
+
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">f</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">stored_args</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__stored_args__&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">estimator</span><span class="o">==</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<span class="k">assert</span> <span class="n">stored_args</span> <span class="o">==</span> <span class="n">estimator</span>
+
+<span class="c1"># test without kwargs</span>
+<span class="k">def</span> <span class="nf">g</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">Bunch</span> <span class="p">()</span>
+    <span class="n">replace_attr_and_store</span> <span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span> <span class="n">include_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">estimator</span>
+
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">g</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">stored_args</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__stored_args__&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">estimator</span><span class="o">==</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<span class="k">assert</span> <span class="n">stored_args</span> <span class="o">==</span> <span class="n">estimator</span>
+
+<span class="c1"># test without kwargs and with replace_generic_attr=False</span>
+<span class="k">def</span> <span class="nf">h</span> <span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">Bunch</span> <span class="p">()</span>
+    <span class="n">replace_attr_and_store</span> <span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span> <span class="n">include_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">replace_generic_attr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">estimator</span>
+
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">h</span> <span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">stored_args</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__stored_args__&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">estimator</span><span class="o">==</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<span class="k">assert</span> <span class="n">stored_args</span> <span class="o">==</span> <span class="n">estimator</span>
 </pre></div>
 
     </div>
