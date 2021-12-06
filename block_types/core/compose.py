@@ -41,6 +41,9 @@ class MultiComponent (SamplingComponent):
             or in the same input `X`, as an additional variable. See description of
             Pipeline class for more details.
         """
+        if 'estimator' in kwargs:
+            self.logger.warning ('estimator passed as key-word argument in MultiComponent')
+
         if not hasattr (self, 'components'):
             self.components = []
         if not hasattr (self, 'finalized_component_list'):

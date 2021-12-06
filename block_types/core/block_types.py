@@ -87,6 +87,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             Verbosity, 0: warning or critical, 1: info, 2: debug.
         """
 
+        assert not isinstance(estimator, Component), 'estimator cannot be an instance of Component'
+
         # name of current component, for logging and plotting purposes
         self._determine_component_name (name, estimator, class_name=class_name)
 
