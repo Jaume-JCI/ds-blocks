@@ -357,3 +357,5 @@ docs/_site
 */**/.ipynb_checkpoints
 .ipynb_checkpoints
 block_types.egg-info
+
+block_types/test
