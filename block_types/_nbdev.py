@@ -84,7 +84,7 @@ modules = ["blocks/preprocessing.py",
            "core/data_conversion.py",
            "core/utils.py",
            "datasets/datasets.py",
-           "test/utils/nbdev_utils.py",
+           "test/utils/test_nbdev_utils.py",
            "utils/nbdev_utils.py",
            "utils/utils.py"]
 

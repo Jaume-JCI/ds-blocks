@@ -6,6 +6,8 @@ __all__ = ['example_people_data_fixture', 'example_people_data', 'myf', 'my_firs
 # Cell
 import pytest
 import os
+import joblib
+
 from block_types.utils.nbdev_utils import TestRunner
 
 # Cell
@@ -56,7 +58,7 @@ def test_test_runner_two_tests ():
     assert tst_.all_tests == ['my_first_test', 'second_fails', 'third_fails']
     assert tst_.tags == {'dummy': ['my_first_test', 'third_fails'], 'slow': ['second_fails']}
     assert tst_.targets==['dummy']
-    assert tst.do_test==[]
+    assert tst_.do_test==[]
 
     do_test_, all_tests_, tags_, targets_, remote_targets_, localhostname_ = joblib.load ('config_test/test_names.pk')
 
