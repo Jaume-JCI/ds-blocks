@@ -2,7 +2,8 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
+index = {"example_people_data_fixture": "tests.utils.nbdev_utils.ipynb",
+         "OneHotEncoder": "blocks.preprocessing.ipynb",
          "path_results": "config.bt_defaults.ipynb",
          "path_data": "config.bt_defaults.ipynb",
          "file_format": "config.bt_defaults.ipynb",
@@ -54,7 +55,6 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "Comparator": "core.utils.ipynb",
          "camel_to_snake": "core.utils.ipynb",
          "DataSet": "datasets.datasets.ipynb",
-         "example_people_data_fixture": "test.utils.nbdev_utils.ipynb",
          "cd_root": "utils.nbdev_utils.ipynb",
          "nbdev_setup": "utils.nbdev_utils.ipynb",
          "TestRunner": "utils.nbdev_utils.ipynb",
@@ -66,6 +66,8 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "test_test_runner": "utils.nbdev_utils.ipynb",
          "test_test_runner_two_tests": "utils.nbdev_utils.ipynb",
          "test_test_runner_two_targets": "utils.nbdev_utils.ipynb",
+         "replace_imports": "utils.nbdev_utils.ipynb",
+         "nbdev_build_test": "utils.nbdev_utils.ipynb",
          "make_reproducible": "utils.utils.ipynb",
          "get_logging_level": "utils.utils.ipynb",
          "set_logger": "utils.utils.ipynb",
@@ -77,14 +79,14 @@ index = {"OneHotEncoder": "blocks.preprocessing.ipynb",
          "get_hierarchy_level": "utils.utils.ipynb",
          "replace_attr_and_store": "utils.utils.ipynb"}
 
-modules = ["blocks/preprocessing.py",
+modules = ["tests/utils/test_nbdev_utils.py",
+           "blocks/preprocessing.py",
            "config/bt_defaults.py",
            "core/block_types.py",
            "core/compose.py",
            "core/data_conversion.py",
            "core/utils.py",
            "datasets/datasets.py",
-           "test/utils/test_nbdev_utils.py",
            "utils/nbdev_utils.py",
            "utils/utils.py"]
 
