@@ -36,4 +36,3 @@ jobs:
     - name: Run tests
       run: |
         nbdev_test_nbs --verbose 1
-        pytest test
