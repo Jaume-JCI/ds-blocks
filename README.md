@@ -14,6 +14,12 @@ The following are a selectiong of some of the features provided by `block-types`
 
 - Enable the use of sampling components that not only change the variables (or columns) but also change the number of observations (or rows), by either under-sampling or over-sampling. This is not supported by standard scikit-learn components. 
 
+For further details, please see the [documentation](https://jaume-jci.github.io/block-types/)
+
 ## Install
 
 pip install block-types
+
+## Documentation
+
+Documenation can be found [here](https://jaume-jci.github.io/block-types/)
