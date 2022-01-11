@@ -548,8 +548,7 @@ class ModelPlotter ():
         self.diagram_node_name = diagram_node_name
         self.diagram_edge_name = diagram_edge_name
         self.diagram_module_path = diagram_module_path
-        self.training_result_shape = None
-        self.test_result_shape = None
+        self.result_shape = {}
 
     def set_component (self, component=None):
         self.component = component
@@ -557,17 +556,14 @@ class ModelPlotter ():
     def get_node_name (self):
         return self.diagram_node_name
 
-    def get_edge_name (self, training_data_flag=False, load_data=True):
-        result_shape = self.training_result_shape if training_data_flag else self.test_result_shape
+    def get_edge_name (self, split=None, load_data=True):
+        split = self.component.data_io.split if split is None else split
+        result_shape = self.result_shape[split] if split in self.result_shape else None
         if result_shape is None:
             if load_data:
-                self.component.data_io.set_training_data_flag (training_data_flag)
-                df = self.component.data_io.load_result()
+                df = self.component.data_io.load_result(split=split)
                 if (df is not None) and hasattr(df, 'shape'):
-                    if training_data_flag:
-                        self.training_result_shape = result_shape = df.shape
-                    else:
-                        self.test_result_shape = result_shape = df.shape
+                    result_shape = self.result_shape[split] = df.shape
 
         if result_shape is None:
             return self.diagram_edge_name

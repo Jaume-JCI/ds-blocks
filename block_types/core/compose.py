@@ -10,6 +10,12 @@ import pandas as pd
 import warnings
 from sklearn.utils import Bunch
 
+try:
+    from graphviz import *
+    imported_graphviz = True
+except:
+    imported_graphviz = False
+
 from .block_types import (Component,
                                           PandasComponent,
                                           SamplingComponent,

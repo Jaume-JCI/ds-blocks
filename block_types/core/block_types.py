@@ -19,12 +19,6 @@ import pyarrow as pa
 import joblib
 from IPython.display import display
 
-try:
-    from graphviz import *
-    imported_graphviz = True
-except:
-    imported_graphviz = False
-
 # block_types
 from .data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
 from .utils import (save_csv,

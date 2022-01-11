@@ -54,11 +54,15 @@ def get_logging_level (verbose):
 
 def set_logger (name, path_results='log', stdout=True,
                 mode='w', just_message = False, filename='logs.txt',
-                logging_level=logging.DEBUG, verbose=None):
+                logging_level=logging.DEBUG, verbose=None, verbose_out=None):
     """Set logger."""
     logger = logging.getLogger(name)
     if verbose is not None:
         logging_level = get_logging_level (verbose)
+    if verbose_out is not None:
+        logging_level_out = get_logging_level (verbose_out)
+    else:
+        logging_level_out = logging_level
     logger.setLevel(logging_level)
 
     for hdlr in logger.handlers[:]:  # remove all old handlers
@@ -69,7 +73,7 @@ def set_logger (name, path_results='log', stdout=True,
     # Create handlers
     if stdout:
         c_handler = logging.StreamHandler()
-        c_handler.setLevel(logging_level)
+        c_handler.setLevel(logging_level_out)
         c_format = logging.Formatter('%(message)s')
         c_handler.setFormatter(c_format)
         logger.addHandler(c_handler)

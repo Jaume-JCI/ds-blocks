@@ -49,9 +49,14 @@ index = {"component_save_data_fixture": "block_types.ipynb",
          "test_pipeline_new_comp": "compose.ipynb",
          "test_pipeline_set_comp": "compose.ipynb",
          "test_pipeline_load_estimator": "compose.ipynb",
+         "build_pipeline_construct_diagram_1": "compose.ipynb",
+         "build_pipeline_construct_diagram_2": "compose.ipynb",
+         "test_construct_diagram": "compose.ipynb",
+         "test_show_summary": "compose.ipynb",
          "make_pipeline": "compose.ipynb",
          "test_make_pipeline": "compose.ipynb",
          "pipeline_factory": "compose.ipynb",
+         "test_pipeline_factory": "compose.ipynb",
          "PandasPipeline": "compose.ipynb",
          "ColumnSelector": "compose.ipynb",
          "test_column_selector": "compose.ipynb",
@@ -116,6 +121,7 @@ index = {"component_save_data_fixture": "block_types.ipynb",
          "test_test_runner": "nbdev_utils.ipynb",
          "test_test_runner_two_tests": "nbdev_utils.ipynb",
          "test_test_runner_two_targets": "nbdev_utils.ipynb",
+         "md": "nbdev_utils.ipynb",
          "replace_imports": "nbdev_utils.ipynb",
          "nbdev_build_test": "nbdev_utils.ipynb",
          "make_reproducible": "utils.ipynb",
@@ -152,6 +158,6 @@ modules = ["tests/blocks/test_preprocessing.py",
 
 doc_url = "https://Jaume-JCI.github.io/"
 
-git_url = "https://github.com/Jaume-JCI/block_types/blob/main/"
+git_url = "https://github.com/Jaume-JCI/block-types/tree/main/"
 
 def custom_doc_links(name): return None
