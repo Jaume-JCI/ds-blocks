@@ -39,7 +39,6 @@ from ..utils.utils import (set_logger,
 import block_types.config.bt_defaults as dflt
 
 # Cell
-
 class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     """Base component class used in our Pipeline."""
     def __init__ (self,
@@ -390,7 +389,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if self.estimator is not None:
             self.estimator.fit (X, y)
 
-    def show_result_statistics (self, result=None, training_data_flag=False) -> None:
+    def show_result_statistics (self, result=None, split=None) -> None:
         """
         Show statistics of transformed data.
 
@@ -404,8 +403,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             data is loaded.
         """
         if result is None:
-            self.set_training_data_flag (training_data_flag)
-            df = self.data_io.load_result()
+            df = self.load_result(split=split)
         else:
             df = result
 
@@ -413,8 +411,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             display (self.name)
             if callable(getattr(df, 'describe', None)):
                 display (df.describe())
-
-
+            elif isinstance(df, np.ndarray) or isinstance(df, list):
+                df = pd.DataFrame (df)
+                display (df.describe())
 
     # ********************************
     # exposing some data_io and data_converters methods
@@ -550,15 +549,9 @@ class PandasComponent (Component):
     """
     def __init__ (self,
                   estimator=None,
-                  data_converter=None,
-                  data_io=None,
+                  data_converter='PandasConverter',
+                  data_io='PandasIO',
                   **kwargs):
-
-        if data_converter is None:
-            data_converter = PandasConverter (**kwargs)
-        if data_io is None:
-            data_io = PandasIO (**kwargs)
-
         super().__init__ (estimator=estimator,
                           data_converter=data_converter,
                           data_io=data_io,

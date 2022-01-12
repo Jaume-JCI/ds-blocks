@@ -272,11 +272,9 @@ class MultiComponent (SamplingComponent):
             self.logger.setLevel(get_logging_level (verbose))
         is_equal = True
         non_equal_components = []
-        end_recursion = max_recursion is not None and current_recursion > max_recursion
-        if end_recursion:
-            self.logger.setLevel(get_logging_level (self.verbose))
-            return True
-        for component in self.components:
+        end_recursion = max_recursion is not None and current_recursion >= max_recursion
+        components = self.components if not end_recursion else [self]
+        for component in components:
             if isinstance(component, MultiComponent) and recursive and not end_recursion:
                 this_equal = component.assert_all_equal (path_reference_results,
                                                          raise_error=raise_error,
@@ -441,18 +439,13 @@ class PandasPipeline (Pipeline):
     See `Pipeline` class for an explanation of using `separate_labels=False`
     """
     def __init__ (self,
-                  data_converter=None,
-                  data_io=None,
+                  data_converter='PandasConverter',
+                  data_io='PandasIO',
                   separate_labels=False,
                   **kwargs):
-        if data_converter is None:
-            data_converter = PandasConverter (separate_labels=separate_labels,
-                                              **kwargs)
-        if data_io is None:
-            data_io = PandasIO (**kwargs)
-        super().__init__ (self,
-                          data_converter=data_converter,
+        super().__init__ (data_converter=data_converter,
                           data_io=data_io,
+                          separate_labels=separate_labels,
                           **kwargs)
 
 # Cell
