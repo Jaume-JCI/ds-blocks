@@ -657,11 +657,18 @@ class Profiler ():
 
 # Cell
 class Comparator ():
-    def __init__ (self, component, **kwargs):
-        self.component = component
-        self.logger = component.logger
-        self.name = component.name
-        self.data_io = component.data_io
+    def __init__ (self, component=None, data_io=None, name='comparator', **kwargs):
+        if component is not None:
+            self.component = component
+            self.logger = component.logger
+            self.name = component.name
+            self.data_io = component.data_io
+        else:
+            self.component = None
+            self.logger = set_logger ('comparator', filename=None)
+            self.name = name
+            if data_io is not None:
+                self.data_io = data_io_factory (data_io)
 
     def compare_objects (self, left, right, message='', **kwargs):
         if left != right:

@@ -78,15 +78,16 @@ def set_logger (name, path_results='log', stdout=True,
         c_handler.setFormatter(c_format)
         logger.addHandler(c_handler)
 
-    os.makedirs(path_results, exist_ok=True)
-    f_handler = logging.FileHandler('%s/%s' %(path_results, filename), mode = mode)
-    f_handler.setLevel(logging_level)
-    if just_message:
-        f_format = logging.Formatter('%(asctime)s - %(message)s')
-    else:
-        f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s {%(filename)s:%(funcName)s:%(lineno)d} - %(message)s')
-    f_handler.setFormatter(f_format)
-    logger.addHandler(f_handler)
+    if filename is not None and path_results is not None:
+        os.makedirs(path_results, exist_ok=True)
+        f_handler = logging.FileHandler(f'{path_results}/{filename}', mode = mode)
+        f_handler.setLevel(logging_level)
+        if just_message:
+            f_format = logging.Formatter('%(asctime)s - %(message)s')
+        else:
+            f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s {%(filename)s:%(funcName)s:%(lineno)d} - %(message)s')
+        f_handler.setFormatter(f_format)
+        logger.addHandler(f_handler)
     logger.propagate = 0
 
     return logger

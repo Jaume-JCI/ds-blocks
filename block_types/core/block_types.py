@@ -525,11 +525,8 @@ class NoSaverComponent (Component):
 # Cell
 class OneClassSklearnComponent (SklearnComponent):
     """Component that uses only normal data (labelled with 0) for fitting parameters."""
-    def __init__ (self,
-                  estimator=None,
-                  **kwargs):
-        super().__init__ (estimator=estimator,
-                          **kwargs)
+    def __init__ (self, estimator=None, **kwargs):
+        super().__init__ (estimator=estimator, **kwargs)
 
     def _fit (self, X, y=None):
         assert y is not None, 'y must be provided in OneClassSklearnComponent class'
