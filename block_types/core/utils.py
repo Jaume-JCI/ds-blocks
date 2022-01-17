@@ -412,7 +412,8 @@ class DataIO ():
             self.path_results = Path(self.path_results).resolve()
             if self.path_models is None:
                 self.set_path_models (path_results)
-        self.component.path_results = path_results
+        self.component.path_results = self.path_results
+        self.component.path_models = self.path_models
 
     def set_path_models (self, path_models):
         self.path_models = path_models
@@ -424,7 +425,8 @@ class DataIO ():
             self.path_model_file = self.path_models / 'models' / self.fitting_file_name
         else:
             self.path_model_file = None
-        self.component.path_models = path_models
+        self.component.path_results = self.path_results
+        self.component.path_models = self.path_models
 
 
     # global saving and loading
@@ -548,8 +550,7 @@ class ModelPlotter ():
         self.diagram_node_name = diagram_node_name
         self.diagram_edge_name = diagram_edge_name
         self.diagram_module_path = diagram_module_path
-        self.training_result_shape = None
-        self.test_result_shape = None
+        self.result_shape = {}
 
     def set_component (self, component=None):
         self.component = component
@@ -557,17 +558,14 @@ class ModelPlotter ():
     def get_node_name (self):
         return self.diagram_node_name
 
-    def get_edge_name (self, training_data_flag=False, load_data=True):
-        result_shape = self.training_result_shape if training_data_flag else self.test_result_shape
+    def get_edge_name (self, split=None, load_data=True):
+        split = self.component.data_io.split if split is None else split
+        result_shape = self.result_shape[split] if split in self.result_shape else None
         if result_shape is None:
             if load_data:
-                self.component.data_io.set_training_data_flag (training_data_flag)
-                df = self.component.data_io.load_result()
+                df = self.component.data_io.load_result(split=split)
                 if (df is not None) and hasattr(df, 'shape'):
-                    if training_data_flag:
-                        self.training_result_shape = result_shape = df.shape
-                    else:
-                        self.test_result_shape = result_shape = df.shape
+                    result_shape = self.result_shape[split] = df.shape
 
         if result_shape is None:
             return self.diagram_edge_name
@@ -661,11 +659,18 @@ class Profiler ():
 
 # Cell
 class Comparator ():
-    def __init__ (self, component, **kwargs):
-        self.component = component
-        self.logger = component.logger
-        self.name = component.name
-        self.data_io = component.data_io
+    def __init__ (self, component=None, data_io=None, name='comparator', **kwargs):
+        if component is not None:
+            self.component = component
+            self.logger = component.logger
+            self.name = component.name
+            self.data_io = component.data_io
+        else:
+            self.component = None
+            self.logger = set_logger ('comparator', filename=None)
+            self.name = name
+            if data_io is not None:
+                self.data_io = data_io_factory (data_io)
 
     def compare_objects (self, left, right, message='', **kwargs):
         if left != right:

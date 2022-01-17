@@ -7,6 +7,7 @@ from pathlib import Path
 import abc
 import pandas as pd
 import numpy as np
+import logging
 
 # block_types API
 from ..config import bt_defaults as dflt
@@ -31,5 +32,5 @@ class DataSet (metaclass=abc.ABCMeta):
         else:
             self.logger = logger
     @abc.abstractmethod
-    def load ():
+    def load (self):
         pass

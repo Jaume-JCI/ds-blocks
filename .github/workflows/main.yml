@@ -16,6 +16,7 @@ jobs:
       run: |
         pip install nbdev jupyter
         pip install -e .
+        pip install tensorflow
     - name: Read all notebooks
       run: |
         nbdev_read_nbs

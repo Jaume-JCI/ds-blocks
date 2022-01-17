@@ -19,12 +19,6 @@ import pyarrow as pa
 import joblib
 from IPython.display import display
 
-try:
-    from graphviz import *
-    imported_graphviz = True
-except:
-    imported_graphviz = False
-
 # block_types
 from .data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
 from .utils import (save_csv,
@@ -45,7 +39,6 @@ from ..utils.utils import (set_logger,
 import block_types.config.bt_defaults as dflt
 
 # Cell
-
 class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     """Base component class used in our Pipeline."""
     def __init__ (self,
@@ -396,7 +389,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if self.estimator is not None:
             self.estimator.fit (X, y)
 
-    def show_result_statistics (self, result=None, training_data_flag=False) -> None:
+    def show_result_statistics (self, result=None, split=None) -> None:
         """
         Show statistics of transformed data.
 
@@ -410,8 +403,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             data is loaded.
         """
         if result is None:
-            self.set_training_data_flag (training_data_flag)
-            df = self.data_io.load_result()
+            df = self.load_result(split=split)
         else:
             df = result
 
@@ -419,8 +411,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             display (self.name)
             if callable(getattr(df, 'describe', None)):
                 display (df.describe())
-
-
+            elif isinstance(df, np.ndarray) or isinstance(df, list):
+                df = pd.DataFrame (df)
+                display (df.describe())
 
     # ********************************
     # exposing some data_io and data_converters methods
@@ -479,14 +472,10 @@ class SamplingComponent (Component):
     the data and in the labels. See `PandasConverter` class in
     `block_types.core.data_conversion`.
     """
-    def __init__ (self,
-                  estimator=None,
-                  transform_uses_labels=True,
-                  **kwargs):
+    def __init__ (self, estimator=None, transform_uses_labels=True, **kwargs):
 
         # the SamplingComponent over-rides the following parameters:
-        super().__init__ (estimator=estimator,
-                          transform_uses_labels=transform_uses_labels,
+        super().__init__ (estimator=estimator, transform_uses_labels=transform_uses_labels,
                           **kwargs)
 
 # Cell
@@ -497,18 +486,10 @@ class SklearnComponent (Component):
     Convenience subclass used when the results can be saved in
     pickle format. See `SklearnIO` class in `core.utils`.
     """
-    def __init__ (self,
-                  estimator=None,
-                  data_io=None,
-                  transform_uses_labels=False,
+    def __init__ (self, estimator=None, data_io='SklearnIO', transform_uses_labels=False,
                   **kwargs):
 
-        if data_io is None:
-            data_io = SklearnIO (**kwargs)
-
-        super().__init__ (estimator=estimator,
-                          data_io = data_io,
-                          transform_uses_labels=False,
+        super().__init__ (estimator=estimator, data_io=data_io, transform_uses_labels=False,
                           **kwargs)
 
 # alias
@@ -517,26 +498,15 @@ PickleSaverComponent = SklearnComponent
 # Cell
 class NoSaverComponent (Component):
     """Component that does not save any data."""
-    def __init__ (self,
-                  estimator=None,
-                  data_io=NoSaverIO,
-                  **kwargs):
+    def __init__ (self, estimator=None, data_io='NoSaverIO', **kwargs):
 
-        super().__init__ (estimator=estimator,
-                          data_io=data_io,
-                          **kwargs)
-
-        if not isinstance(self.data_io, NoSaverIO):
-            self.logger.warning ('NoSaverComponent has DataIO != NoSaverIO')
+        super().__init__ (estimator=estimator, data_io=data_io, **kwargs)
 
 # Cell
 class OneClassSklearnComponent (SklearnComponent):
     """Component that uses only normal data (labelled with 0) for fitting parameters."""
-    def __init__ (self,
-                  estimator=None,
-                  **kwargs):
-        super().__init__ (estimator=estimator,
-                          **kwargs)
+    def __init__ (self, estimator=None, **kwargs):
+        super().__init__ (estimator=estimator, **kwargs)
 
     def _fit (self, X, y=None):
         assert y is not None, 'y must be provided in OneClassSklearnComponent class'
@@ -554,18 +524,7 @@ class PandasComponent (Component):
     See `PandasConverter` in `core.data_conversion` for details on the data
     conversion performed.
     """
-    def __init__ (self,
-                  estimator=None,
-                  data_converter=None,
-                  data_io=None,
+    def __init__ (self, estimator=None, data_converter='PandasConverter', data_io='PandasIO',
                   **kwargs):
-
-        if data_converter is None:
-            data_converter = PandasConverter (**kwargs)
-        if data_io is None:
-            data_io = PandasIO (**kwargs)
-
-        super().__init__ (estimator=estimator,
-                          data_converter=data_converter,
-                          data_io=data_io,
+        super().__init__ (estimator=estimator, data_converter=data_converter, data_io=data_io,
                           **kwargs)
