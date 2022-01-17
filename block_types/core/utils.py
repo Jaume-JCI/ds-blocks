@@ -412,7 +412,8 @@ class DataIO ():
             self.path_results = Path(self.path_results).resolve()
             if self.path_models is None:
                 self.set_path_models (path_results)
-        self.component.path_results = path_results
+        self.component.path_results = self.path_results
+        self.component.path_models = self.path_models
 
     def set_path_models (self, path_models):
         self.path_models = path_models
@@ -424,7 +425,8 @@ class DataIO ():
             self.path_model_file = self.path_models / 'models' / self.fitting_file_name
         else:
             self.path_model_file = None
-        self.component.path_models = path_models
+        self.component.path_results = self.path_results
+        self.component.path_models = self.path_models
 
 
     # global saving and loading

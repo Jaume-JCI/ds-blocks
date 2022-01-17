@@ -472,14 +472,10 @@ class SamplingComponent (Component):
     the data and in the labels. See `PandasConverter` class in
     `block_types.core.data_conversion`.
     """
-    def __init__ (self,
-                  estimator=None,
-                  transform_uses_labels=True,
-                  **kwargs):
+    def __init__ (self, estimator=None, transform_uses_labels=True, **kwargs):
 
         # the SamplingComponent over-rides the following parameters:
-        super().__init__ (estimator=estimator,
-                          transform_uses_labels=transform_uses_labels,
+        super().__init__ (estimator=estimator, transform_uses_labels=transform_uses_labels,
                           **kwargs)
 
 # Cell
@@ -490,18 +486,10 @@ class SklearnComponent (Component):
     Convenience subclass used when the results can be saved in
     pickle format. See `SklearnIO` class in `core.utils`.
     """
-    def __init__ (self,
-                  estimator=None,
-                  data_io=None,
-                  transform_uses_labels=False,
+    def __init__ (self, estimator=None, data_io='SklearnIO', transform_uses_labels=False,
                   **kwargs):
 
-        if data_io is None:
-            data_io = SklearnIO (**kwargs)
-
-        super().__init__ (estimator=estimator,
-                          data_io = data_io,
-                          transform_uses_labels=False,
+        super().__init__ (estimator=estimator, data_io=data_io, transform_uses_labels=False,
                           **kwargs)
 
 # alias
@@ -510,17 +498,9 @@ PickleSaverComponent = SklearnComponent
 # Cell
 class NoSaverComponent (Component):
     """Component that does not save any data."""
-    def __init__ (self,
-                  estimator=None,
-                  data_io=NoSaverIO,
-                  **kwargs):
+    def __init__ (self, estimator=None, data_io='NoSaverIO', **kwargs):
 
-        super().__init__ (estimator=estimator,
-                          data_io=data_io,
-                          **kwargs)
-
-        if not isinstance(self.data_io, NoSaverIO):
-            self.logger.warning ('NoSaverComponent has DataIO != NoSaverIO')
+        super().__init__ (estimator=estimator, data_io=data_io, **kwargs)
 
 # Cell
 class OneClassSklearnComponent (SklearnComponent):
@@ -544,12 +524,7 @@ class PandasComponent (Component):
     See `PandasConverter` in `core.data_conversion` for details on the data
     conversion performed.
     """
-    def __init__ (self,
-                  estimator=None,
-                  data_converter='PandasConverter',
-                  data_io='PandasIO',
+    def __init__ (self, estimator=None, data_converter='PandasConverter', data_io='PandasIO',
                   **kwargs):
-        super().__init__ (estimator=estimator,
-                          data_converter=data_converter,
-                          data_io=data_io,
+        super().__init__ (estimator=estimator, data_converter=data_converter, data_io=data_io,
                           **kwargs)

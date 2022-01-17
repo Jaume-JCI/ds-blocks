@@ -127,6 +127,11 @@ def set_tf_loglevel(level):
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'
     logging.getLogger('tensorflow').setLevel(level)
 
+    try:
+        import tensorflow as tf
+    except:
+        print ('tensorflow needs to be installed in order to call set_tf_loglevel()')
+
     tf.get_logger().setLevel(level)
 
 # Cell

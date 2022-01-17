@@ -2,7 +2,7 @@
 
 __all__ = ['example_people_data_fixture', 'example_people_data', 'myf', 'my_first_test', 'second_fails', 'third_fails',
            'test_test_runner', 'test_test_runner_two_tests', 'test_test_runner_two_targets', 'test_cd_root',
-           'create_fake_tests', 'test_nbdev_build_test']
+           'test_nbdev_setup', 'create_fake_tests', 'test_nbdev_build_test']
 
 # Cell
 import pytest
@@ -10,7 +10,8 @@ import os
 import joblib
 from IPython.display import display
 
-from block_types.utils.nbdev_utils import TestRunner
+from block_types.utils.nbdev_utils import *
+from block_types.utils.utils import remove_previous_results
 
 # Cell
 @pytest.fixture (name='example_people_data')
@@ -92,17 +93,28 @@ def test_cd_root ():
     assert 'settings.ini' in d
 
 # Comes from nbdev_utils.ipynb, cell
+def test_nbdev_setup ():
+    os.chdir('nbs/utils')
+    d = os.listdir ('.')
+    assert 'settings.ini' not in d
+    nbdev_setup ()
+    d = os.listdir ('.')
+    assert 'settings.ini' in d
+
+# Comes from nbdev_utils.ipynb, cell
 def create_fake_tests ():
     os.makedirs ('mylibrary/mytests/first', exist_ok=True)
     os.makedirs ('mylibrary/mytests/second', exist_ok=True)
     f = open ('mylibrary/mytests/first/mod_a.py','wt')
-    f.write ('from block_types.mytests.second.mod_b import b\na=3\nprint(a)')
+    f.write ('from ')
+    f.write ('...mytests.second.mod_b import b\na=3\nprint(a)')
     f.close()
     f = open ('mylibrary/mytests/second/mod_b.py','wt')
     f.write ('b=4\nprint(b)')
     f.close()
     f = open ('mylibrary/mytests/first/mod_c.py','wt')
-    f.write ('from block_types.mytests.first.mod_a import a\nc=5\nprint(c)')
+    f.write ('from ')
+    f.write ('...mytests.first.mod_a import a\nc=5\nprint(c)')
     f.close()
     f = open ('mylibrary/mytests/mod_d.py','wt')
     f.write ('d=6\nprint(d)')
@@ -127,3 +139,6 @@ def test_nbdev_build_test ():
     lines = f.readlines ()
     f.close()
     assert lines[0]=='from mylibrary.mytests.second.mod_b import b\n'
+
+    remove_previous_results ('mylibrary')
+    remove_previous_results ('mytests')
