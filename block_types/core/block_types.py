@@ -177,7 +177,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.estimator = Bunch(**kwargs)
 
     def fit_like (self, X, y=None, load=None, save=None, split=None,
-                  func='_fit', validation_data=None, test_data=None, **kwargs):
+                  func='_fit', validation_data=None, test_data=None,
+                  converter_args={}, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -196,7 +197,19 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if self.data_io.can_load_model (load):
             previous_estimator = self.data_io.load_estimator()
 
-        if previous_estimator is None:
+        already_computed = False
+        if previous_estimator is not None:
+            if func=='_fit':
+                already_computed = True
+            elif func=='_fit_apply':
+                previous_result = None
+                if self.data_io.can_load_result (load):
+                    previous_result = self.data_io.load_result (split=split)
+                already_computed = previous_result is not None
+            else:
+                raise ValueError (f'function {func} not valid')
+
+        if not already_computed:
             X, y = self.data_converter.convert_before_fitting (X, y)
             additional_data= self._add_validation_and_test (validation_data, test_data)
             if func=='_fit':
@@ -213,12 +226,22 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             else:
                 raise ValueError (f'function {func} not valid')
             self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
-            self.data_converter.convert_after_fitting (X)
+            if func=='_fit':
+                self.data_converter.convert_after_fitting (X)
+            elif func=='_fit_apply':
+                result = self.data_converter.convert_after_transforming (result, **converter_args)
+                if self.data_io.can_save_result (save, split):
+                    self.data_io.save_result (result, split=split)
+            else:
+                raise ValueError (f'function {func} not valid')
             if self.data_io.can_save_model (save):
                 self.data_io.save_estimator ()
         else:
             self.estimator = previous_estimator
             self.logger.info (f'loaded pre-trained {self.name}')
+            if func=='_fit_apply':
+                result = previous_result
+                self.logger.info (f'loaded pre-computed result')
 
         self.profiler.finish_timer (method=func, split=self.data_io.split)
 
