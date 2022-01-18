@@ -20,21 +20,15 @@ import joblib
 from IPython.display import display
 
 # block_types
-from .data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
-from .utils import (save_csv,
-                                    save_parquet,
-                                    save_multi_index_parquet,
-                                    save_keras_model,
-                                    save_csv_gz,
-                                    read_csv,
-                                    read_csv_gz)
+from .data_conversion import (DataConverter, NoConverter, PandasConverter,
+                                              data_converter_factory)
+from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
+                                    save_keras_model,  save_csv_gz, read_csv, read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
 from .utils import data_io_factory
 from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake
-from ..utils.utils import (set_logger,
-                                     replace_attr_and_store,
-                                     get_specific_dict_param,
+from ..utils.utils import (set_logger, replace_attr_and_store,  get_specific_dict_param,
                                      get_hierarchy_level)
 import block_types.config.bt_defaults as dflt
 
@@ -177,7 +171,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.estimator = Bunch(**kwargs)
 
     def fit_like (self, X, y=None, load=None, save=None, split=None,
-                  func='_fit', validation_data=None, test_data=None, **kwargs):
+                  func='_fit', validation_data=None, test_data=None,
+                  converter_args={}, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -196,7 +191,23 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if self.data_io.can_load_model (load):
             previous_estimator = self.data_io.load_estimator()
 
-        if previous_estimator is None:
+        already_computed = False
+        if previous_estimator is not None:
+            if func=='_fit':
+                already_computed = True
+            elif func=='_fit_apply':
+                previous_result = None
+                if self.data_io.can_load_result (load):
+                    previous_result = self.data_io.load_result (split=split)
+                already_computed = previous_result is not None
+            else:
+                raise ValueError (f'function {func} not valid')
+
+        if not already_computed:
+            if func=='_fit_apply':
+                (X_original, y_original) = ((copy.deepcopy (X), copy.deepcopy (y))
+                                            if self.data_converter.inplace else (X, y))
+                _ = self.data_converter.convert_before_transforming (X_original, **converter_args)
             X, y = self.data_converter.convert_before_fitting (X, y)
             additional_data= self._add_validation_and_test (validation_data, test_data)
             if func=='_fit':
@@ -213,12 +224,24 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             else:
                 raise ValueError (f'function {func} not valid')
             self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
-            self.data_converter.convert_after_fitting (X)
+            if func=='_fit':
+                _ = self.data_converter.convert_after_fitting (X)
+            elif func=='_fit_apply':
+                if self.data_converter.inplace:
+                    _ = self.data_converter.convert_after_fitting (X)
+                result = self.data_converter.convert_after_transforming (result, **converter_args)
+                if self.data_io.can_save_result (save, split):
+                    self.data_io.save_result (result, split=split)
+            else:
+                raise ValueError (f'function {func} not valid')
             if self.data_io.can_save_model (save):
                 self.data_io.save_estimator ()
         else:
             self.estimator = previous_estimator
             self.logger.info (f'loaded pre-trained {self.name}')
+            if func=='_fit_apply':
+                result = previous_result
+                self.logger.info (f'loaded pre-computed result')
 
         self.profiler.finish_timer (method=func, split=self.data_io.split)
 
