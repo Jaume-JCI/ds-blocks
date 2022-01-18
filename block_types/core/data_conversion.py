@@ -22,7 +22,7 @@ class DataConverter ():
     particular component from the remaining components in the pipeline,
     making it more reusable across different pipelines.
     """
-    def __init__ (self, logger = None, verbose: int = dflt.verbose, **kwargs):
+    def __init__ (self, logger=None, verbose: int=dflt.verbose, inplace: bool=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
 
@@ -38,6 +38,7 @@ class DataConverter ():
             self.logger = set_logger ('block_types', verbose=verbose)
         else:
             self.logger = logger
+        self.inplace = inplace
 
     def convert_before_fitting (self, X, y=None):
         """
@@ -115,7 +116,8 @@ class DataConverter ():
 # Cell
 class NoConverter (DataConverter):
     """Performs no conversion."""
-    pass
+    def __init__ (self, **kwargs):
+        super().__init__(inplace=False)
 
 # Cell
 class PandasConverter (DataConverter):
@@ -173,12 +175,8 @@ class PandasConverter (DataConverter):
         will be indicated by a parameter called something like `metadata`, which contains
         the list of columns in the DataFrame which contain the rest of metadata.
     """
-    def __init__ (self,
-                  transform_uses_labels=False,
-                  transformed_index=None,
-                  transformed_columns=None,
-                  separate_labels=True,
-                  **kwargs):
+    def __init__ (self, transform_uses_labels=False, transformed_index=None, transformed_columns=None,
+                  separate_labels=True, inplace=False, **kwargs):
         """
         Initialize attributes and fields.
 
@@ -218,7 +216,7 @@ class PandasConverter (DataConverter):
             the description of that class.
         """
 
-        super().__init__(**kwargs)
+        super().__init__(inplace=inplace, **kwargs)
 
         # whether the _transform method receives a DataFrame that includes the labels, or it doesn't
         self.transform_uses_labels = transform_uses_labels
@@ -386,6 +384,7 @@ class Window2Dto3Dconverter (DataConverter):
             self.data_converter = PandasConverter (**kwargs)
         else:
             self.data_converter = data_converter
+        super ().__init__ (inplace=self.data_converter.inplace)
 
     def convert_before_fitting (self, X, y=None):
         """
