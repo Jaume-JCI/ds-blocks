@@ -141,10 +141,13 @@ def argnames(f, frame=False):
     return code.co_varnames[:code.co_argcount+code.co_kwonlyargcount]
 
 # Cell
-def _store_attr(self, overwrite=False, **attrs):
+def _store_attr(self, overwrite=False, error_if_present=False, ignore=set(), **attrs):
     stored = getattr(self, '__stored_args__', None)
     for n,v in attrs.items():
-        if not overwrite and hasattr(self, n):
+        if hasattr(self, n) and not overwrite:
+            if (error_if_present and getattr(self, n) is not v and n not in ignore
+                and not callable(getattr(self, n))):
+                raise RuntimeError (f'field {n} already present in {self}')
             continue
         setattr(self, n, v)
         if stored is not None: stored[n] = v
@@ -220,9 +223,8 @@ def get_hierarchy_level (base_class=object):
 def replace_attr_and_store (names=None, but='', store_args=None,
                             recursive=True, base_class=object,
                             replace_generic_attr=True, overwrite=False,
-                            overwrite_name=True, self=None,
-                            include_first=False,
-                            **attrs):
+                            error_if_present=False, ignore=set(), overwrite_name=True,
+                            self=None, include_first=False, **attrs):
     """
     Replaces generic attributes and stores them into attrs in `self`.
 
@@ -241,6 +243,7 @@ def replace_attr_and_store (names=None, but='', store_args=None,
     frame_number=1
     stack = inspect.stack()
     original_type = None
+    input_attrs = attrs
     while True:
         fr = sys._getframe(frame_number)
         fr_stack = stack[frame_number]
@@ -277,7 +280,7 @@ def replace_attr_and_store (names=None, but='', store_args=None,
         #pdb.set_trace()
         ns = names if names is not None else getattr(self, '__slots__', args[1:])
         added = {n:fr.f_locals[n] for n in ns}
-        attrs = {**attrs, **added}
+        attrs = {**input_attrs, **added}
         if replace_generic_attr and 'kwargs' in fr.f_locals:
             class_specific_attrs = obtain_class_specific_attrs (self, **fr.f_locals['kwargs'])
             attrs.update(class_specific_attrs)
@@ -285,10 +288,14 @@ def replace_attr_and_store (names=None, but='', store_args=None,
             class_specific_attrs={}
         if isinstance(but,str): but = re.split(', *', but)
         attrs = {k:v for k,v in attrs.items() if k not in but}
-        _store_attr(self, overwrite=overwrite, **attrs)
-        if overwrite_name and ('name' in class_specific_attrs or 'class_name' in class_specific_attrs):
-            new_attrs = {k:class_specific_attrs[k] for k in ['name', 'class_name'] if k in class_specific_attrs}
-            _store_attr(self, overwrite=True, **new_attrs)
+        _store_attr(self, overwrite=overwrite, error_if_present=error_if_present,
+                    ignore=ignore, **attrs)
+        if overwrite_name and ('name' in class_specific_attrs
+                               or 'class_name' in class_specific_attrs):
+            new_attrs = {k:class_specific_attrs[k] for k in ['name', 'class_name']
+                         if k in class_specific_attrs}
+            _store_attr(self, overwrite=True, error_if_present=error_if_present,
+                        ignore=ignore, **new_attrs)
 
         if not recursive:
             break

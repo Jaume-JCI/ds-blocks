@@ -5,10 +5,11 @@ __all__ = ['Component', 'SamplingComponent', 'SklearnComponent', 'PickleSaverCom
 
 # Cell
 from functools import partialmethod
-from typing import Optional
+from typing import Optional, Union
 import copy
 import pickle
 from pathlib import Path
+import re
 
 from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
 from sklearn.utils import Bunch
@@ -39,7 +40,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   estimator=None,
                   name: Optional[str] = None,
                   class_name: Optional[str] = None,
-                  group: str = 'group_0',
+                  group: str = dflt.group,
+                  overwrite_field: bool = dflt.overwrite_field,
+                  error_if_present: bool = dflt.error_if_present,
+                  ignore:set = set(),
+                  but: Union[str, list] = '',
                   data_converter: Optional[DataConverter] = None,
                   data_io: Optional[DataIO] = None,
                   model_plotter: Optional[ModelPlotter] = None,
@@ -83,7 +88,14 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.hierarchy_level = get_hierarchy_level (base_class=Component)
 
         # store __init__ attrs into `self`
-        replace_attr_and_store (base_class=Component)
+        but = ', '.join (but) if isinstance(but, list) else but
+        but = (but + ', ') if len(but)>0 else but
+        but = but + 'ignore, but, overwrite_field, error_if_present, path_results, path_models'
+        if isinstance (ignore, str): ignore = set(re.split(', *', ignore))
+        ignore.update ({'name', 'class_name'})
+        replace_attr_and_store (base_class=Component, but=but,
+                                error_if_present=error_if_present, overwrite=overwrite_field,
+                                ignore=ignore)
 
         # obtain class-specific kwargs
         kwargs = self.obtain_config_params (**kwargs)

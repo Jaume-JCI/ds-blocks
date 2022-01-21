@@ -58,8 +58,7 @@ class MultiComponent (SamplingComponent):
         # we need to call super().__init__() *after* having creating the `components` field,
         # since the constructor of Component calls a method that is overriden in Pipeline,
         # and this method makes use of the mentioned `components` field
-        super().__init__ (separate_labels = separate_labels,
-                          **kwargs)
+        super().__init__ (separate_labels=separate_labels, **kwargs)
 
         self.set_split ('whole')
 
