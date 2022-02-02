@@ -22,7 +22,7 @@ from .block_types import (Component,
                                           NoSaverComponent)
 from .data_conversion import PandasConverter
 from .utils import PandasIO
-from ..utils.utils import get_logging_level
+from ..utils.utils import get_logging_level, set_empty_logger
 import block_types.config.bt_defaults as dflt
 
 # Cell
