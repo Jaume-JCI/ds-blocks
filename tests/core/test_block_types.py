@@ -129,6 +129,50 @@ def test_component_store_attrs ():
     o = Final (x=9, h=[1,2,4], group='group_1', group_1={'y': 10, 'z':60})
     assert o.x==9 and o.y==10 and o.z==60 and o.h==[1,2,4]
 
+
+     # *******************
+    # test using same field in B4 and in A3, but
+    # B4 passes that value to A3 in super(),
+    # after modifying it
+    # *****************
+    class A (Component):
+        def __init__ (self, x=3, path_results='test_recursive', **kwargs):
+            path_results = f'{path_results}/another'
+            super ().__init__ (path_results=path_results, error_if_present=True,
+                               **kwargs)
+
+    class B (A):
+        def __init__ (self, x=30, y=10, **kwargs):
+            x = x*2
+            super().__init__ (x=x, **kwargs)
+            self.ab = A (**kwargs)
+
+    b = B ()
+    assert b.x==60 and b.ab.x==3 and b.y==10 and b.path_results==Path('test_recursive/another').resolve()
+
+    b = B (x=6, path_results='new_path')
+    assert b.x==12 and b.ab.x==3 and b.y==10 and b.path_results==Path('new_path/another').resolve()
+
+    # *******************
+    # test using same field in C and in A, but
+    # the field is modified in a parent B
+    # *****************
+    class C(B):
+        def __init__ (self, x=40, z=100, **kwargs):
+            super().__init__ (x=x, **kwargs)
+            self.b = B(**kwargs)
+
+    with pytest.raises (RuntimeError):
+        c = C()
+
+    c = C(ignore={'x'})
+    assert c.x==80 and c.y==10 and c.z==100 and c.b.x==60 and c.b.y==10
+
+    c = C (x=9, ignore={'x'})
+    assert c.x==18 and c.y==10 and c.z==100 and c.b.x==60 and c.b.y==10
+
+    assert not hasattr(c, 'ignore')
+
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
 def test_component_aliases ():

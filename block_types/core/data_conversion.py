@@ -117,7 +117,7 @@ class DataConverter ():
 class NoConverter (DataConverter):
     """Performs no conversion."""
     def __init__ (self, **kwargs):
-        super().__init__(inplace=False)
+        super().__init__(inplace=False, **kwargs)
 
 # Cell
 class PandasConverter (DataConverter):
@@ -384,7 +384,7 @@ class Window2Dto3Dconverter (DataConverter):
             self.data_converter = PandasConverter (**kwargs)
         else:
             self.data_converter = data_converter
-        super ().__init__ (inplace=self.data_converter.inplace)
+        super ().__init__ (inplace=self.data_converter.inplace, **kwargs)
 
     def convert_before_fitting (self, X, y=None):
         """

@@ -29,8 +29,8 @@ from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
 from .utils import data_io_factory
 from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake
-from ..utils.utils import (set_logger, replace_attr_and_store,  get_specific_dict_param,
-                                     get_hierarchy_level)
+from ..utils.utils import (set_logger, delete_logger, replace_attr_and_store,
+                                     get_specific_dict_param, get_hierarchy_level)
 import block_types.config.bt_defaults as dflt
 
 # Cell
@@ -97,11 +97,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                                 error_if_present=error_if_present, overwrite=overwrite_field,
                                 ignore=ignore)
 
-        # obtain class-specific kwargs
-        kwargs = self.obtain_config_params (**kwargs)
-
         if self.logger is None:
             self.logger = set_logger (self.name_logger, verbose=self.verbose)
+
+        # obtain class-specific kwargs
+        kwargs = self.obtain_config_params (**kwargs)
 
         # object that manages loading / saving
         if self.data_io is None:
@@ -136,6 +136,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # comparing results against other implementations of this component
         if self.comparator is None:
             self.comparator = Comparator (self, **kwargs)
+
+    def reset_logger (self):
+        delete_logger (self.name_logger)
 
     def obtain_config_params (self, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
@@ -458,8 +461,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         if estimator is not None:
             self.estimator = estimator
 
-    def load_result (self, split=None, path_results=None):
-        return self.data_io.load_result (split=split, path_results=path_results)
+    def load_result (self, split=None, path_results=None, result_file_name=None):
+        return self.data_io.load_result (split=split, path_results=path_results,
+                                         result_file_name=result_file_name)
 
     def assert_equal (self, item1, item2=None, split=None, raise_error=True, **kwargs):
         return self.comparator.assert_equal (item1, item2=item2, split=split,

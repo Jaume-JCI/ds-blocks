@@ -33,22 +33,28 @@ def test_make_reproducible ():
 # Comes from utils.ipynb, cell
 #@pytest.mark.reference_fails
 def test_set_logger ():
-    logger = set_logger ('test', path_results='test_logger')
-
+    path_results = 'test_logger'
+    logger = set_logger ('test', path_results=path_results)
     assert os.listdir ('test_logger')==['logs.txt']
-
     assert logger.level==logging.DEBUG
 
-    logger = set_logger ('test', path_results='test_logger', verbose=1)
+    logger = set_logger ('test', path_results=path_results, verbose=1)
     assert logger.level==logging.INFO
 
     set_verbosity (logger=logger, verbose=0)
     assert logger.level==logging.WARNING
 
-    for hdlr in logger.handlers[:]:  # remove all old handlers
+    for hdlr in logger.handlers[:]:
         assert hdlr.level==logging.WARNING
 
-    shutil.rmtree ('test_logger')
+    delete_logger ('test', path_results=path_results)
+    assert os.listdir ('test_logger')==[]
+
+    logger = set_empty_logger ()
+    logger.critical ('this does not show up')
+    assert os.listdir ('test_logger')==[]
+
+    shutil.rmtree (path_results)
 
 # Comes from utils.ipynb, cell
 #@pytest.mark.reference_fails
@@ -168,6 +174,108 @@ def test_replace_attr_and_store ():
 
     c = C2 (y=3, x='Hi')
     assert (c.b.y, c.b.x) == (6, 'Hi world')
+
+    # **************************************************
+    # test error_if_present
+    # **************************************************
+
+    def f3 (**kwargs):
+        return B(**kwargs)
+
+    class A3 ():
+        def __init__ (self, x=3, ignore=set(), **kwargs):
+            replace_attr_and_store (base_class=A3, error_if_present=True,
+                                    ignore=ignore, but='ignore')
+
+    class B3(A3):
+        def __init__ (self, y=10, **kwargs):
+            super().__init__ (**kwargs)
+            self.ab = A3 (**kwargs)
+
+
+    a = A3()
+
+    b = B3()
+
+    b2 = B3(x=5, y=20)
+
+    assert a.x==3 and b.y==10 and b.x==3 and b.ab.x==3 and b2.x==5 and b2.y==20 and b2.ab.x==5
+
+    # *******************
+    # test using same field in B4 and in A3, but
+    # B4 passes that value to A3 in super()
+    # *****************
+    class B4(A3):
+        def __init__ (self, x=30, y=10, **kwargs):
+            super().__init__ (x=x, **kwargs)
+            self.ab = A3 (**kwargs)
+
+    b3 = B4 ()
+    assert b3.x==30 and b3.ab.x==3 and b3.y==10
+
+    # *******************
+    # test using same field in B4 and in A3, but
+    # B4 passes that value to A3 in super(),
+    # after modifying it
+    # *****************
+    class B5(A3):
+        def __init__ (self, x=30, y=10, **kwargs):
+            x = x*2
+            super().__init__ (x=x, **kwargs)
+            self.ab = A3 (**kwargs)
+
+    b3 = B5 ()
+    assert b3.x==60 and b3.ab.x==3 and b3.y==10
+
+    b3 = B5 (x=6)
+    assert b3.x==12 and b3.ab.x==3 and b3.y==10
+
+    # *******************
+    # test using same field in D and in A3, but
+    # the field is modified in a parent B5
+    # *****************
+    class D(B5):
+        def __init__ (self, x=40, z=100, **kwargs):
+            super().__init__ (x=x, **kwargs)
+            self.b = B5(**kwargs)
+
+    with pytest.raises (RuntimeError):
+        d = D ()
+
+    d = D(ignore={'x'})
+    assert d.x==80 and d.y==10 and d.z==100 and d.b.x==60 and d.b.y==10
+
+    d = D (x=9, ignore={'x'})
+    assert d.x==18 and d.y==10 and d.z==100 and d.b.x==60 and d.b.y==10
+
+    assert not hasattr(d, 'ignore')
+
+    # *******************
+    # test having a field with same name
+    # *******************
+    class C3(A3):
+        def __init__ (self, x=4, z=100, **kwargs):
+            super().__init__ (**kwargs)
+            self.a = A3(**kwargs)
+            self.b = f3(**kwargs)
+
+    with pytest.raises (RuntimeError):
+        c = C3()
+
+    # **************************************************
+    # test overwrite
+    # **************************************************
+    class A4 ():
+        def __init__ (self, x=3, **kwargs):
+            replace_attr_and_store (base_class=A4, overwrite=True)
+
+    class C5(A4):
+        def __init__ (self, x=4, z=100, **kwargs):
+            super().__init__ (x=x, **kwargs)
+            self.a = A4(**kwargs)
+
+    c = C5 ()
+    assert c.x == 4 and c.a.x==3
 
 # Comes from utils.ipynb, cell
 #@pytest.mark.reference_fails

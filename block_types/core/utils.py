@@ -334,7 +334,7 @@ class DataIO ():
         if self.component.estimator is not None:
             self._save (self.path_model_file, self.fitting_save_func, self.component.estimator)
 
-    def load_result (self, split=None, path_results=None):
+    def load_result (self, split=None, path_results=None, result_file_name=None):
         """
         Load transformed data.
 
@@ -343,13 +343,14 @@ class DataIO ():
         """
         split = self.split if split is None else split
         path_results = self.path_results if path_results is None else Path(path_results).resolve()
+        result_file_name = self.result_file_name if result_file_name is None else result_file_name
         if path_results is not None:
-            path_result_file = path_results / split / self.result_file_name
+            path_result_file = path_results / split / result_file_name
         else:
             path_result_file = None
         return self._load (path_result_file, self.result_load_func)
 
-    def save_result (self, result, split=None):
+    def save_result (self, result, split=None, path_results=None, result_file_name=None):
         """
         Save transformed data.
 
@@ -357,8 +358,10 @@ class DataIO ():
         otherwise transformed test data is saved.
         """
         split = self.split if split is None else split
-        if self.path_results is not None:
-            path_result_file = self.path_results / split / self.result_file_name
+        path_results = self.path_results if path_results is None else Path(path_results).resolve()
+        result_file_name = self.result_file_name if result_file_name is None else result_file_name
+        if path_results is not None:
+            path_result_file = path_results / split / result_file_name
         else:
             path_result_file = None
         self._save (path_result_file, self.result_save_func,

@@ -304,6 +304,16 @@ class MultiComponent (SamplingComponent):
         for component in self.components:
             component.load_estimator ()
 
+    def save_result (self, result, split=None, path_results=None, result_file_name=None):
+        self.data_io.save_result (result, split=split, path_results=path_results,
+                                  result_file_name=result_file_name)
+        for component in self.components:
+            if isinstance (component, MultiComponent):
+                component.save_result (result, split=split, path_results=path_results,
+                                       result_file_name=result_file_name)
+            else:
+                component.data_io.save_result (result, split=split, path_results=path_results,
+                                               result_file_name=result_file_name)
     # *************************
     # setters
     # *************************
@@ -458,7 +468,7 @@ class ColumnSelector (NoSaverComponent):
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
-            logger=None
+            logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
                           **kwargs)
@@ -478,7 +488,7 @@ class Concat (NoSaverComponent):
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
-            logger=None
+            logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
                           **kwargs)
@@ -529,7 +539,7 @@ class Identity (NoSaverComponent):
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
-            logger=None
+            logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
                           **kwargs)
