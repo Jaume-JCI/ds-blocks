@@ -166,7 +166,7 @@ def _store_attr(self, overwrite=False, error_if_present=False, ignore=set(), **a
         if hasattr(self, n) and not overwrite:
             if (error_if_present and getattr(self, n) is not v and n not in ignore
                 and not callable(getattr(self, n))):
-                raise RuntimeError (f'field {n} already present in {self}')
+                raise RuntimeError (f'field {n} already present in object from {self.__class__.__name__}')
             continue
         setattr(self, n, v)
         if stored is not None: stored[n] = v
