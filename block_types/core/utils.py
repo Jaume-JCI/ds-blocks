@@ -690,7 +690,7 @@ class Comparator ():
                 right = np.array(right, dtype=float)
             except:
                 for i, (x, y) in enumerate(zip(left, right)):
-                    result = self.compare (x, y, message + f'[{i}] ', rtol=rtol, atol=atol, **kwargs)
+                    result = self.compare (x, y, message=message+f'[{i}] ', rtol=rtol, atol=atol, **kwargs)
                     if len(result) > 0:
                         return result
                 return ''
@@ -698,7 +698,7 @@ class Comparator ():
             if sorted(left.keys()) != sorted(right.keys()):
                 return f'{message}{sorted(left.keys())}!={sorted(right.keys())}'
             for k in left:
-                result = self.compare (left[k], right[k], message + f'[{k}] ', rtol=rtol, atol=atol,
+                result = self.compare (left[k], right[k], message=message+f'[{k}] ', rtol=rtol, atol=atol,
                                        **kwargs)
                 if len(result) > 0:
                     return result

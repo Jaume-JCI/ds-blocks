@@ -136,6 +136,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # comparing results against other implementations of this component
         if self.comparator is None:
             self.comparator = Comparator (self, **kwargs)
+        elif type(self.comparator) is type:
+            self.comparator = self.comparator (self, **kwargs)
 
     def reset_logger (self):
         delete_logger (self.name_logger)

@@ -60,6 +60,7 @@ def delete_logger (name, path_results='log', filename='logs.txt'):
             os.remove (path_to_log_file)
 
 # Cell
+import pdb
 def set_logger (name, path_results='log', stdout=True,
                 mode='a', just_message = False, filename='logs.txt',
                 logging_level=logging.DEBUG, verbose=None, verbose_out=None,
@@ -76,9 +77,6 @@ def set_logger (name, path_results='log', stdout=True,
 
     for hdlr in logger.handlers[:]:  # remove all old handlers
         logger.removeHandler(hdlr)
-
-    #if not logger.hasHandlers():
-
     # Create handlers
     if stdout:
         c_handler = logging.StreamHandler()
