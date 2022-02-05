@@ -53,6 +53,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   logger=None,
                   verbose: int = dflt.verbose,
                   name_logger:str = dflt.name_logger,
+                  mode_logger:str = dflt.mode_logger,
                   **kwargs):
 
         """
@@ -98,7 +99,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                                 ignore=ignore)
 
         if self.logger is None:
-            self.logger = set_logger (self.name_logger, verbose=self.verbose)
+            self.logger = set_logger (self.name_logger, verbose=self.verbose, mode=self.mode_logger)
 
         # obtain class-specific kwargs
         kwargs = self.obtain_config_params (**kwargs)

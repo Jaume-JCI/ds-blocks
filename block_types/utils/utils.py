@@ -60,12 +60,14 @@ def delete_logger (name, path_results='log', filename='logs.txt'):
             os.remove (path_to_log_file)
 
 # Cell
-import pdb
+#import pdb
 def set_logger (name, path_results='log', stdout=True,
-                mode='a', just_message = False, filename='logs.txt',
-                logging_level=logging.DEBUG, verbose=None, verbose_out=None,
+                mode='a', just_message = False, filename='logs.txt', null_file_name='null_log.txt',
+                null_name='no_logging', logging_level=logging.WARNING, verbose=None, verbose_out=None,
                 print_path=False):
     """Set logger."""
+    name= name if verbose is not None else null_name
+    filename= filename if verbose is not None else null_file_name
     logger = logging.getLogger(name)
     if verbose is not None:
         logging_level = get_logging_level (verbose)
