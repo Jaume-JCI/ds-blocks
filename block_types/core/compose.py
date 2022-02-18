@@ -305,6 +305,7 @@ class MultiComponent (SamplingComponent):
             component.load_estimator ()
 
     def save_result (self, result, split=None, path_results=None, result_file_name=None):
+        raise NotImplementedError ()
         self.data_io.save_result (result, split=split, path_results=path_results,
                                   result_file_name=result_file_name)
         for component in self.components:

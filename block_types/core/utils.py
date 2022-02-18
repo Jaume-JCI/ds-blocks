@@ -423,7 +423,7 @@ class DataIO ():
         if self.path_models is not None:
             self.path_models = Path(self.path_models).resolve()
         else:
-            self.path_models = path_results
+            self.path_models = self.path_results
         if self.path_models is not None and self.fitting_file_name is not None:
             self.path_model_file = self.path_models / 'models' / self.fitting_file_name
         else:
