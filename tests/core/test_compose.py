@@ -107,24 +107,6 @@ def test_multi_comp_io ():
 
     remove_previous_results (path_results=path_results)
 
-    # ************************************
-    # test saving results after computing them
-    # ************************************
-
-    composition1 = SimpleMultiComponent ()
-    result1 = composition1 (X)
-    composition1.save_result (X, path_results=path_results)
-    print (sorted (os.listdir (path_results)))
-
-    path_results2 = 'multi_component_loading_saving2'
-    composition2 = SimpleMultiComponent ()
-    result2 = composition2 (X)
-    composition2.save_result (X, path_results=path_results2)
-
-    assert (joblib.load (f'{path_results}/whole/tr1_result.pk') == joblib.load(f'{path_results2}/whole/tr1_result.pk')).all()
-    assert (joblib.load (f'{path_results}/whole/tr2_result.pk') == joblib.load(f'{path_results2}/whole/tr2_result.pk')).all()
-    remove_previous_results (path_results=path_results2)
-
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
 def test_multi_comp_desc ():
