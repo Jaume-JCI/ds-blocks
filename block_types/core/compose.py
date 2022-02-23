@@ -6,9 +6,10 @@ __all__ = ['MultiComponent', 'Pipeline', 'make_pipeline', 'pipeline_factory', 'P
 
 # Cell
 import warnings
-import pandas as pd
-import warnings
+import sys
+from pathlib import Path
 from sklearn.utils import Bunch
+import pandas as pd
 
 try:
     from graphviz import *
@@ -235,7 +236,7 @@ class MultiComponent (SamplingComponent):
         for component in self.components:
             component.show_result_statistics(split=split)
 
-    def show_summary (self, split=None):
+    def show_summary (self, split=None, file=sys.stdout):
         """
         Show list of pipeline components, data flow and dimensionality.
 
@@ -247,12 +248,13 @@ class MultiComponent (SamplingComponent):
 
         node_name = 'data'
         output = 'train / test'
+        if isinstance (file, str) or isinstance (file, Path): file = open (file, 'wt')
 
         for i, component in enumerate(self.components):
             node_name = component.model_plotter.get_node_name()
             output = component.model_plotter.get_edge_name(split=split)
-            print (f'{"-"*100}')
-            print (f'{i}: {node_name} => {output}')
+            print (f'{"-"*100}', file=file)
+            print (f'{i}: {node_name} => {output}', file=file)
 
 
     def get_split (self, split=None):
