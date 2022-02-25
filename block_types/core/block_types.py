@@ -426,7 +426,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         return result
 
 
-    def _fit (self, X, y=None):
+    def _fit (self, X, y=None, **kwargs):
         if self.estimator is not None:
             self.estimator.fit (X, y)
 
