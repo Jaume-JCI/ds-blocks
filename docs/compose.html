@@ -98,7 +98,7 @@ nb_path: "nbs/core/compose.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L29" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong><code>warning_if_nick_name_exists</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h2 id="MultiComponent" class="doc_header"><code>class</code> <code>MultiComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L30" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiComponent</code>(<strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong><code>warning_if_nick_name_exists</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -274,24 +274,6 @@ See `Pipeline` class.</code></pre>
     <span class="k">assert</span> <span class="p">(</span><span class="n">resut_tr2_2</span><span class="o">==</span><span class="n">composition1</span><span class="o">.</span><span class="n">tr2</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 
     <span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
-    
-    <span class="c1"># ************************************</span>
-    <span class="c1"># test saving results after computing them</span>
-    <span class="c1"># ************************************</span>
-    
-    <span class="n">composition1</span> <span class="o">=</span> <span class="n">SimpleMultiComponent</span> <span class="p">()</span>
-    <span class="n">result1</span> <span class="o">=</span> <span class="n">composition1</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="n">composition1</span><span class="o">.</span><span class="n">save_result</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">path_results</span><span class="o">=</span><span class="n">path_results</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="p">(</span><span class="nb">sorted</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="p">(</span><span class="n">path_results</span><span class="p">)))</span>
-    
-    <span class="n">path_results2</span> <span class="o">=</span> <span class="s1">&#39;multi_component_loading_saving2&#39;</span>
-    <span class="n">composition2</span> <span class="o">=</span> <span class="n">SimpleMultiComponent</span> <span class="p">()</span>
-    <span class="n">result2</span> <span class="o">=</span> <span class="n">composition2</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="n">composition2</span><span class="o">.</span><span class="n">save_result</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">path_results</span><span class="o">=</span><span class="n">path_results2</span><span class="p">)</span>
-    
-    <span class="k">assert</span> <span class="p">(</span><span class="n">joblib</span><span class="o">.</span><span class="n">load</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole/tr1_result.pk&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results2</span><span class="si">}</span><span class="s1">/whole/tr1_result.pk&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="n">joblib</span><span class="o">.</span><span class="n">load</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results</span><span class="si">}</span><span class="s1">/whole/tr2_result.pk&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_results2</span><span class="si">}</span><span class="s1">/whole/tr2_result.pk&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-    <span class="n">remove_previous_results</span> <span class="p">(</span><span class="n">path_results</span><span class="o">=</span><span class="n">path_results2</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -350,7 +332,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_comp_desc" class="doc_header"><code>test_multi_comp_desc</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L130" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_desc</code>()</p>
+<h4 id="test_multi_comp_desc" class="doc_header"><code>test_multi_comp_desc</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L112" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_desc</code>()</p>
 </blockquote>
 
 </div>
@@ -563,7 +545,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_athena_pipeline_training" class="doc_header"><code>test_athena_pipeline_training</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L779" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_athena_pipeline_training</code>()</p>
+<h4 id="test_athena_pipeline_training" class="doc_header"><code>test_athena_pipeline_training</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L761" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_athena_pipeline_training</code>()</p>
 </blockquote>
 
 </div>
@@ -747,7 +729,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_comp_hierarchy" class="doc_header"><code>test_multi_comp_hierarchy</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L383" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_hierarchy</code>()</p>
+<h4 id="test_multi_comp_hierarchy" class="doc_header"><code>test_multi_comp_hierarchy</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L365" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_hierarchy</code>()</p>
 </blockquote>
 
 </div>
@@ -858,7 +840,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_comp_profiling" class="doc_header"><code>test_multi_comp_profiling</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L419" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_profiling</code>()</p>
+<h4 id="test_multi_comp_profiling" class="doc_header"><code>test_multi_comp_profiling</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L401" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_profiling</code>()</p>
 </blockquote>
 
 </div>
@@ -1212,7 +1194,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_comp_all_equal" class="doc_header"><code>test_multi_comp_all_equal</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L486" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_all_equal</code>()</p>
+<h4 id="test_multi_comp_all_equal" class="doc_header"><code>test_multi_comp_all_equal</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L468" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_comp_all_equal</code>()</p>
 </blockquote>
 
 </div>
@@ -1524,7 +1506,7 @@ Results are different in components [&#39;tr1&#39;, &#39;tr2&#39;]
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_component_setters" class="doc_header"><code>test_multi_component_setters</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L593" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_component_setters</code>()</p>
+<h4 id="test_multi_component_setters" class="doc_header"><code>test_multi_component_setters</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L575" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_component_setters</code>()</p>
 </blockquote>
 
 </div>
@@ -1647,7 +1629,7 @@ Results are different in components [&#39;tr1&#39;, &#39;tr2&#39;]
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_show_result_statistics" class="doc_header"><code>test_show_result_statistics</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L641" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_show_result_statistics</code>()</p>
+<h4 id="test_show_result_statistics" class="doc_header"><code>test_show_result_statistics</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L623" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_show_result_statistics</code>()</p>
 </blockquote>
 
 </div>
@@ -2056,7 +2038,7 @@ Results are different in components [&#39;tr1&#39;, &#39;tr2&#39;]
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L351" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="Pipeline" class="doc_header"><code>class</code> <code>Pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L354" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Pipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -2116,7 +2098,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Transform1" class="doc_header"><code>class</code> <code>Transform1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L656" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Transform1" class="doc_header"><code>class</code> <code>Transform1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L638" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -2142,7 +2124,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Transform2" class="doc_header"><code>class</code> <code>Transform2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L668" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Transform2" class="doc_header"><code>class</code> <code>Transform2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L650" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -2168,7 +2150,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SimplePipeline" class="doc_header"><code>class</code> <code>SimplePipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L680" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="SimplePipeline" class="doc_header"><code>class</code> <code>SimplePipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L662" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline composed of a list of components that run sequentially.
@@ -2270,7 +2252,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_fit_apply" class="doc_header"><code>test_pipeline_fit_apply</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L692" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_fit_apply</code>()</p>
+<h4 id="test_pipeline_fit_apply" class="doc_header"><code>test_pipeline_fit_apply</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L674" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_fit_apply</code>()</p>
 </blockquote>
 
 </div>
@@ -2355,7 +2337,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_fit_apply_bis" class="doc_header"><code>test_pipeline_fit_apply_bis</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L705" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_fit_apply_bis</code>()</p>
+<h4 id="test_pipeline_fit_apply_bis" class="doc_header"><code>test_pipeline_fit_apply_bis</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L687" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_fit_apply_bis</code>()</p>
 </blockquote>
 
 </div>
@@ -2464,7 +2446,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_new_comp" class="doc_header"><code>test_pipeline_new_comp</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L738" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_new_comp</code>()</p>
+<h4 id="test_pipeline_new_comp" class="doc_header"><code>test_pipeline_new_comp</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L720" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_new_comp</code>()</p>
 </blockquote>
 
 </div>
@@ -2550,7 +2532,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_set_comp" class="doc_header"><code>test_pipeline_set_comp</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L754" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_set_comp</code>()</p>
+<h4 id="test_pipeline_set_comp" class="doc_header"><code>test_pipeline_set_comp</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L736" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_set_comp</code>()</p>
 </blockquote>
 
 </div>
@@ -2645,7 +2627,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_athena_pipeline_training" class="doc_header"><code>test_athena_pipeline_training</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L779" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_athena_pipeline_training</code>()</p>
+<h4 id="test_athena_pipeline_training" class="doc_header"><code>test_athena_pipeline_training</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L761" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_athena_pipeline_training</code>()</p>
 </blockquote>
 
 </div>
@@ -2742,7 +2724,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_load_estimator" class="doc_header"><code>test_pipeline_load_estimator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L800" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_load_estimator</code>()</p>
+<h4 id="test_pipeline_load_estimator" class="doc_header"><code>test_pipeline_load_estimator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L782" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_load_estimator</code>()</p>
 </blockquote>
 
 </div>
@@ -2872,7 +2854,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="build_pipeline_construct_diagram_1" class="doc_header"><code>build_pipeline_construct_diagram_1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L854" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>build_pipeline_construct_diagram_1</code>(<strong><code>path_results</code></strong>)</p>
+<h4 id="build_pipeline_construct_diagram_1" class="doc_header"><code>build_pipeline_construct_diagram_1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L836" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>build_pipeline_construct_diagram_1</code>(<strong><code>path_results</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -2896,7 +2878,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="build_pipeline_construct_diagram_2" class="doc_header"><code>build_pipeline_construct_diagram_2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L871" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>build_pipeline_construct_diagram_2</code>(<strong><code>path_results</code></strong>)</p>
+<h4 id="build_pipeline_construct_diagram_2" class="doc_header"><code>build_pipeline_construct_diagram_2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L853" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>build_pipeline_construct_diagram_2</code>(<strong><code>path_results</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -2920,7 +2902,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_construct_diagram" class="doc_header"><code>test_construct_diagram</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L891" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_construct_diagram</code>()</p>
+<h4 id="test_construct_diagram" class="doc_header"><code>test_construct_diagram</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L873" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_construct_diagram</code>()</p>
 </blockquote>
 
 </div>
@@ -3190,7 +3172,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_show_summary" class="doc_header"><code>test_show_summary</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L916" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_show_summary</code>()</p>
+<h4 id="test_show_summary" class="doc_header"><code>test_show_summary</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L898" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_show_summary</code>()</p>
 </blockquote>
 
 </div>
@@ -3283,7 +3265,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L418" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_pipeline" class="doc_header"><code>make_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L421" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_pipeline</code>(<strong>*<code>components</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Create `Pipeline` object of class `cls`, given `components` list.</code></pre>
@@ -3322,7 +3304,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_pipeline" class="doc_header"><code>test_make_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L930" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_pipeline</code>()</p>
+<h4 id="test_make_pipeline" class="doc_header"><code>test_make_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L912" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_pipeline</code>()</p>
 </blockquote>
 
 </div>
@@ -3409,7 +3391,7 @@ on all the components except for the last one)</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L425" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="pipeline_factory" class="doc_header"><code>pipeline_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L428" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>pipeline_factory</code>(<strong><code>pipeline_class</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Creates a pipeline object given its class `pipeline_class`
@@ -3454,7 +3436,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pipeline_factory" class="doc_header"><code>test_pipeline_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L941" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_factory</code>()</p>
+<h4 id="test_pipeline_factory" class="doc_header"><code>test_pipeline_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L923" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pipeline_factory</code>()</p>
 </blockquote>
 
 </div>
@@ -3542,7 +3524,7 @@ pipeline_class : class or str
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L444" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>'PandasConverter'</code></em>, <strong><code>data_io</code></strong>=<em><code>'PandasIO'</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#Pipeline"><code>Pipeline</code></a></p>
+<h2 id="PandasPipeline" class="doc_header"><code>class</code> <code>PandasPipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L447" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasPipeline</code>(<strong><code>data_converter</code></strong>=<em><code>'PandasConverter'</code></em>, <strong><code>data_io</code></strong>=<em><code>'PandasIO'</code></em>, <strong><code>separate_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#Pipeline"><code>Pipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -3583,7 +3565,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasTransformWithLabels1" class="doc_header"><code>class</code> <code>PandasTransformWithLabels1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L956" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasTransformWithLabels1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#PandasComponent"><code>PandasComponent</code></a></p>
+<h2 id="PandasTransformWithLabels1" class="doc_header"><code>class</code> <code>PandasTransformWithLabels1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L938" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasTransformWithLabels1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#PandasComponent"><code>PandasComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -3613,7 +3595,7 @@ conversion performed.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasTransformWithLabels2" class="doc_header"><code>class</code> <code>PandasTransformWithLabels2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L969" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasTransformWithLabels2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#PandasComponent"><code>PandasComponent</code></a></p>
+<h2 id="PandasTransformWithLabels2" class="doc_header"><code>class</code> <code>PandasTransformWithLabels2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L951" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasTransformWithLabels2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#PandasComponent"><code>PandasComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -3643,7 +3625,7 @@ conversion performed.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SimplePandasPipeline" class="doc_header"><code>class</code> <code>SimplePandasPipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L982" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePandasPipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#PandasPipeline"><code>PandasPipeline</code></a></p>
+<h2 id="SimplePandasPipeline" class="doc_header"><code>class</code> <code>SimplePandasPipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L964" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePandasPipeline</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#PandasPipeline"><code>PandasPipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -3671,7 +3653,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TransformWithLabels1" class="doc_header"><code>class</code> <code>TransformWithLabels1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L995" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformWithLabels1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="TransformWithLabels1" class="doc_header"><code>class</code> <code>TransformWithLabels1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L977" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformWithLabels1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -3697,7 +3679,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TransformWithLabels2" class="doc_header"><code>class</code> <code>TransformWithLabels2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1007" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformWithLabels2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="TransformWithLabels2" class="doc_header"><code>class</code> <code>TransformWithLabels2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L989" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TransformWithLabels2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -3723,7 +3705,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="SimplePandasPipelineNoPandasComponent" class="doc_header"><code>class</code> <code>SimplePandasPipelineNoPandasComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1020" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePandasPipelineNoPandasComponent</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#PandasPipeline"><code>PandasPipeline</code></a></p>
+<h2 id="SimplePandasPipelineNoPandasComponent" class="doc_header"><code>class</code> <code>SimplePandasPipelineNoPandasComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1002" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SimplePandasPipelineNoPandasComponent</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#PandasPipeline"><code>PandasPipeline</code></a></p>
 </blockquote>
 
 <pre><code>Pipeline that saves results in parquet format, and preserves DataFrame format.
@@ -3843,7 +3825,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pandas_pipeline" class="doc_header"><code>test_pandas_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1033" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pandas_pipeline</code>()</p>
+<h4 id="test_pandas_pipeline" class="doc_header"><code>test_pandas_pipeline</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1015" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pandas_pipeline</code>()</p>
 </blockquote>
 
 </div>
@@ -4012,7 +3994,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L461" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong><code>remainder</code></strong>=<em><code>False</code></em>, <strong><code>verbose</code></strong>=<em><code>0</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
+<h2 id="ColumnSelector" class="doc_header"><code>class</code> <code>ColumnSelector</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L464" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnSelector</code>(<strong><code>columns</code></strong>=<em><code>[]</code></em>, <strong><code>remainder</code></strong>=<em><code>False</code></em>, <strong><code>verbose</code></strong>=<em><code>None</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -4051,7 +4033,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_column_selector" class="doc_header"><code>test_column_selector</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1062" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_column_selector</code>()</p>
+<h4 id="test_column_selector" class="doc_header"><code>test_column_selector</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1044" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_column_selector</code>()</p>
 </blockquote>
 
 </div>
@@ -4137,7 +4119,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L483" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong><code>verbose</code></strong>=<em><code>0</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
+<h2 id="Concat" class="doc_header"><code>class</code> <code>Concat</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L486" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Concat</code>(<strong><code>verbose</code></strong>=<em><code>None</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -4176,7 +4158,7 @@ See `Pipeline` class for an explanation of using `separate_labels=False`</code><
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L527" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
+<h2 id="ColumnTransformer" class="doc_header"><code>class</code> <code>ColumnTransformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L530" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ColumnTransformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>_BaseColumnTransformer</code></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -4219,7 +4201,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L534" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong><code>verbose</code></strong>=<em><code>0</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
+<h2 id="Identity" class="doc_header"><code>class</code> <code>Identity</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L537" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Identity</code>(<strong><code>verbose</code></strong>=<em><code>None</code></em>, <strong><code>force_verbose</code></strong>=<em><code>False</code></em>, <strong><code>logger</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#NoSaverComponent"><code>NoSaverComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that does not save any data.</code></pre>
@@ -4258,7 +4240,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L588" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer_pipelines" class="doc_header"><code>make_column_transformer_pipelines</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L591" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer_pipelines</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -4282,7 +4264,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L601" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>class_name</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="make_column_transformer" class="doc_header"><code>make_column_transformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L604" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>make_column_transformer</code>(<strong>*<code>transformers</code></strong>, <strong><code>remainder</code></strong>=<em><code>'drop'</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>class_name</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -4319,7 +4301,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="column_transformer_data" class="doc_header"><code>column_transformer_data</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1072" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>column_transformer_data</code>()</p>
+<h4 id="column_transformer_data" class="doc_header"><code>column_transformer_data</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1054" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>column_transformer_data</code>()</p>
 </blockquote>
 
 </div>
@@ -4343,7 +4325,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_column_transformer" class="doc_header"><code>test_make_column_transformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1086" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer</code>(<strong><code>column_transformer_data</code></strong>)</p>
+<h4 id="test_make_column_transformer" class="doc_header"><code>test_make_column_transformer</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1068" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer</code>(<strong><code>column_transformer_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -4546,7 +4528,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_column_transformer_passthrough" class="doc_header"><code>test_make_column_transformer_passthrough</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1130" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_passthrough</code>(<strong><code>column_transformer_data</code></strong>)</p>
+<h4 id="test_make_column_transformer_passthrough" class="doc_header"><code>test_make_column_transformer_passthrough</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1112" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_passthrough</code>(<strong><code>column_transformer_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -4709,7 +4691,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_column_transformer_remainder" class="doc_header"><code>test_make_column_transformer_remainder</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1147" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_remainder</code>(<strong><code>column_transformer_data</code></strong>)</p>
+<h4 id="test_make_column_transformer_remainder" class="doc_header"><code>test_make_column_transformer_remainder</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1129" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_remainder</code>(<strong><code>column_transformer_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5108,7 +5090,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_column_transformer_descendants" class="doc_header"><code>test_make_column_transformer_descendants</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1204" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_descendants</code>(<strong><code>column_transformer_data</code></strong>)</p>
+<h4 id="test_make_column_transformer_descendants" class="doc_header"><code>test_make_column_transformer_descendants</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1186" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_descendants</code>(<strong><code>column_transformer_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5201,7 +5183,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_make_column_transformer_fit_transform" class="doc_header"><code>test_make_column_transformer_fit_transform</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1222" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_fit_transform</code>(<strong><code>column_transformer_data</code></strong>)</p>
+<h4 id="test_make_column_transformer_fit_transform" class="doc_header"><code>test_make_column_transformer_fit_transform</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1204" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_make_column_transformer_fit_transform</code>(<strong><code>column_transformer_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5385,7 +5367,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L616" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>class_name</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#MultiComponent"><code>MultiComponent</code></a></p>
+<h2 id="MultiSplitComponent" class="doc_header"><code>class</code> <code>MultiSplitComponent</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/compose.py#L619" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSplitComponent</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>None</code></em>, <strong><code>class_name</code></strong>=<em><code>None</code></em>, <strong><code>fit_to</code></strong>=<em><code>'training'</code></em>, <strong><code>fit_additional</code></strong>=<em><code>[]</code></em>, <strong><code>apply_to</code></strong>=<em><code>['training', 'validation', 'test']</code></em>, <strong><code>raise_error_if_split_doesnot_exist</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_split_doesnot_exist</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/compose.html#MultiComponent"><code>MultiComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component containing a list of components inside.
@@ -5434,7 +5416,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Transform1" class="doc_header"><code>class</code> <code>Transform1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L656" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Transform1" class="doc_header"><code>class</code> <code>Transform1</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L638" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform1</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -5460,7 +5442,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Transform2" class="doc_header"><code>class</code> <code>Transform2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L668" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
+<h2 id="Transform2" class="doc_header"><code>class</code> <code>Transform2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L650" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transform2</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#Component"><code>Component</code></a></p>
 </blockquote>
 
 <pre><code>Base component class used in our Pipeline.</code></pre>
@@ -5486,7 +5468,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="multi_split_data" class="doc_header"><code>multi_split_data</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1281" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>multi_split_data</code>()</p>
+<h4 id="multi_split_data" class="doc_header"><code>multi_split_data</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1263" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>multi_split_data</code>()</p>
 </blockquote>
 
 </div>
@@ -5510,7 +5492,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_transform" class="doc_header"><code>test_multi_split_transform</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1296" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_transform</code>(<strong><code>multi_split_data</code></strong>)</p>
+<h4 id="test_multi_split_transform" class="doc_header"><code>test_multi_split_transform</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1278" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_transform</code>(<strong><code>multi_split_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5653,7 +5635,7 @@ See `Pipeline` class.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_fit" class="doc_header"><code>test_multi_split_fit</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1322" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_fit</code>(<strong><code>multi_split_data</code></strong>)</p>
+<h4 id="test_multi_split_fit" class="doc_header"><code>test_multi_split_fit</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1304" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_fit</code>(<strong><code>multi_split_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5753,7 +5735,7 @@ test_data: [[100]
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_chain" class="doc_header"><code>test_multi_split_chain</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1341" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_chain</code>(<strong><code>multi_split_data</code></strong>)</p>
+<h4 id="test_multi_split_chain" class="doc_header"><code>test_multi_split_chain</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1323" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_chain</code>(<strong><code>multi_split_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5861,7 +5843,7 @@ test_data: None
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_io" class="doc_header"><code>test_multi_split_io</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1364" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_io</code>(<strong><code>multi_split_data</code></strong>)</p>
+<h4 id="test_multi_split_io" class="doc_header"><code>test_multi_split_io</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1346" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_io</code>(<strong><code>multi_split_data</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -5984,7 +5966,7 @@ test_data: None
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_non_dict" class="doc_header"><code>test_multi_split_non_dict</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1412" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_non_dict</code>()</p>
+<h4 id="test_multi_split_non_dict" class="doc_header"><code>test_multi_split_non_dict</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1394" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_non_dict</code>()</p>
 </blockquote>
 
 </div>
@@ -6074,7 +6056,7 @@ test_data: None
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_multi_split_non_dict_bis" class="doc_header"><code>test_multi_split_non_dict_bis</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1426" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_non_dict_bis</code>()</p>
+<h4 id="test_multi_split_non_dict_bis" class="doc_header"><code>test_multi_split_non_dict_bis</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_compose.py#L1408" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_multi_split_non_dict_bis</code>()</p>
 </blockquote>
 
 </div>
