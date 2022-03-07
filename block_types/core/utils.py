@@ -345,7 +345,7 @@ class DataIO ():
                                                         fitting_file_name=fitting_file_name)
             self._save (path_model_file, self.fitting_save_func, self.component.estimator)
 
-    def get_path_result_file (split=None, path_results=None, result_file_name=None):
+    def get_path_result_file (self, split=None, path_results=None, result_file_name=None):
         split = self.split if split is None else split
         path_results = self.path_results if path_results is None else Path(path_results).resolve()
         result_file_name = self.result_file_name if result_file_name is None else result_file_name
