@@ -232,6 +232,7 @@ class DataIO ():
                load=True,
                save=True,
                split='whole',
+               folder='',
                **kwargs):
 
         self.path_models = path_models
@@ -268,7 +269,7 @@ class DataIO ():
         self.set_save_result (save_result)
         self.set_load_result (load_result)
 
-        self.path_model_file = None
+        self.folder = folder
 
     def setup (self, component=None):
         """
@@ -318,21 +319,44 @@ class DataIO ():
         else:
             self.path_models = Path(self.path_models).resolve()
 
-        if self.path_models is not None:
-            self.path_model_file = self.path_models / 'models' / self.fitting_file_name
+    def get_path_model_file (self, path_models=None, fitting_file_name=None):
+        path_models = self.path_models if path_models is None else Path(path_models).resolve()
+        fitting_file_name = self.fitting_file_name if fitting_file_name is None else fitting_file_name
+        if path_models is not None:
+            if self.folder != '':
+                path_model_file = path_models / self.folder / 'models' / fitting_file_name
+            else:
+                path_model_file = path_models / 'models' / fitting_file_name
         else:
-            self.path_model_file = None
-
-    def load_estimator (self):
+            path_model_file = None
+        return path_model_file
+    def load_estimator (self, path_models=None, fitting_file_name=None):
         """Load estimator parameters."""
-        estimator = self._load (path=self.path_model_file,
+        path_model_file = self.get_path_model_file (path_models=path_models,
+                                                    fitting_file_name=fitting_file_name)
+        estimator = self._load (path=path_model_file,
                                 load_func=self.fitting_load_func)
         return estimator
 
-    def save_estimator (self):
+    def save_estimator (self, path_models=None, fitting_file_name=None):
         """Save estimator parameters."""
         if self.component.estimator is not None:
-            self._save (self.path_model_file, self.fitting_save_func, self.component.estimator)
+            path_model_file = self.get_path_model_file (path_models=path_models,
+                                                        fitting_file_name=fitting_file_name)
+            self._save (path_model_file, self.fitting_save_func, self.component.estimator)
+
+    def get_path_result_file (split=None, path_results=None, result_file_name=None):
+        split = self.split if split is None else split
+        path_results = self.path_results if path_results is None else Path(path_results).resolve()
+        result_file_name = self.result_file_name if result_file_name is None else result_file_name
+        if path_results is not None:
+            if self.folder != '':
+                path_result_file = path_results / self.folder / split / result_file_name
+            else:
+                path_result_file = path_results / split / result_file_name
+        else:
+            path_result_file = None
+        return path_result_file
 
     def load_result (self, split=None, path_results=None, result_file_name=None):
         """
@@ -341,13 +365,8 @@ class DataIO ():
         Transformed training data is loaded if self.training_data_flag=True,
         otherwise transformed test data is loaded.
         """
-        split = self.split if split is None else split
-        path_results = self.path_results if path_results is None else Path(path_results).resolve()
-        result_file_name = self.result_file_name if result_file_name is None else result_file_name
-        if path_results is not None:
-            path_result_file = path_results / split / result_file_name
-        else:
-            path_result_file = None
+        path_result_file = self.get_path_result_file (split=split, path_results=path_results,
+                                                      result_file_name=result_file_name)
         return self._load (path_result_file, self.result_load_func)
 
     def save_result (self, result, split=None, path_results=None, result_file_name=None):
@@ -357,13 +376,8 @@ class DataIO ():
         Transformed training data is saved if self.training_data_flag=True,
         otherwise transformed test data is saved.
         """
-        split = self.split if split is None else split
-        path_results = self.path_results if path_results is None else Path(path_results).resolve()
-        result_file_name = self.result_file_name if result_file_name is None else result_file_name
-        if path_results is not None:
-            path_result_file = path_results / split / result_file_name
-        else:
-            path_result_file = None
+        path_result_file = self.get_path_result_file (split=split, path_results=path_results,
+                                                      result_file_name=result_file_name)
         self._save (path_result_file, self.result_save_func,
                     result)
 
@@ -424,10 +438,6 @@ class DataIO ():
             self.path_models = Path(self.path_models).resolve()
         else:
             self.path_models = self.path_results
-        if self.path_models is not None and self.fitting_file_name is not None:
-            self.path_model_file = self.path_models / 'models' / self.fitting_file_name
-        else:
-            self.path_model_file = None
         self.component.path_results = self.path_results
         self.component.path_models = self.path_models
 
@@ -456,6 +466,14 @@ class DataIO ():
 
     def set_load_result (self, load):
         self.load_result_flag = load if self.load_flag else False
+
+    def chain_folders (self, folder):
+        if folder=='':
+            return
+        if self.folder == '':
+            self.folder = folder
+        else:
+            self.folder = f'{folder}/{self.folder}'
 
 # Cell
 class PandasIO (DataIO):
