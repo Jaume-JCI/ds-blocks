@@ -40,6 +40,8 @@ class MultiComponent (SamplingComponent):
                   separate_labels=dflt.separate_labels,
                   warning_if_nick_name_exists=dflt.warning_if_nick_name_exists,
                   propagate=dflt.propagate,
+                  path_results=dflt.path_results,
+                  path_models=dflt.path_models,
                   **kwargs):
         """Assigns attributes and calls parent constructor.
 
@@ -55,6 +57,8 @@ class MultiComponent (SamplingComponent):
 
         if len(components) > 0:
             self.set_components (*components)
+            self.set_path_results (path_results)
+            self.set_path_models (path_models)
         elif not hasattr (self, 'components'):
             self.components = []
         if not hasattr (self, 'finalized_component_list'):
@@ -63,7 +67,8 @@ class MultiComponent (SamplingComponent):
         # we need to call super().__init__() *after* having creating the `components` field,
         # since the constructor of Component calls a method that is overriden in Pipeline,
         # and this method makes use of the mentioned `components` field
-        super().__init__ (separate_labels=separate_labels, **kwargs)
+        super().__init__ (separate_labels=separate_labels, path_results=path_results, path_models=path_models,
+                          **kwargs)
 
         self.set_split ('whole')
 
@@ -86,14 +91,16 @@ class MultiComponent (SamplingComponent):
         if not self.finalized_component_list:
             self.components += components
 
-    def _add_named_attribute (self, component):
+    def _add_named_attribute (self, component, nick_name):
+        if not hasattr(self, 'finalized_component_list'):
+            self.finalized_component_list = False
         if not hasattr(self, component.name):
-            super().__setattr__(component.name, v)
+            super().__setattr__(component.name, component)
         if not self.finalized_component_list:
-            if hasattr(v, 'nick_name') and self.warning_if_nick_name_exists:
-                self.logger.warning (f'{v} already has a nick_name: {component.nick_name}')
-                warnings.warn (f'{v} already has a nick_name: {component.nick_name}')
-            component.nick_name = k
+            if hasattr(component, 'nick_name') and self.warning_if_nick_name_exists:
+                self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
+                warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
+            component.nick_name = nick_name
 
     def __setattr__(self, k, v):
         """
@@ -103,7 +110,7 @@ class MultiComponent (SamplingComponent):
 
         if isinstance(v, Component):
             self.register_components(v)
-        self._add_named_attribute (v)
+            self._add_named_attribute (v, k)
 
     def add_component (self, component):
         if not hasattr(self, 'finalized_component_list'):
@@ -111,13 +118,13 @@ class MultiComponent (SamplingComponent):
         finalized_component_list = self.finalized_component_list
         self.finalized_component_list = False
         self.register_components(component)
-        self._add_named_attribute (component)
+        self._add_named_attribute (component, component.name)
         self.finalized_component_list = finalized_component_list
 
     def set_components (self, *components):
         self.components = components
         for component in components:
-            self._add_named_attribute (component)
+            self._add_named_attribute (component, component.name)
         self.finalized_component_list = True
 
     def clear_descendants (self):
