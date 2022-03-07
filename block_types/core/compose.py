@@ -57,8 +57,6 @@ class MultiComponent (SamplingComponent):
 
         if len(components) > 0:
             self.set_components (*components)
-            self.set_path_results (path_results)
-            self.set_path_models (path_models)
         elif not hasattr (self, 'components'):
             self.components = []
         if not hasattr (self, 'finalized_component_list'):
@@ -76,6 +74,9 @@ class MultiComponent (SamplingComponent):
         if self.propagate:
             self.set_path_results (self.path_results)
             self.set_path_models (self.path_models)
+        #elif len(components) > 0:
+        #    self.set_path_results (path_results)
+        #    self.set_path_models (path_models)
 
     def register_components (self, *components):
         """
