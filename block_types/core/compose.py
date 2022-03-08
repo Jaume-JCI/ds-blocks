@@ -55,12 +55,15 @@ class MultiComponent (SamplingComponent):
         if 'estimator' in kwargs:
             self.logger.warning ('estimator passed as key-word argument in MultiComponent')
 
+        self.warning_if_nick_name_exists = warning_if_nick_name_exists
+
         if len(components) > 0:
             self.set_components (*components)
         elif not hasattr (self, 'components'):
             self.components = []
         if not hasattr (self, 'finalized_component_list'):
             self.finalized_component_list = False
+
 
         # we need to call super().__init__() *after* having creating the `components` field,
         # since the constructor of Component calls a method that is overriden in Pipeline,
@@ -361,10 +364,11 @@ class MultiComponent (SamplingComponent):
     def set_path_results (self, path_results):
         self.data_io.set_path_results (path_results)
         for component in self.components:
-            if isinstance (component, MultiComponent):
-                component.set_path_results (path_results)
-            else:
-                component.data_io.set_path_results (path_results)
+            if not component.data_io.stop_propagation:
+                if isinstance (component, MultiComponent):
+                    component.set_path_results (path_results)
+                else:
+                    component.data_io.set_path_results (path_results)
     def set_path_models (self, path_models):
         self.data_io.set_path_models (path_models)
         for component in self.components:
@@ -372,15 +376,18 @@ class MultiComponent (SamplingComponent):
                 component.set_path_models (path_models)
             else:
                 component.data_io.set_path_models (path_models)
-    def chain_folders (self, folder):
+    def chain_folders (self, folder, root=True):
         if folder == '':
             return
-        self.data_io.chain_folders (folder)
+        if root:
+            self.data_io.chain_folders ('')
+        else:
+            self.data_io.chain_folders (folder)
         for component in self.components:
             if isinstance (component, MultiComponent):
-                component.chain_folders (self.data_io.folder)
+                component.chain_folders (folder, root=False)
             else:
-                component.data_io.chain_folders (self.data_io.folder)
+                component.data_io.chain_folders (folder)
 
 # Cell
 class Pipeline (MultiComponent):

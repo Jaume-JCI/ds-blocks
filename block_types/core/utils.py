@@ -233,6 +233,7 @@ class DataIO ():
                save=True,
                split='whole',
                folder='',
+               stop_propagation=False,
                **kwargs):
 
         self.path_models = path_models
@@ -269,7 +270,8 @@ class DataIO ():
         self.set_save_result (save_result)
         self.set_load_result (load_result)
 
-        self.folder = folder
+        self.set_folder (folder)
+        self.stop_propagation = stop_propagation
 
     def setup (self, component=None):
         """
@@ -467,7 +469,21 @@ class DataIO ():
     def set_load_result (self, load):
         self.load_result_flag = load if self.load_flag else False
 
+    def _get_folder_name (self, folder):
+        if folder == '__class__':
+            if self.component is not None:
+                return self.component.name
+            else:
+                self.logger.warning (f'folder {folder} set on data_io without associated component')
+                return ''
+        else:
+            return folder
+
+    def set_folder (self, folder):
+        self.folder = self._get_folder_name (folder)
+
     def chain_folders (self, folder):
+        folder = self._get_folder_name (folder)
         if folder=='':
             return
         if self.folder == '':

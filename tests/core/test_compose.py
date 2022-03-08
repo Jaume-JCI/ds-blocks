@@ -3,18 +3,18 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture', 'SimpleMultiComponent', 'test_multi_comp_io',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_multi_comp_hierarchy',
            'test_multi_comp_profiling', 'test_multi_comp_all_equal', 'test_multi_component_setters',
-           'test_show_result_statistics', 'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply',
-           'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
-           'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
-           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
-           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
-           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
-           'test_pandas_pipeline', 'test_column_selector', 'column_transformer_data', 'test_make_column_transformer',
-           'test_make_column_transformer_passthrough', 'test_make_column_transformer_remainder',
-           'test_make_column_transformer_descendants', 'test_make_column_transformer_fit_transform', 'Transform1',
-           'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
-           'test_multi_split_chain', 'test_multi_split_io', 'test_multi_split_non_dict',
-           'test_multi_split_non_dict_bis']
+           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'Transform1', 'Transform2',
+           'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp',
+           'test_pipeline_set_comp', 'test_athena_pipeline_training', 'test_pipeline_load_estimator',
+           'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2', 'test_construct_diagram',
+           'test_show_summary', 'test_make_pipeline', 'test_pipeline_factory', 'PandasTransformWithLabels1',
+           'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1', 'TransformWithLabels2',
+           'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_column_selector',
+           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
+           'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
+           'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
+           'test_multi_split_non_dict', 'test_multi_split_non_dict_bis']
 
 # Cell
 import pytest
@@ -633,6 +633,177 @@ def test_show_result_statistics ():
     r = multi_component(X)
     multi_component.show_result_statistics();
     remove_previous_results (path_results=path_results)
+
+# Comes from compose.ipynb, cell
+def test_pass_components ():
+    config = dict (path_results='my_path', Second=dict(path_results='other_path'))
+    multi = MultiComponent (Component (name='first', class_name='First', folder='one', **config),
+                            Component (name='second', class_name='Second', folder='two', **config),
+                            name='Inner',
+                            **config)
+
+    assert multi.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path')
+    assert multi.second.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path')
+    assert multi.first.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path')
+
+    assert multi.first.data_io.folder=='one'
+    assert multi.second.data_io.folder=='two'
+
+    def make_inner (folder, name, **kwargs):
+        return MultiComponent (Component (name='first', class_name='First', folder='folder_first', **kwargs),
+                               Component (name='second', class_name='Second', folder='folder_second', **kwargs),
+                               folder=folder,
+                               class_name='Inner',
+                               name=name,
+                               **kwargs)
+    multi = MultiComponent (make_inner ('one', 'inner1', **config), make_inner ('two', 'inner2', **config), **config)
+
+    assert multi.inner1.first.data_io.get_path_result_file() == Path(
+        '/home/jcidatascience/jaume/workspace/remote/block-types/my_path/one/folder_first/whole/first_result.pk')
+
+    assert multi.inner1.second.data_io.get_path_result_file() == Path (
+        '/home/jcidatascience/jaume/workspace/remote/block-types/other_path/one/folder_second/whole/second_result.pk'
+    )
+
+    assert multi.inner2.first.data_io.get_path_result_file() == Path(
+        '/home/jcidatascience/jaume/workspace/remote/block-types/my_path/two/folder_first/whole/first_result.pk')
+
+    assert multi.inner2.second.data_io.get_path_result_file() == Path(
+        '/home/jcidatascience/jaume/workspace/remote/block-types/other_path/two/folder_second/whole/second_result.pk')
+
+    config = dict (path_results='my_path', Inner=dict(path_results='other_path'))
+    def make_inner (folder, name, **kwargs):
+        return MultiComponent (Component (name='first', class_name='First', folder='folder_first', **kwargs),
+                               Component (name='second', class_name='Second', folder='folder_second', **kwargs),
+                               folder=folder,
+                               class_name='Inner',
+                               name=name,
+                               **kwargs)
+    multi = MultiComponent (make_inner ('one', 'inner1', **config),
+                            make_inner ('two', 'inner2', **config),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            **config)
+
+    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_first/whole/first_result.pk')
+
+    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_second/whole/second_result.pk')
+
+    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_first/whole/first_result.pk')
+
+    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_second/whole/second_result.pk')
+
+    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+
+    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+
+    multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
+                            make_inner ('two', 'inner2', **config, propagate=True),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            **config)
+
+    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_first/whole/first_result.pk')
+
+    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_second/whole/second_result.pk')
+
+    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_first/whole/first_result.pk')
+
+    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_second/whole/second_result.pk')
+
+    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+
+    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+
+    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+
+    multi = MultiComponent (make_inner ('one', 'inner1', **config),
+                            make_inner ('two', 'inner2', **config),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            propagate=True,
+                            **config)
+
+    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_first/whole/first_result.pk')
+
+    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_second/whole/second_result.pk')
+
+    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_first/whole/first_result.pk')
+
+    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_second/whole/second_result.pk')
+
+    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/whole/inner1_result.pk')
+
+    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/whole/inner2_result.pk')
+
+    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+
+    config = dict (path_results='my_path', Inner=dict(path_results='other_path', stop_propagation=True))
+    multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
+                            make_inner ('two', 'inner2', **config, propagate=True),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            propagate=True,
+                            **config)
+
+    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_first/whole/first_result.pk')
+
+    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_second/whole/second_result.pk')
+
+    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_first/whole/first_result.pk')
+
+    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_second/whole/second_result.pk')
+
+    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+
+    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+
+    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+
+# Comes from compose.ipynb, cell
+def test_chain_folders ():
+    def first_level ():
+        a0=Component (name='first', class_name='First', folder='folder_first', **config)
+        b0=Component (name='second', class_name='Second', folder='folder_second', **config)
+        return a0, b0
+
+    a0, b0 = first_level()
+
+    assert a0.data_io.folder=='folder_first'
+
+    def second_level ():
+        a0, b0 = first_level ()
+        a1= MultiComponent (a0, b0, folder='one', class_name='Inner', name='inner1', **config)
+        a0, b0 = first_level ()
+        b1= MultiComponent (a0, b0, folder='two', class_name='Inner', name='inner2', **config)
+        return a1, b1
+
+    a1, b1 = second_level ()
+
+    assert a1.first.data_io.folder=='one/folder_first'
+    assert a1.second.data_io.folder=='one/folder_second'
+    assert b1.first.data_io.folder=='two/folder_first'
+    assert b1.second.data_io.folder=='two/folder_second'
+
+    def third_level ():
+        a1, b1 = second_level ()
+        a2= MultiComponent (a1, b1, folder='third1', class_name='Higher', name='higher1', **config)
+        a1, b1 = second_level ()
+        b2= MultiComponent (a1, b1, folder='third2', class_name='Higher', name='higher2', **config)
+        return a2, b2
+
+    a2, b2 = third_level ()
+
+    assert a2.inner1.first.data_io.folder=='third1/one/folder_first'
+    assert a2.inner1.second.data_io.folder=='third1/one/folder_second'
+    assert b2.inner1.first.data_io.folder=='third2/one/folder_first'
+    assert b2.inner1.second.data_io.folder=='third2/one/folder_second'
+    assert b2.inner2.first.data_io.folder=='third2/two/folder_first'
+    assert b2.inner2.second.data_io.folder=='third2/two/folder_second'
 
 # Comes from compose.ipynb, cell
 class Transform1 (Component):
