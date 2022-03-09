@@ -38,6 +38,7 @@ from block_types.utils.utils import remove_previous_results
 from block_types.core.block_types import Component, PickleSaverComponent
 
 import block_types.config.bt_defaults as dflt
+from block_types.utils.utils import check_last_part
 
 # Cell
 @pytest.fixture (name='column_transformer_data')
@@ -642,9 +643,9 @@ def test_pass_components ():
                             name='Inner',
                             **config)
 
-    assert multi.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path')
-    assert multi.second.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path')
-    assert multi.first.path_results==Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path')
+    check_last_part (multi.path_results, 'my_path')
+    check_last_part (multi.second.path_results, 'other_path')
+    check_last_part (multi.first.path_results, 'my_path')
 
     assert multi.first.data_io.folder=='one'
     assert multi.second.data_io.folder=='two'
@@ -658,18 +659,17 @@ def test_pass_components ():
                                **kwargs)
     multi = MultiComponent (make_inner ('one', 'inner1', **config), make_inner ('two', 'inner2', **config), **config)
 
-    assert multi.inner1.first.data_io.get_path_result_file() == Path(
-        '/home/jcidatascience/jaume/workspace/remote/block-types/my_path/one/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'my_path/one/folder_first/whole/first_result.pk')
 
-    assert multi.inner1.second.data_io.get_path_result_file() == Path (
-        '/home/jcidatascience/jaume/workspace/remote/block-types/other_path/one/folder_second/whole/second_result.pk'
-    )
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+        'other_path/one/folder_second/whole/second_result.pk')
 
-    assert multi.inner2.first.data_io.get_path_result_file() == Path(
-        '/home/jcidatascience/jaume/workspace/remote/block-types/my_path/two/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+        'my_path/two/folder_first/whole/first_result.pk')
 
-    assert multi.inner2.second.data_io.get_path_result_file() == Path(
-        '/home/jcidatascience/jaume/workspace/remote/block-types/other_path/two/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+        'other_path/two/folder_second/whole/second_result.pk')
 
     config = dict (path_results='my_path', Inner=dict(path_results='other_path'))
     def make_inner (folder, name, **kwargs):
@@ -686,17 +686,23 @@ def test_pass_components ():
                             name='higher',
                             **config)
 
-    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'my_path/higher/one/folder_first/whole/first_result.pk')
 
-    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+        'my_path/higher/one/folder_second/whole/second_result.pk')
 
-    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+        'my_path/higher/two/folder_first/whole/first_result.pk')
 
-    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+        'my_path/higher/two/folder_second/whole/second_result.pk')
 
-    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+        'other_path/higher/one/whole/inner1_result.pk')
 
-    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+        'other_path/higher/two/whole/inner2_result.pk')
 
     multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
                             make_inner ('two', 'inner2', **config, propagate=True),
@@ -705,19 +711,26 @@ def test_pass_components ():
                             name='higher',
                             **config)
 
-    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'other_path/higher/one/folder_first/whole/first_result.pk')
 
-    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_second/whole/second_result.pk')
 
-    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_first/whole/first_result.pk')
 
-    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_second/whole/second_result.pk')
 
-    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'other_path/higher/one/whole/inner1_result.pk')
 
-    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'other_path/higher/two/whole/inner2_result.pk')
 
-    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
 
     multi = MultiComponent (make_inner ('one', 'inner1', **config),
                             make_inner ('two', 'inner2', **config),
@@ -727,19 +740,26 @@ def test_pass_components ():
                             propagate=True,
                             **config)
 
-    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+                     'my_path/higher/one/folder_first/whole/first_result.pk')
 
-    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'my_path/higher/one/folder_second/whole/second_result.pk')
 
-    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'my_path/higher/two/folder_first/whole/first_result.pk')
 
-    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'my_path/higher/two/folder_second/whole/second_result.pk')
 
-    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/one/whole/inner1_result.pk')
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'my_path/higher/one/whole/inner1_result.pk')
 
-    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/two/whole/inner2_result.pk')
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'my_path/higher/two/whole/inner2_result.pk')
 
-    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
 
     config = dict (path_results='my_path', Inner=dict(path_results='other_path', stop_propagation=True))
     multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
@@ -750,19 +770,26 @@ def test_pass_components ():
                             propagate=True,
                             **config)
 
-    assert multi.inner1.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_first/whole/first_result.pk')
 
-    assert multi.inner1.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_second/whole/second_result.pk')
 
-    assert multi.inner2.first.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_first/whole/first_result.pk')
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_first/whole/first_result.pk')
 
-    assert multi.inner2.second.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/folder_second/whole/second_result.pk')
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_second/whole/second_result.pk')
 
-    assert multi.inner1.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/one/whole/inner1_result.pk')
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'other_path/higher/one/whole/inner1_result.pk')
 
-    assert multi.inner2.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/other_path/higher/two/whole/inner2_result.pk')
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'other_path/higher/two/whole/inner2_result.pk')
 
-    assert multi.data_io.get_path_result_file() == Path('/home/jcidatascience/jaume/workspace/remote/block-types/my_path/higher/whole/higher_result.pk')
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
 
 # Comes from compose.ipynb, cell
 def test_chain_folders ():
