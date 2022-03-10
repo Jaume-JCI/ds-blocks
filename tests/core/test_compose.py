@@ -3,13 +3,14 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture', 'SimpleMultiComponent', 'test_multi_comp_io',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_multi_comp_hierarchy',
            'test_multi_comp_profiling', 'test_multi_comp_all_equal', 'test_multi_component_setters',
-           'test_show_result_statistics', 'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply',
-           'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
-           'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
-           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
-           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
-           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
-           'test_pandas_pipeline', 'test_column_selector', 'column_transformer_data', 'test_make_column_transformer',
+           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'Transform1', 'Transform2',
+           'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp',
+           'test_pipeline_set_comp', 'test_athena_pipeline_training', 'test_pipeline_load_estimator',
+           'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2', 'test_construct_diagram',
+           'test_show_summary', 'test_make_pipeline', 'test_pipeline_factory', 'PandasTransformWithLabels1',
+           'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1', 'TransformWithLabels2',
+           'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel', 'TransformM',
+           'test_multi_modality', 'test_column_selector', 'column_transformer_data', 'test_make_column_transformer',
            'test_make_column_transformer_passthrough', 'test_make_column_transformer_remainder',
            'test_make_column_transformer_descendants', 'test_make_column_transformer_fit_transform', 'Transform1',
            'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
@@ -38,6 +39,7 @@ from block_types.utils.utils import remove_previous_results
 from block_types.core.block_types import Component, PickleSaverComponent
 
 import block_types.config.bt_defaults as dflt
+from block_types.utils.utils import check_last_part
 
 # Cell
 @pytest.fixture (name='column_transformer_data')
@@ -635,6 +637,204 @@ def test_show_result_statistics ():
     remove_previous_results (path_results=path_results)
 
 # Comes from compose.ipynb, cell
+def test_pass_components ():
+    config = dict (path_results='my_path', Second=dict(path_results='other_path'))
+    multi = MultiComponent (Component (name='first', class_name='First', folder='one', **config),
+                            Component (name='second', class_name='Second', folder='two', **config),
+                            name='Inner',
+                            **config)
+
+    check_last_part (multi.path_results, 'my_path')
+    check_last_part (multi.second.path_results, 'other_path')
+    check_last_part (multi.first.path_results, 'my_path')
+
+    assert multi.first.data_io.folder=='one'
+    assert multi.second.data_io.folder=='two'
+
+    def make_inner (folder, name, **kwargs):
+        return MultiComponent (Component (name='first', class_name='First', folder='folder_first', **kwargs),
+                               Component (name='second', class_name='Second', folder='folder_second', **kwargs),
+                               folder=folder,
+                               class_name='Inner',
+                               name=name,
+                               **kwargs)
+    multi = MultiComponent (make_inner ('one', 'inner1', **config), make_inner ('two', 'inner2', **config), **config)
+
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'my_path/one/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+        'other_path/one/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+        'my_path/two/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+        'other_path/two/folder_second/whole/second_result.pk')
+
+    config = dict (path_results='my_path', Inner=dict(path_results='other_path'))
+    def make_inner (folder, name, **kwargs):
+        return MultiComponent (Component (name='first', class_name='First', folder='folder_first', **kwargs),
+                               Component (name='second', class_name='Second', folder='folder_second', **kwargs),
+                               folder=folder,
+                               class_name='Inner',
+                               name=name,
+                               **kwargs)
+    multi = MultiComponent (make_inner ('one', 'inner1', **config),
+                            make_inner ('two', 'inner2', **config),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            **config)
+
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'my_path/higher/one/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+        'my_path/higher/one/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+        'my_path/higher/two/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+        'my_path/higher/two/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+        'other_path/higher/one/whole/inner1_result.pk')
+
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+        'other_path/higher/two/whole/inner2_result.pk')
+
+    multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
+                            make_inner ('two', 'inner2', **config, propagate=True),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            **config)
+
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+        'other_path/higher/one/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'other_path/higher/one/whole/inner1_result.pk')
+
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'other_path/higher/two/whole/inner2_result.pk')
+
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
+
+    multi = MultiComponent (make_inner ('one', 'inner1', **config),
+                            make_inner ('two', 'inner2', **config),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            propagate=True,
+                            **config)
+
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+                     'my_path/higher/one/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'my_path/higher/one/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'my_path/higher/two/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'my_path/higher/two/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'my_path/higher/one/whole/inner1_result.pk')
+
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'my_path/higher/two/whole/inner2_result.pk')
+
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
+
+    config = dict (path_results='my_path', Inner=dict(path_results='other_path', stop_propagation=True))
+    multi = MultiComponent (make_inner ('one', 'inner1', **config, propagate=True),
+                            make_inner ('two', 'inner2', **config, propagate=True),
+                            folder='__class__',
+                            class_name='Higher',
+                            name='higher',
+                            propagate=True,
+                            **config)
+
+    check_last_part (multi.inner1.first.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner1.second.data_io.get_path_result_file(),
+                     'other_path/higher/one/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner2.first.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_first/whole/first_result.pk')
+
+    check_last_part (multi.inner2.second.data_io.get_path_result_file(),
+                     'other_path/higher/two/folder_second/whole/second_result.pk')
+
+    check_last_part (multi.inner1.data_io.get_path_result_file(),
+                     'other_path/higher/one/whole/inner1_result.pk')
+
+    check_last_part (multi.inner2.data_io.get_path_result_file(),
+                     'other_path/higher/two/whole/inner2_result.pk')
+
+    check_last_part (multi.data_io.get_path_result_file(),
+                     'my_path/higher/whole/higher_result.pk')
+
+# Comes from compose.ipynb, cell
+def test_chain_folders ():
+    config = dict (path_results='my_path', Second=dict(path_results='other_path'))
+    def first_level ():
+        a0=Component (name='first', class_name='First', folder='folder_first', **config)
+        b0=Component (name='second', class_name='Second', folder='folder_second', **config)
+        return a0, b0
+
+    a0, b0 = first_level()
+
+    assert a0.data_io.folder=='folder_first'
+
+    def second_level ():
+        a0, b0 = first_level ()
+        a1= MultiComponent (a0, b0, folder='one', class_name='Inner', name='inner1', **config)
+        a0, b0 = first_level ()
+        b1= MultiComponent (a0, b0, folder='two', class_name='Inner', name='inner2', **config)
+        return a1, b1
+
+    a1, b1 = second_level ()
+
+    assert a1.first.data_io.folder=='one/folder_first'
+    assert a1.second.data_io.folder=='one/folder_second'
+    assert b1.first.data_io.folder=='two/folder_first'
+    assert b1.second.data_io.folder=='two/folder_second'
+
+    def third_level ():
+        a1, b1 = second_level ()
+        a2= MultiComponent (a1, b1, folder='third1', class_name='Higher', name='higher1', **config)
+        a1, b1 = second_level ()
+        b2= MultiComponent (a1, b1, folder='third2', class_name='Higher', name='higher2', **config)
+        return a2, b2
+
+    a2, b2 = third_level ()
+
+    assert a2.inner1.first.data_io.folder=='third1/one/folder_first'
+    assert a2.inner1.second.data_io.folder=='third1/one/folder_second'
+    assert b2.inner1.first.data_io.folder=='third2/one/folder_first'
+    assert b2.inner1.second.data_io.folder=='third2/one/folder_second'
+    assert b2.inner2.first.data_io.folder=='third2/two/folder_first'
+    assert b2.inner2.second.data_io.folder=='third2/two/folder_second'
+
+# Comes from compose.ipynb, cell
 class Transform1 (Component):
 
     def __init__ (self, **kwargs):
@@ -677,6 +877,19 @@ def test_pipeline_fit_apply ():
     x = np.array([3,4,5])
     r1 = pipeline.fit_apply (x.reshape(-1,1))
     print (r1)
+
+    x1 = x * 1000 + sum(x)
+    x2 = x1 * 100 + max(x1)
+    assert (r1.ravel()==x2).all()
+
+    # *********************************
+    # Another way of building a pipeline
+    # *********************************
+    pipeline = Sequential (Transform1(),
+                           Transform2())
+
+    x = np.array([3,4,5])
+    r1 = pipeline.fit_apply (x.reshape(-1,1))
 
     x1 = x * 1000 + sum(x)
     x2 = x1 * 100 + max(x1)
@@ -1038,6 +1251,81 @@ def test_pandas_pipeline ():
     df_equal = (r2==r1*100+r1[r1.label==0].max(axis=0))[['a','b']]
     assert df_equal.all().all()
     remove_previous_results (path_results=path_results)
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_parallel ():
+    x = np.array([3,4,5]).reshape(-1,1)
+    parallel = Parallel (Transform1 (),
+                         Transform2 ())
+    r1 = parallel.fit_apply (x)
+
+    x1 = x * 1000 + x.sum(axis=0)
+    x2 = x * 100 + x.max(axis=0)
+    r_ref = [x1, x2]
+    assert all([(x==y).all() for x, y in zip(r1, r_ref)])
+
+    parallel = Parallel (Transform1 (),
+                         Transform2 (),
+                         initialize_result=lambda : {},
+                         join_result=lambda Xr, Xi_r, components, i: {**Xr, **{components[i].name:Xi_r}})
+
+    r1 = parallel.fit_apply (x)
+    assert list(r1.keys())==['transform1','transform2']
+    assert (r1['transform1']==r_ref[0]).all()
+    assert (r1['transform2']==r_ref[1]).all()
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+class TransformM (Component):
+
+    def __init__ (self, modality='', factor=1000, **kwargs):
+        super().__init__ (**kwargs)
+        self.estimator= Bunch(sum = 1)
+
+    def _fit (self, X, y=None):
+        self.estimator.sum = X.sum(axis=0)
+
+    def _apply (self, x):
+        return x*self.factor + self.estimator.sum
+
+def test_multi_modality ():
+    data = {'transform1': np.array([1,2,3]),
+            'transform2': np.array([10,20,30])}
+
+    parallel = MultiModality (Transform1 (),
+                              Transform2 (),
+                              use_name=True)
+    r = parallel.fit_apply (data)
+
+    x1 = data['transform1']
+    x1 = x1 * 1000 + x1.sum(axis=0)
+    x2 = data['transform2']
+    x2 = x2 * 100 + x2.max(axis=0)
+    assert list(r.keys())==['transform1','transform2']
+    assert (r['transform1']==x1).all()
+    assert (r['transform2']==x2).all()
+
+    # with configs
+    data = dict(modA=np.array([1,2,3]),
+                modB=np.array([10,20,30]))
+    configs = dict(modA=dict (modality='A', factor=2000),
+                   modB=dict (modality='B', factor=3000))
+
+    parallel = MultiModality (component_class=TransformM,
+                              configs=configs)
+    r = parallel.fit_apply (data)
+
+    x1 = data['modA']
+    x1 = x1 * 2000 + x1.sum(axis=0)
+    x2 = data['modB']
+    x2 = x2 * 3000 + x2.sum(axis=0)
+    assert list(r.keys())==['modA','modB']
+    assert (r['modA']==x1).all()
+    assert (r['modB']==x2).all()
+
+    assert parallel.transform_m_modA.modality == 'A'
+    assert parallel.transform_m_modB.modality == 'B'
 
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails

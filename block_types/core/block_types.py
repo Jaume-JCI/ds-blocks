@@ -40,6 +40,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   estimator=None,
                   name: Optional[str] = None,
                   class_name: Optional[str] = None,
+                  suffix: Optional[str] = None,
                   group: str = dflt.group,
                   overwrite_field: bool = dflt.overwrite_field,
                   error_if_present: bool = dflt.error_if_present,
@@ -83,7 +84,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         assert not isinstance(estimator, Component), 'estimator cannot be an instance of Component'
 
         # name of current component, for logging and plotting purposes
-        self._determine_component_name (name, estimator, class_name=class_name)
+        self._determine_component_name (name, estimator, class_name=class_name, suffix=suffix)
 
         # obtain hierarchy_level
         self.hierarchy_level = get_hierarchy_level (base_class=Component)
@@ -93,7 +94,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         but = (but + ', ') if len(but)>0 else but
         but = but + 'ignore, but, overwrite_field, error_if_present, path_results, path_models'
         if isinstance (ignore, str): ignore = set(re.split(', *', ignore))
-        ignore.update ({'name', 'class_name'})
+        ignore.update ({'name', 'class_name', 'suffix'})
         replace_attr_and_store (base_class=Component, but=but,
                                 error_if_present=error_if_present, overwrite=overwrite_field,
                                 ignore=ignore)
@@ -166,7 +167,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         return config
 
-    def _determine_component_name (self, name: str, estimator, class_name:Optional[str]=None) -> None:
+    def _determine_component_name (self, name: str, estimator, class_name:Optional[str]=None,
+                                   suffix:Optional[str]=None) -> None:
         """
         Determines an appropriate name for the component if not provided by input.
 
@@ -184,6 +186,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             self.name = name
         else:
             self.name = camel_to_snake (self.class_name)
+
+        self.suffix = suffix
+        if self.suffix is not None:
+            self.name = f'{self.name}_{self.suffix}'
 
     def create_estimator (self, **kwargs):
         self.estimator = Bunch(**kwargs)

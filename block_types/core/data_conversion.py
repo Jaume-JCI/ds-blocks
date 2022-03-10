@@ -22,7 +22,10 @@ class DataConverter ():
     particular component from the remaining components in the pipeline,
     making it more reusable across different pipelines.
     """
-    def __init__ (self, logger=None, verbose: int=dflt.verbose, inplace: bool=True, **kwargs):
+    def __init__ (self, logger=None, verbose: int=dflt.verbose, inplace: bool=True,
+                  convert_before=None, convert_before_transforming=None, convert_before_fitting=None,
+                  convert_after=None, convert_after_transforming=None, convert_after_fitting=None,
+                  **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
 
@@ -39,6 +42,10 @@ class DataConverter ():
         else:
             self.logger = logger
         self.inplace = inplace
+        self._set_convert_from_functions (
+            convert_before=convert_before, convert_before_transforming=convert_before_transforming,
+            convert_before_fitting=convert_before_fitting, convert_after=convert_after,
+            convert_after_transforming=convert_after_transforming, convert_after_fitting=convert_after_fitting)
 
     def convert_before_fitting (self, X, y=None):
         """
@@ -112,6 +119,49 @@ class DataConverter ():
             result with transformed format but same content
         """
         return result
+
+    ## methods based on passed-in functions
+    def _set_convert_from_functions (self, convert_before=None, convert_before_transforming=None,
+                                     convert_before_fitting=None, convert_after=None,
+                                     convert_after_transforming=None, convert_after_fitting=None):
+                # functions
+        if convert_before is not None:
+            if convert_before_transforming is None: convert_before_transforming = convert_before
+            if convert_before_fitting is None:
+                self._convert_before_fitting = convert_before
+                self.convert_before_fitting = self.convert_only_X_before_fitting_from_function
+        if convert_before_transforming is not None:
+            self._convert_before_transforming = convert_before_transforming
+            self.convert_before_transforming = self.convert_before_transforming_from_function
+        if convert_before_fitting is not None:
+            self._convert_before_fitting = convert_before_fitting
+            self.convert_before_fitting = self.convert_before_fitting_from_function
+
+        if convert_after is not None:
+            if convert_after_transforming is None: convert_after_transforming = convert_after
+            if convert_after_fitting is None: convert_after_fitting = convert_after
+        if convert_after_transforming is not None:
+            self._convert_after_transforming = convert_after_transforming
+            self.convert_after_transforming = self.convert_after_transforming_from_function
+        if convert_after_fitting is not None:
+            self._convert_after_fitting = convert_after_fitting
+            self.convert_after_fitting = self.convert_after_fitting_from_function
+
+    def convert_before_fitting_from_function (self, X, y=None):
+        return self._convert_before_fitting (X, y)
+
+    def convert_only_X_before_fitting_from_function (self, X, y=None):
+        X = self._convert_before_fitting (X)
+        return X, y
+
+    def convert_after_fitting_from_function (self, X):
+        return self._convert_after_fitting (X)
+
+    def convert_before_transforming_from_function (self, X, **kwargs):
+        return self._convert_before_transforming (X, **kwargs)
+
+    def convert_after_transforming_from_function (self, result, **kwargs):
+        return self._convert_after_transforming (result, **kwargs)
 
 # Cell
 class NoConverter (DataConverter):
