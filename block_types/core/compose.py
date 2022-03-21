@@ -77,9 +77,12 @@ class MultiComponent (SamplingComponent):
         if self.propagate:
             self.set_path_results (self.path_results)
             self.set_path_models (self.path_models)
-        #elif len(components) > 0:
-        #    self.set_path_results (path_results)
-        #    self.set_path_models (path_models)
+
+        self.start_idx = dict (apply = dict (training=0, validation=0, test=0, whole=0),
+                               fit = dict (training=0, validation=0, test=0, whole=0))
+        self.is_data_source = dict (apply = dict (training=False, validation=False, test=False, whole=False),
+                               fit = dict (training=False, validation=False, test=False, whole=False))
+
 
     def register_components (self, *components):
         """
@@ -389,6 +392,12 @@ class MultiComponent (SamplingComponent):
             else:
                 component.data_io.chain_folders (folder)
 
+    def find_last_result (self, split=None):
+        return False
+
+    def find_last_fitted_model (self, split=None):
+        return False
+
 # Cell
 class Pipeline (MultiComponent):
     """
@@ -446,15 +455,63 @@ class Pipeline (MultiComponent):
             X = component.fit_apply (X, y, **kwargs)
         return X
 
-    def _apply (self, X):
+    def _apply (self, *X, split=None):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
-        for component in self.components:
-            X = component.transform (X)
+        split = self.data_io.split if split is None else split
+        idx = self.start_idx['apply'][split]
+
+        if idx < len(self.components):
+            component = self.components[idx]
+            X = component (*X)
+            idx += 1
+        if idx >= len(self.components):
+            return X
+        for component in self.components[idx:]:
+            X = component (X)
 
         return X
+
+    def find_last_result (self, split=None, func='apply', first=-1):
+
+        idx = None
+        for i, component in enumerate(self.components[first:0:-1]):
+            if component.data_io.can_load_result () and component.data_io.exists_result (split=split):
+                idx = i
+                break
+            elif isinstance (component, MultiComponent):
+                starting_point = component.find_last_result (split=split)
+                if starting_point:
+                    idx = i
+                    break
+        split = self.data_io.split if split is None else split
+        if idx is not None:
+            self.start_idx[func][split] = len(self.components) - idx - 1
+            self.is_data_source[func][split] = True
+        else:
+            self.start_idx[func][split] = 0
+            self.is_data_source[func][split] = False
+        return self.is_data_source[func][split]
+
+    def find_last_fitted_model (self, split='training'):
+        idx = len(self.components)-1
+        all_components_fitted = True
+        for i, component in enumerate(self.components):
+            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
+                idx = i-1
+                all_components_fitted = False
+                break
+            elif (component.is_model and
+                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+                    idx = i-1
+                    all_components_fitted = False
+                    break
+
+        if idx >= 0:
+            _ = self.find_last_result (split=split, func='fit', first=idx)
+        return all_components_fitted
 
 # Sequential is an alias of Pipeline
 Sequential = Pipeline
@@ -575,6 +632,31 @@ class Parallel (MultiComponent):
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
         return Xr
+
+    def find_last_result (self, split=None):
+        self.is_data_source = True
+        for i, component in self.components:
+            if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
+                if isinstance (component, MultiComponent):
+                    self.is_data_source = self.is_data_source and component.find_last_result (split=split)
+                else:
+                    self.is_data_source = False
+        return self.is_data_source
+
+    def find_last_fitted_model (self, split='training'):
+        idx = len(self.components)-1
+        all_components_fitted = True
+        for i, component in enumerate(self.components):
+            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
+                idx = i-1
+                all_components_fitted = False
+                break
+            elif (component.is_model and
+                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+                    idx = i-1
+                    all_components_fitted = False
+                    break
+        return all_components_fitted
 
 # Cell
 class MultiModality (Parallel):
@@ -833,3 +915,34 @@ class MultiSplitComponent (MultiComponent):
         elif output_not_dict and len(result)==1:
             result = list(result.items())[0][1]
         return result
+
+    def find_last_result (self, apply_to = None, split=None, **kwargs):
+        apply_to = self.apply_to if apply_to is None else apply_to
+        apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
+
+        self.is_data_source = True
+        for split in apply_to:
+            if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
+                if isinstance (component, MultiComponent):
+                    # TODO: have one flag is_data_source per split
+                    # or make MultiSplitComponent a Parallel object
+                    # or always use DataFrame
+                    self.is_data_source = self.is_data_source and component.find_last_result (split=split)
+                else:
+                    self.is_data_source = False
+        return self.is_data_source
+
+    def find_last_fitted_model (self, apply_to = None, split=None, **kwargs):
+        apply_to = self.apply_to if apply_to is None else apply_to
+        apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
+
+        all_components_fitted = True
+        for split in apply_to:
+            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
+                all_components_fitted = False
+                break
+            elif (component.is_model and
+                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+                    all_components_fitted = False
+                    break
+        return all_components_fitted

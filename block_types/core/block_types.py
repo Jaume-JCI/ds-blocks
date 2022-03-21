@@ -141,6 +141,17 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         elif type(self.comparator) is type:
             self.comparator = self.comparator (self, **kwargs)
 
+        # determine result and fit functions
+        self.result_func = self._determine_result_func ()
+        self.fit_apply_func = self._determine_fit_apply_func ()
+        fit_func = self._determine_fit_func ()
+        if fit_func is None:
+            self._fit = self.__fit
+            self.is_model = False
+        else:
+            self._fit = fit_func
+            self.is_model = True
+
     def reset_logger (self):
         delete_logger (self.name_logger)
 
@@ -240,11 +251,10 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                 self.profiler.start_no_overhead_timer ()
                 self._fit (X, y, **additional_data)
             elif func=='_fit_apply':
-                fit_apply_func = self._determine_fit_apply_func ()
-                assert fit_apply_func is not None, ('object must have _fit_apply method or one of '
+                assert self.fit_apply_func is not None, ('object must have _fit_apply method or one of '
                                                     'its aliases implemented when func="_fit_apply"')
                 self.profiler.start_no_overhead_timer ()
-                result = fit_apply_func (X, y=y, **additional_data, **kwargs)
+                result = self.fit_apply_func (X, y=y, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
             self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
@@ -283,7 +293,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                    load_result=None, save_result=None, func='_fit',
                    validation_data=None, test_data=None, **kwargs):
 
-        if self._determine_fit_apply_func () is not None:
+        if self.fit_apply_func is not None:
             return self.fit_like (X, y=y,
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
@@ -337,12 +347,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         is True.
         """
         self.profiler.start_timer ()
-        result_func = self._determine_result_func ()
-        result = self._compute_result (X, result_func, load=load, save=save, **kwargs)
+        assert self.result_func is not None, 'apply function not implemented'
+        result = self._compute_result (X, self.result_func, load=load, save=save, **kwargs)
         return result
 
     def _determine_result_func (self):
         implemented = []
+        result_func = None
         if callable(getattr(self, '_apply', None)):
             result_func = self._apply
             implemented += [result_func]
@@ -359,9 +370,6 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             if self.estimator is not None and callable(getattr(self.estimator, 'predict', None)):
                 result_func = self.estimator.predict
                 implemented += [result_func]
-        if len (implemented) == 0:
-            raise AttributeError (f'{self.class_name} must have one of _transform, _apply, or _predict methods implemented\n'
-                                  f'Otherwise, self.estimator must have either predict or transform methods')
         if len(implemented) > 1:
             raise AttributeError (f'{self.class_name} must have only one of _transform, _apply, '
                                   f'or _predict methods implemented => found: {implemented}')
@@ -405,7 +413,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         self.logger.debug (f'applying {self.name} (on {self.data_io.split} data)')
 
-        if len(X) == 1:
+        if len(X) == 1:  # TODO: check if this is really necessary
             X = X[0]
         previous_result = None
         if self.data_io.can_load_result (load):
@@ -431,10 +439,17 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
 
         return result
 
+    def __fit (self, X, y=None, **kwargs):
+        pass
 
-    def _fit (self, X, y=None, **kwargs):
-        if self.estimator is not None:
-            self.estimator.fit (X, y)
+    def _determine_fit_func (self):
+        implemented = []
+        fit_func = None
+        if callable(getattr(self, '_fit', None)):
+            fit_func = self._fit
+        elif self.estimator is not None and callable(getattr(self.estimator, 'fit', None)):
+            fit_func = self.estimator.fit
+        return fit_func
 
     def show_result_statistics (self, result=None, split=None) -> None:
         """

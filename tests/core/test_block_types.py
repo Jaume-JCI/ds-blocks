@@ -7,7 +7,8 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'TransformWithoutFitApply2', 'TransformWithFitApply2', 'component_save_data', 'test_component_save_load',
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
-           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
+           'MyEstimator', 'TransformWithoutFit', 'test_determine_fit_function', 'test_sampling_component',
+           'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
            'test_one_class_sklearn_component', 'test_pandas_component']
 
 # Cell
@@ -221,7 +222,7 @@ def test_component_aliases ():
     my_transform4 = MyTransform4 ()
 
     import pytest
-    with pytest.raises(Exception):
+    with pytest.raises (AssertionError):
         my_transform4.transform(3)
 
 
@@ -232,11 +233,9 @@ def test_component_aliases ():
         def _apply (self, x):
             return x*2
 
-    my_transform5 = MyTransform5 ()
-
     import pytest
-    with pytest.raises(Exception):
-        my_transform5.transform(3)
+    with pytest.raises(AttributeError):
+        my_transform5 = MyTransform5 ()
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
@@ -740,6 +739,51 @@ def test_set_paths ():
     path_models = 'test_set_paths_models_b'
     tr.data_io.set_path_models (path_models)
     assert_paths (tr, path_results, path_models)
+
+# Comes from block_types.ipynb, cell
+#@pytest.mark.reference_fails
+class MyEstimator ():
+    def __init__ (self, factor=3):
+        self.factor = factor
+    def fit (self, X, y=None):
+        self.sum = sum(X)
+    def transform (self, X):
+        return X * self.factor + self.sum
+
+class TransformWithoutFit (Component):
+    def __init__ (self, factor=2, **kwargs):
+        super().__init__ (**kwargs)
+    def _apply (self, X):
+        return X * self.factor
+
+def test_determine_fit_function ():
+    # example when there is _fit implemented
+    component = TransformWithoutFitApply ()
+    X = np.array ([1,2,3])
+    component.fit (X)
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2)).all()
+    assert component.is_model
+
+    # example when there is estimator
+    component = Component (MyEstimator (2))
+    X = np.array ([1,2,3])
+    component.fit (X)
+    assert component.estimator.sum == 6
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2*2)).all()
+    assert component.is_model
+
+    # example when there is no _fit implemented, and there is no estimator
+    component = TransformWithoutFit ()
+    X = np.array ([1,2,3])
+    component.fit (X)
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X2*2)).all()
+    assert not component.is_model
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails

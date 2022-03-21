@@ -491,6 +491,17 @@ class DataIO ():
         else:
             self.folder = f'{folder}/{self.folder}'
 
+    def exists_result (self, split=None, path_results=None, result_file_name=None):
+        path_result_file = self.get_path_result_file (split=split, path_results=path_results,
+                                                      result_file_name=result_file_name)
+        return path_result_file.exists ()
+
+    def exists_estimator (self, path_models=None, fitting_file_name=None):
+        """Load estimator parameters."""
+        path_model_file = self.get_path_model_file (path_models=path_models,
+                                                    fitting_file_name=fitting_file_name)
+        return path_model_file.exists ()
+
 # Cell
 class PandasIO (DataIO):
     """
