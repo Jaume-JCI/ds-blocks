@@ -42,6 +42,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   class_name: Optional[str] = None,
                   suffix: Optional[str] = None,
                   group: str = dflt.group,
+                  root=None,
                   overwrite_field: bool = dflt.overwrite_field,
                   error_if_present: bool = dflt.error_if_present,
                   ignore:set = set(),

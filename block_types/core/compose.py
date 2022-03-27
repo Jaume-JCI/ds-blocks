@@ -42,6 +42,8 @@ class MultiComponent (SamplingComponent):
                   propagate=dflt.propagate,
                   path_results=dflt.path_results,
                   path_models=dflt.path_models,
+                  root=None,
+                  automatic_root=False,
                   **kwargs):
         """Assigns attributes and calls parent constructor.
 
@@ -64,12 +66,13 @@ class MultiComponent (SamplingComponent):
         if not hasattr (self, 'finalized_component_list'):
             self.finalized_component_list = False
 
-
+        if root == True: root = self
+        elif automatic_root: root = self if root is None else root
         # we need to call super().__init__() *after* having creating the `components` field,
         # since the constructor of Component calls a method that is overriden in Pipeline,
         # and this method makes use of the mentioned `components` field
         super().__init__ (separate_labels=separate_labels, path_results=path_results, path_models=path_models,
-                          **kwargs)
+                          root=root, **kwargs)
 
         self.set_split ('whole')
 
@@ -83,6 +86,11 @@ class MultiComponent (SamplingComponent):
         self.is_data_source = dict (apply = dict (training=False, validation=False, test=False, whole=False),
                                fit = dict (training=False, validation=False, test=False, whole=False))
 
+        self.set_root (root)
+        if root is self:
+            self.num_names = {}
+            self.names = {}
+            self.set_unique_names ()
 
     def register_components (self, *components):
         """
@@ -392,6 +400,28 @@ class MultiComponent (SamplingComponent):
             else:
                 component.data_io.chain_folders (folder)
 
+    def set_root (self, root):
+        for component in self.components:
+            if isinstance (component, MultiComponent):
+                component.set_root (root)
+            else:
+                component.root = root
+
+    def register_global_name (self, component):
+        if component.name in self.root.names:
+            if component.name not in self.root.num_names:
+                self.root.num_names[component.name] = 0
+            self.root.num_names[component.name] += 1
+            component.name = f'{component.name}_{self.root.num_names[component.name]}'
+        self.root.names[component.name] = component
+
+    def set_unique_names (self):
+        self.register_global_name (self)
+        for component in self.components:
+            self.register_global_name (component)
+            if isinstance (component, MultiComponent):
+                component.set_unique_names (root)
+
     def find_last_result (self, split=None):
         return False
 
@@ -477,7 +507,7 @@ class Pipeline (MultiComponent):
     def find_last_result (self, split=None, func='apply', first=-1):
 
         idx = None
-        for i, component in enumerate(self.components[first:0:-1]):
+        for i, component in enumerate(self.components[first::-1]):
             if component.data_io.can_load_result () and component.data_io.exists_result (split=split):
                 idx = i
                 break
@@ -568,7 +598,7 @@ class Parallel (MultiComponent):
     if a concurrency mechanism is employed.
     """
     def __init__ (self, *components, select_data_before_fitting=None, select_data_before_transforming=None,
-                  initialize_result=None, join_result=None, **kwargs):
+                  initialize_result=None, join_result=None, finalize_result=None, **kwargs):
         """Assigns attributes and calls parent constructor.
         """
 
@@ -585,6 +615,9 @@ class Parallel (MultiComponent):
         join_result = (self.join_result if join_result is None
                                       else join_result)
         self.join_result = join_result
+        finalize_result = (self.finalize_result if finalize_result is None
+                                      else finalize_result)
+        self.finalize_result = finalize_result
 
         super().__init__ (*components, **kwargs)
 
@@ -611,6 +644,9 @@ class Parallel (MultiComponent):
         Xr.append (Xi_r)
         return Xr
 
+    def finalize_result (self, Xr, components=None):
+        return Xr
+
     def _apply (self, X):
         """Transform data with components of pipeline, and predict labels with last component.
 
@@ -622,6 +658,8 @@ class Parallel (MultiComponent):
             Xi_r = component.transform (Xi)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
+        Xr = self.finalize_result (Xr)
+
         return Xr
 
     def _fit_apply (self, X, y=None, **kwargs):
@@ -631,11 +669,13 @@ class Parallel (MultiComponent):
             Xi_r = component.fit_apply (Xi, yi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
+        Xr = self.finalize_result (Xr)
+
         return Xr
 
     def find_last_result (self, split=None):
         self.is_data_source = True
-        for i, component in self.components:
+        for i, component in enumerate(self.components):
             if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
                 if isinstance (component, MultiComponent):
                     self.is_data_source = self.is_data_source and component.find_last_result (split=split)
