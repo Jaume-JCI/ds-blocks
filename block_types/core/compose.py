@@ -419,9 +419,10 @@ class MultiComponent (SamplingComponent):
     def set_unique_names (self):
         self.register_global_name (self)
         for component in self.components:
-            self.register_global_name (component)
             if isinstance (component, MultiComponent):
                 component.set_unique_names ()
+            else:
+                self.register_global_name (component)
 
     def find_last_result (self, split=None):
         return False

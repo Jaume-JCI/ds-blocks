@@ -3,21 +3,20 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture', 'SimpleMultiComponent', 'test_multi_comp_io',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_multi_comp_hierarchy',
            'test_multi_comp_profiling', 'test_multi_comp_all_equal', 'test_multi_component_setters',
-           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'first_level', 'second_level',
-           'third_level', 'config', 'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply',
-           'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
-           'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
-           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
-           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
-           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
-           'test_pandas_pipeline', 'test_parallel', 'Sum1', 'Multiply10', 'make_pipe1', 'make_pipe2',
-           'test_pipeline_find_last_result', 'test_pipeline_find_last_result_parallel1', 'TransformM',
-           'test_multi_modality', 'test_column_selector', 'column_transformer_data', 'test_make_column_transformer',
-           'test_make_column_transformer_passthrough', 'test_make_column_transformer_remainder',
-           'test_make_column_transformer_descendants', 'test_make_column_transformer_fit_transform', 'Transform1',
-           'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
-           'test_multi_split_chain', 'test_multi_split_io', 'test_multi_split_non_dict',
-           'test_multi_split_non_dict_bis']
+           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'test_set_root', 'Transform1',
+           'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis',
+           'test_pipeline_new_comp', 'test_pipeline_set_comp', 'test_athena_pipeline_training',
+           'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2',
+           'test_construct_diagram', 'test_show_summary', 'test_make_pipeline', 'test_pipeline_factory',
+           'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1',
+           'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
+           'Sum1', 'Multiply10', 'make_pipe1', 'make_pipe2', 'test_pipeline_find_last_result',
+           'test_pipeline_find_last_result_parallel1', 'TransformM', 'test_multi_modality', 'test_column_selector',
+           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
+           'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
+           'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
+           'test_multi_split_non_dict', 'test_multi_split_non_dict_bis']
 
 # Cell
 import pytest
@@ -837,32 +836,41 @@ def test_chain_folders ():
     assert b2.inner2.second.data_io.folder=='third2/two/folder_second'
 
 # Comes from compose.ipynb, cell
-#def test_set_root ():
-config = dict (path_results='my_path', Second=dict(path_results='other_path'))
-def first_level ():
-    a0=Component (name='first', class_name='First', folder='folder_first', **config)
-    b0=Component (name='second', class_name='Second', folder='folder_second', **config)
-    return a0, b0
+def test_set_root ():
+    config = dict (path_results='my_path', Second=dict(path_results='other_path'))
+    def first_level ():
+        a0=Component (name='first', class_name='First', folder='folder_first', **config)
+        b0=Component (name='second', class_name='Second', folder='folder_second', **config)
+        return a0, b0
 
-a0, b0 = first_level()
+    a0, b0 = first_level()
 
-def second_level ():
-    a0, b0 = first_level ()
-    a1= MultiComponent (a0, b0, folder='one', class_name='Inner', name='inner1', **config)
-    a0, b0 = first_level ()
-    b1= MultiComponent (a0, b0, folder='two', class_name='Inner', name='inner2', **config)
-    return a1, b1
+    def second_level ():
+        a0, b0 = first_level ()
+        a1= MultiComponent (a0, b0, folder='one', class_name='Inner', name='inner1', **config)
+        a0, b0 = first_level ()
+        b1= MultiComponent (a0, b0, folder='two', class_name='Inner', name='inner2', **config)
+        return a1, b1
 
-a1, b1 = second_level ()
-
-def third_level ():
     a1, b1 = second_level ()
-    a2= MultiComponent (a1, b1, folder='third1', class_name='Higher', name='higher1', **config)
-    a1, b1 = second_level ()
-    b2= MultiComponent (a1, b1, folder='third2', class_name='Higher', name='higher2', **config)
-    return a2, b2
 
-a2, b2 = third_level ()
+    def third_level ():
+        a1, b1 = second_level ()
+        a2= MultiComponent (a1, b1, folder='third1', class_name='Higher', name='higher1', **config)
+        a1, b1 = second_level ()
+        b2= MultiComponent (a1, b1, folder='third2', class_name='Higher', name='higher2', **config)
+        return a2, b2
+
+    a2, b2 = third_level ()
+    c = MultiComponent (a2, b2)
+    assert [x.name for x in c.higher1.inner1.components] == ['first', 'second']
+    assert [x.name for x in c.higher1.inner2.components] == ['first', 'second']
+
+    c = MultiComponent (a2, b2, root=True)
+    assert [x.name for x in c.higher1.inner1.components] == ['first', 'second']
+    assert [x.name for x in c.higher1.inner2.components] == ['first_1', 'second_1']
+    assert [x.data_io.fitting_file_name for x in c.higher1.inner2.components] == ['first_1_estimator.pk', 'second_1_estimator.pk']
+    assert [x.data_io.result_file_name for x in c.higher1.inner2.components] == ['first_1_result.pk', 'second_1_result.pk']
 
 # Comes from compose.ipynb, cell
 class Transform1 (Component):
@@ -1308,11 +1316,27 @@ def test_parallel ():
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
 class Sum1 (Component):
+    def __init__ (self, raise_error=False, **kwargs):
+        super().__init__ (**kwargs)
     def _apply (self, X):
         return X+1
+    def apply (self, *X, **kwargs):
+        if self.raise_error: raise RuntimeError ('apply should not be called')
+        return super().apply (*X, **kwargs)
+    __call__ = apply
+    transform = apply
+
 class Multiply10 (Component):
+    def __init__ (self, raise_error=False, **kwargs):
+        super().__init__ (**kwargs)
     def _apply (self, X):
         return X*10
+    def apply (self, *X, **kwargs):
+        if self.raise_error: raise RuntimeError ('apply should not be called')
+        return super().apply (*X, **kwargs)
+    __call__ = apply
+    transform = apply
+
 
 def make_pipe1 (**kwargs):
     pipe = Sequential (Sum1 (name='A', **kwargs),
@@ -1357,7 +1381,19 @@ def test_pipeline_find_last_result ():
     X2 = b.apply (X2)
 
     is_source = pipe2.find_last_result ()
-    print (is_source)
+    assert is_source
+
+    pipe2.A.raise_error = True
+    pipe2.B.raise_error = False
+    pipe2.C.raise_error = False
+    pipe2.D.raise_error = False
+    pipe2.E.raise_error = False
+    with pytest.raises (RuntimeError):
+        _ = a.apply (X)
+    pipe2.C.raise_error = True
+    with pytest.raises (RuntimeError):
+        _ = pipe2.apply ()
+    pipe2.C.raise_error = False
     r2 = pipe2.apply ()
     assert (r1==r2).all()
     print (r2)
@@ -1374,12 +1410,18 @@ def test_pipeline_find_last_result_parallel1 ():
     r1 = pipe1.apply (X)
     print (r1)
     # second
-    pipe2 = make_pipe2 (path_results=path_results, verbose=2)
+    pipe2 = make_pipe2 (path_results=path_results, verbose=2, root=True)
     a = pipe2.obj.A (X)
     b1 = pipe2.obj.B1 (a)
     b2a = pipe2.obj.B2a (a)
     b3a = pipe2.obj.B3a (a)
     b3b = pipe2.obj.B3b (b3a)
+
+    #pipe2.obj.A.raise_error = True
+    #pipe2.obj.B1.raise_error = True
+    #pipe2.obj.B2a.raise_error = True
+    pipe2.obj.B3a.raise_error = True
+    #pipe2.obj.B3b.raise_error = True
 
     is_source = pipe2.find_last_result ()
     print (is_source)
