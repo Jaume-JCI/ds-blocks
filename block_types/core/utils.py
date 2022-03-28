@@ -307,11 +307,11 @@ class DataIO ():
 
         # configuration for saving / loading fitted estimator
         if self.fitting_file_name is None:
-            self.fitting_file_name = f'{self.component.name}_estimator{self.fitting_file_extension}'
+            self.set_fitting_file_name (self.component.name)
 
         # configuration for saving / loading result of transforming training data
         if self.result_file_name is None:
-            self.result_file_name = f'{self.component.name}_result{self.result_file_extension}'
+            self.set_result_file_name (self.component.name)
 
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
@@ -468,6 +468,16 @@ class DataIO ():
 
     def set_load_result (self, load):
         self.load_result_flag = load if self.load_flag else False
+
+    def set_fitting_file_name (self, name):
+        self.fitting_file_name = f'{name}_estimator{self.fitting_file_extension}'
+
+    def set_result_file_name (self, name):
+        self.result_file_name = f'{name}_result{self.result_file_extension}'
+
+    def set_file_names (self, name):
+        self.set_fitting_file_name (name)
+        self.set_result_file_name (name)
 
     def _get_folder_name (self, folder):
         if folder == '__class__':

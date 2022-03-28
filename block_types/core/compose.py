@@ -86,7 +86,7 @@ class MultiComponent (SamplingComponent):
         self.is_data_source = dict (apply = dict (training=False, validation=False, test=False, whole=False),
                                fit = dict (training=False, validation=False, test=False, whole=False))
 
-        self.set_root (root)
+        if root is not None: self.set_root (root)
         if root is self:
             self.num_names = {}
             self.names = {}
@@ -401,6 +401,7 @@ class MultiComponent (SamplingComponent):
                 component.data_io.chain_folders (folder)
 
     def set_root (self, root):
+        self.root = root
         for component in self.components:
             if isinstance (component, MultiComponent):
                 component.set_root (root)
@@ -412,7 +413,7 @@ class MultiComponent (SamplingComponent):
             if component.name not in self.root.num_names:
                 self.root.num_names[component.name] = 0
             self.root.num_names[component.name] += 1
-            component.name = f'{component.name}_{self.root.num_names[component.name]}'
+            component.set_name (f'{component.name}_{self.root.num_names[component.name]}')
         self.root.names[component.name] = component
 
     def set_unique_names (self):
@@ -420,7 +421,7 @@ class MultiComponent (SamplingComponent):
         for component in self.components:
             self.register_global_name (component)
             if isinstance (component, MultiComponent):
-                component.set_unique_names (root)
+                component.set_unique_names ()
 
     def find_last_result (self, split=None):
         return False

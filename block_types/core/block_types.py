@@ -519,11 +519,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         self.data_io = copy.copy(data_io) if copy else data_io
         self.data_io.setup (self)
 
-# ******************************************
-# Subclasses of Component.
-# Most of these are basically the same as GenericComponent, the only difference being that some parameters
-# are over-riden when constructing the object, to force a specific behavior
-# ******************************************
+    def set_name (self, name):
+        self.name = name
+        self.data_io.set_file_names (name)
 
 # Cell
 class SamplingComponent (Component):
