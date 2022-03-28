@@ -654,7 +654,7 @@ class MultiSplitComponent (MultiComponent):
             else:
                 self._issue_error_or_warning (split, X)
 
-        component.fit(X[self.fit_to], y=y, split='training', **additional_data)
+        component.fit(X[self.fit_to], y=y, split=self.fit_to, **additional_data)
 
     def _issue_error_or_warning (self, split, X):
         message = f'split {split} not found in X keys ({X.keys()})'
