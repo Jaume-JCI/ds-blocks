@@ -536,7 +536,7 @@ class Pipeline (MultiComponent):
                 all_components_fitted = False
                 break
             elif (component.is_model and
-                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+                  not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                     idx = i-1
                     all_components_fitted = False
                     break
@@ -599,18 +599,16 @@ class Parallel (MultiComponent):
     As the name suggests, these components could run in parallel,
     if a concurrency mechanism is employed.
     """
-    def __init__ (self, *components, select_data_before_fitting=None, select_data_before_transforming=None,
+    def __init__ (self, *components, select_input_to_fit=None, select_input=None,
                   initialize_result=None, join_result=None, finalize_result=None, **kwargs):
         """Assigns attributes and calls parent constructor.
         """
 
-        select_data_before_fitting = (self.select_data_before_fitting if select_data_before_fitting is None
-                                      else select_data_before_fitting)
-        self.select_data_before_fitting = select_data_before_fitting
-        select_data_before_transforming = (self.select_data_before_transforming
-                                           if select_data_before_transforming is None
-                                           else select_data_before_transforming)
-        self.select_data_before_transforming = select_data_before_transforming
+        select_input_to_fit = (self.select_input_to_fit if select_input_to_fit is None
+                                      else select_input_to_fit)
+        self.select_input_to_fit = select_input_to_fit
+        select_input = (self.select_input if select_input is None else select_input)
+        self.select_input = select_input
         initialize_result = (self.initialize_result if initialize_result is None
                                       else initialize_result)
         self.initialize_result = initialize_result
@@ -623,7 +621,7 @@ class Parallel (MultiComponent):
 
         super().__init__ (*components, **kwargs)
 
-    def select_data_before_fitting (self, X, y, components, i):
+    def select_input_to_fit (self, X, y, components, i):
         return X, y
 
     def _fit (self, X, y=None):
@@ -633,13 +631,13 @@ class Parallel (MultiComponent):
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
         for i, component in enumerate(self.components):
-            Xi, yi = self.select_data_before_fitting (X, y, self.components, i)
+            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
             component.fit (Xi, yi, **kwargs)
 
     def initialize_result (self):
         return []
 
-    def select_data_before_transforming (self, X, components, i):
+    def select_input (self, X, components, i):
         return X
 
     def join_result (self, Xr, Xi_r, components, i):
@@ -649,15 +647,15 @@ class Parallel (MultiComponent):
     def finalize_result (self, Xr, components=None):
         return Xr
 
-    def _apply (self, X):
+    def _apply (self, *X):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi = self.select_data_before_transforming (X, self.components, i)
-            Xi_r = component.transform (Xi)
+            Xi = self.select_input (X, self.components, i)
+            Xi_r = component (*Xi)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
         Xr = self.finalize_result (Xr)
@@ -667,7 +665,7 @@ class Parallel (MultiComponent):
     def _fit_apply (self, X, y=None, **kwargs):
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi, yi = self.select_data_before_fitting (X, y, self.components, i)
+            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
             Xi_r = component.fit_apply (Xi, yi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
@@ -694,7 +692,7 @@ class Parallel (MultiComponent):
                 all_components_fitted = False
                 break
             elif (component.is_model and
-                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+                  not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                     idx = i-1
                     all_components_fitted = False
                     break
@@ -718,13 +716,13 @@ class MultiModality (Parallel):
         for component in components:
             component.key = component.name if use_name else component.data_io.folder
 
-    def select_data_before_fitting (self, X, y, components, i):
+    def select_input_to_fit (self, X, y, components, i):
         return X[components[i].key], y
 
     def initialize_result (self):
         return {component.key: None for component in self.components}
 
-    def select_data_before_transforming (self, X, components, i):
+    def select_input (self, X, components, i):
         return X[components[i].key]
 
     def join_result (self, Xr, Xi_r, components, i):
