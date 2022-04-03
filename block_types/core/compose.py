@@ -324,8 +324,8 @@ class MultiComponent (SamplingComponent):
 
         return is_equal
 
-    def load_estimator (self):
-        for component in self.components:
+    def load_estimator (self, skip_from=None):
+        for component in self.components[:skip_from]:
             component.load_estimator ()
 
     def save_result (self, result, split=None, path_results=None, result_file_name=None):
@@ -475,15 +475,17 @@ class Pipeline (MultiComponent):
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
-        X = self._fit_apply_except_last (X, y)
-        self.components[-1].fit (X, y)
+        X = self._fit_apply (X, y=y, last=-1)
+        self.components[-1].fit (X, y=y)
 
-    def _fit_apply (self, X, y=None, **kwargs):
-        X = self._fit_apply_except_last (X, y, **kwargs)
-        return self.components[-1].fit_apply (X, y, **kwargs)
-
-    def _fit_apply_except_last (self, X, y, **kwargs):
-        for component in self.components[:-1]:
+    def _fit_apply (self, X, y=None, split=None, last=None, **kwargs):
+        split = self.data_io.split if split is None else split
+        first = self.start_idx['fit'][split]
+        if first >= len(self.components):
+            return X
+        if first > 0:
+            self.load_estimator (skip_from=first)
+        for component in self.components[first:last]:
             X = component.fit_apply (X, y, **kwargs)
         return X
 
@@ -493,15 +495,15 @@ class Pipeline (MultiComponent):
         In the current implementation, we consider prediction a form of mapping,
         and therefore a special type of transformation."""
         split = self.data_io.split if split is None else split
-        idx = self.start_idx['apply'][split]
+        first = self.start_idx['apply'][split]
 
-        if idx < len(self.components):
-            component = self.components[idx]
+        if first < len(self.components):
+            component = self.components[first]
             X = component (*X)
-            idx += 1
-        if idx >= len(self.components):
+            first += 1
+        if first >= len(self.components):
             return X
-        for component in self.components[idx:]:
+        for component in self.components[first:]:
             X = component (X)
 
         return X
@@ -520,14 +522,15 @@ class Pipeline (MultiComponent):
                     break
         split = self.data_io.split if split is None else split
         if idx is not None:
-            self.start_idx[func][split] = len(self.components) - idx - 1
+            first = (len(self.components) + first) if (first < 0) else first
+            self.start_idx[func][split] = first - idx
             self.is_data_source[func][split] = True
         else:
             self.start_idx[func][split] = 0
             self.is_data_source[func][split] = False
         return self.is_data_source[func][split]
 
-    def find_last_fitted_model (self, split='training'):
+    def find_last_fitted_model (self, split=None):
         idx = len(self.components)-1
         all_components_fitted = True
         for i, component in enumerate(self.components):
@@ -543,6 +546,8 @@ class Pipeline (MultiComponent):
 
         if idx >= 0:
             _ = self.find_last_result (split=split, func='fit', first=idx)
+        if all_components_fitted and self.data_io.exists_result (split=split):
+            self.data_io.load_estimator = self.data_io.load_estimators
         return all_components_fitted
 
 # Sequential is an alias of Pipeline
@@ -683,7 +688,7 @@ class Parallel (MultiComponent):
                     self.is_data_source = False
         return self.is_data_source
 
-    def find_last_fitted_model (self, split='training'):
+    def find_last_fitted_model (self, split=None):
         idx = len(self.components)-1
         all_components_fitted = True
         for i, component in enumerate(self.components):
@@ -696,6 +701,8 @@ class Parallel (MultiComponent):
                     idx = i-1
                     all_components_fitted = False
                     break
+        if all_components_fitted and self.data_io.exists_result (split=split):
+            self.data_io.load_estimator = self.data_io.load_estimators
         return all_components_fitted
 
 # Cell

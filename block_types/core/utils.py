@@ -340,6 +340,13 @@ class DataIO ():
                                 load_func=self.fitting_load_func)
         return estimator
 
+    def load_estimators (self, **kwargs):
+        all_exist = True
+        for component in self.component.components:
+            estimator = component.data_io.load_estimator (**kwargs)
+            all_exist = all_exist and (estimator is not None)
+        return all_exist
+
     def save_estimator (self, path_models=None, fitting_file_name=None):
         """Save estimator parameters."""
         if self.component.estimator is not None:
