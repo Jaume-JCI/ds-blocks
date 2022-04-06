@@ -7,8 +7,8 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'TransformWithoutFitApply2', 'TransformWithFitApply2', 'component_save_data', 'test_component_save_load',
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
-           'MyEstimator', 'TransformWithoutFit', 'test_determine_fit_function', 'test_sampling_component',
-           'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
+           'MyEstimator', 'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
+           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
            'test_one_class_sklearn_component', 'test_pandas_component']
 
 # Cell
@@ -784,6 +784,38 @@ def test_determine_fit_function ():
     r = component (X2)
     assert (r == (X2*2)).all()
     assert not component.is_model
+    assert component._fit == component._fit_
+
+def test_use_fit_from_loaded_estimator ():
+    path_models = 'test_use_fit_from_loaded_estimator'
+    component = Component (MyEstimator (2), path_models=path_models)
+    X = np.array ([1,2,3])
+    component.fit (X)
+    assert (Path (path_models) / 'models').exists()
+    del component
+
+    estimator1 = MyEstimator (2)
+    print (estimator1)
+    component = Component (estimator1, path_models=path_models)
+    print ('before loading')
+    print (component.estimator)
+    print (component._fit)
+    print (component.result_func)
+
+    component.load_estimator ()
+    print ('after loading')
+    print (component.estimator)
+    print (component._fit)
+    print (component.result_func)
+
+    assert component.estimator.sum == 6
+    assert component.is_model
+
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2*2)).all()
+
+    remove_previous_results (path_models)
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
