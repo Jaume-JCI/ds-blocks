@@ -22,7 +22,7 @@ class Sum1 (Component):
     def _apply (self, X):
         return X+1
     def apply (self, *X, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
     transform = apply
@@ -33,7 +33,7 @@ class Multiply10 (Component):
     def _apply (self, X):
         return X*10
     def apply (self, *X, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
     transform = apply
@@ -42,7 +42,7 @@ class NewParallel (Parallel):
     def __init__ (self, *components, raise_error=False, **kwargs):
         super().__init__ (*components, **kwargs)
     def apply (self, *X, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
     transform = apply
@@ -84,15 +84,15 @@ class MinMaxClass (Component):
         super().__init__ (**kwargs)
         self.estimator = Bunch()
     def apply (self, *X, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
     transform = apply
     def fit (self, X, y=None, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: fit should not be called')
         return super().fit (X, y=y, **kwargs)
     def fit_apply (self, X, y=None, **kwargs):
-        if self.raise_error: raise RuntimeError ('apply should not be called')
+        if self.raise_error: raise RuntimeError (f'{self.name}: fit_apply should not be called')
         return super().fit_apply (X, y=y, **kwargs)
     fit_transform = fit_apply
     fit_predict = fit_apply
@@ -130,12 +130,12 @@ def make_pipe_fit2 (new_parallel=False, **kwargs):
     parallel = ParallelClass (
         Multiply10 (name='B1', **kwargs),
         Min10 (name='B2', **kwargs),
-        Sequential (Min10 (name='B2a', **kwargs), Max10 (name='B2b', **kwargs),
-                    Sum1 (name='B2c', **kwargs), Min10 (name='B2d', **kwargs), **kwargs),
-        Sequential (Sum1 (name='B3a', **kwargs), Max10 (name='B3b', **kwargs),
-                    Min10 (name='B3c', **kwargs), Sum1 (name='B3d', **kwargs),
-                    Max10 (name='B3e', **kwargs), **kwargs),
-        Max10 (name='B4', **kwargs),
+        Sequential (Min10 (name='B3a', **kwargs), Max10 (name='B3b', **kwargs),
+                    Sum1 (name='B3c', **kwargs), Min10 (name='B3d', **kwargs), **kwargs),
+        Sequential (Sum1 (name='B4a', **kwargs), Max10 (name='B4b', **kwargs),
+                    Min10 (name='B4c', **kwargs), Sum1 (name='B4d', **kwargs),
+                    Max10 (name='B4e', **kwargs), **kwargs),
+        Max10 (name='B5', **kwargs),
         initialize_result=lambda:np.array([]),
         join_result=lambda Xr, Xi_r, components, i: np.r_[Xr.reshape(-1,Xi_r.shape[1]), Xi_r],
         **kwargs)
