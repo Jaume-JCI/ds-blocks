@@ -689,18 +689,13 @@ class Parallel (MultiComponent):
         return self.is_data_source
 
     def find_last_fitted_model (self, split=None):
-        idx = len(self.components)-1
         all_components_fitted = True
         for i, component in enumerate(self.components):
             if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
-                idx = i-1
                 all_components_fitted = False
-                break
             elif (component.is_model and
                   not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
-                    idx = i-1
                     all_components_fitted = False
-                    break
         if all_components_fitted and self.data_io.exists_result (split=split):
             self.data_io.load_estimator = self.data_io.load_estimators
         return all_components_fitted
@@ -980,16 +975,11 @@ class MultiSplitComponent (MultiComponent):
         return self.is_data_source
 
     def find_last_fitted_model (self, apply_to = None, split=None, **kwargs):
-        apply_to = self.apply_to if apply_to is None else apply_to
-        apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
-
         all_components_fitted = True
-        for split in apply_to:
-            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
+        split = self.fit_to
+        if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
+            all_components_fitted = False
+        elif (component.is_model and
+              not (component.data_io.can_load_model () and component.data_io.exists_model ())):
                 all_components_fitted = False
-                break
-            elif (component.is_model and
-                  not (component.data_io.can_load_model () and component.data_io.exists_model ())):
-                    all_components_fitted = False
-                    break
         return all_components_fitted
