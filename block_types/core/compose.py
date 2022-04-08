@@ -85,6 +85,8 @@ class MultiComponent (SamplingComponent):
                                fit = dict (training=0, validation=0, test=0, whole=0))
         self.is_data_source = dict (apply = dict (training=False, validation=False, test=False, whole=False),
                                fit = dict (training=False, validation=False, test=False, whole=False))
+        self.all_components_fitted = False
+        self.load_all_estimators = False
 
         if root is not None: self.set_root (root)
         if root is self:
@@ -533,11 +535,13 @@ class Pipeline (MultiComponent):
     def find_last_fitted_model (self, split=None):
         idx = len(self.components)-1
         all_components_fitted = True
+        self.load_all_estimators = False
         for i, component in enumerate(self.components):
-            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
-                idx = i-1
-                all_components_fitted = False
-                break
+            if isinstance (component, MultiComponent):
+                if not component.find_last_fitted_model (split=split):
+                    idx = i-1
+                    all_components_fitted = False
+                    break
             elif (component.is_model and
                   not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                     idx = i-1
@@ -548,6 +552,8 @@ class Pipeline (MultiComponent):
             _ = self.find_last_result (split=split, func='fit', first=idx)
         if all_components_fitted and self.data_io.exists_result (split=split):
             self.data_io.load_estimator = self.data_io.load_estimators
+            self.load_all_estimators = True
+        self.all_components_fitted = all_components_fitted
         return all_components_fitted
 
 # Sequential is an alias of Pipeline
@@ -689,15 +695,19 @@ class Parallel (MultiComponent):
         return self.is_data_source
 
     def find_last_fitted_model (self, split=None):
+        self.load_all_estimators = False
         all_components_fitted = True
         for i, component in enumerate(self.components):
-            if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
-                all_components_fitted = False
+            if isinstance (component, MultiComponent):
+                if not component.find_last_fitted_model (split=split):
+                    all_components_fitted = False
             elif (component.is_model and
                   not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                     all_components_fitted = False
         if all_components_fitted and self.data_io.exists_result (split=split):
             self.data_io.load_estimator = self.data_io.load_estimators
+            self.load_all_estimators = True
+        self.all_components_fitted = all_components_fitted
         return all_components_fitted
 
 # Cell
@@ -976,10 +986,18 @@ class MultiSplitComponent (MultiComponent):
 
     def find_last_fitted_model (self, apply_to = None, split=None, **kwargs):
         all_components_fitted = True
+        self.load_all_estimators = False
         split = self.fit_to
-        if isinstance (component, MultiComponent) and not component.find_last_fitted_model (split=split):
-            all_components_fitted = False
+        if isinstance (component, MultiComponent):
+            if not component.find_last_fitted_model (split=split):
+                all_components_fitted = False
         elif (component.is_model and
               not (component.data_io.can_load_model () and component.data_io.exists_model ())):
                 all_components_fitted = False
+
+        if all_components_fitted and self.data_io.exists_result (split=split):
+            self.data_io.load_estimator = self.data_io.load_estimators
+            self.load_all_estimators = True
+        self.all_components_fitted = all_components_fitted
+
         return all_components_fitted

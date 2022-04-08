@@ -19,9 +19,11 @@ import block_types.config.bt_defaults as dflt
 class Sum1 (Component):
     def __init__ (self, raise_error=False, **kwargs):
         super().__init__ (**kwargs)
+        self.applied = False
     def _apply (self, X):
         return X+1
     def apply (self, *X, **kwargs):
+        self.applied = True
         if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
@@ -30,9 +32,11 @@ class Sum1 (Component):
 class Multiply10 (Component):
     def __init__ (self, raise_error=False, **kwargs):
         super().__init__ (**kwargs)
+        self.applied = False
     def _apply (self, X):
         return X*10
     def apply (self, *X, **kwargs):
+        self.applied = True
         if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
@@ -41,7 +45,9 @@ class Multiply10 (Component):
 class NewParallel (Parallel):
     def __init__ (self, *components, raise_error=False, **kwargs):
         super().__init__ (*components, **kwargs)
+        self.applied = False
     def apply (self, *X, **kwargs):
+        self.applied = True
         if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
@@ -83,15 +89,21 @@ class MinMaxClass (Component):
     def __init__ (self, raise_error=False, **kwargs):
         super().__init__ (**kwargs)
         self.estimator = Bunch()
+        self.applied = False
+        self.fitted = False
+        self.fit_applied = False
     def apply (self, *X, **kwargs):
+        self.applied = True
         if self.raise_error: raise RuntimeError (f'{self.name}: apply should not be called')
         return super().apply (*X, **kwargs)
     __call__ = apply
     transform = apply
     def fit (self, X, y=None, **kwargs):
+        self.fitted = True
         if self.raise_error: raise RuntimeError (f'{self.name}: fit should not be called')
         return super().fit (X, y=y, **kwargs)
     def fit_apply (self, X, y=None, **kwargs):
+        self.fit_applied = True
         if self.raise_error: raise RuntimeError (f'{self.name}: fit_apply should not be called')
         return super().fit_apply (X, y=y, **kwargs)
     fit_transform = fit_apply
