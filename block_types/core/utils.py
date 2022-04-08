@@ -307,11 +307,11 @@ class DataIO ():
 
         # configuration for saving / loading fitted estimator
         if self.fitting_file_name is None:
-            self.fitting_file_name = f'{self.component.name}_estimator{self.fitting_file_extension}'
+            self.set_fitting_file_name (self.component.name)
 
         # configuration for saving / loading result of transforming training data
         if self.result_file_name is None:
-            self.result_file_name = f'{self.component.name}_result{self.result_file_extension}'
+            self.set_result_file_name (self.component.name)
 
         if self.path_results is not None:
             self.path_results = Path(self.path_results).resolve()
@@ -339,6 +339,13 @@ class DataIO ():
         estimator = self._load (path=path_model_file,
                                 load_func=self.fitting_load_func)
         return estimator
+
+    def load_estimators (self, **kwargs):
+        all_exist = True
+        for component in self.component.components:
+            estimator = component.data_io.load_estimator (**kwargs)
+            all_exist = all_exist and (estimator is not None)
+        return all_exist
 
     def save_estimator (self, path_models=None, fitting_file_name=None):
         """Save estimator parameters."""
@@ -469,6 +476,16 @@ class DataIO ():
     def set_load_result (self, load):
         self.load_result_flag = load if self.load_flag else False
 
+    def set_fitting_file_name (self, name):
+        self.fitting_file_name = f'{name}_estimator{self.fitting_file_extension}'
+
+    def set_result_file_name (self, name):
+        self.result_file_name = f'{name}_result{self.result_file_extension}'
+
+    def set_file_names (self, name):
+        self.set_fitting_file_name (name)
+        self.set_result_file_name (name)
+
     def _get_folder_name (self, folder):
         if folder == '__class__':
             if self.component is not None:
@@ -490,6 +507,17 @@ class DataIO ():
             self.folder = folder
         else:
             self.folder = f'{folder}/{self.folder}'
+
+    def exists_result (self, split=None, path_results=None, result_file_name=None):
+        path_result_file = self.get_path_result_file (split=split, path_results=path_results,
+                                                      result_file_name=result_file_name)
+        return path_result_file.exists ()
+
+    def exists_estimator (self, path_models=None, fitting_file_name=None):
+        """Load estimator parameters."""
+        path_model_file = self.get_path_model_file (path_models=path_models,
+                                                    fitting_file_name=fitting_file_name)
+        return path_model_file.exists ()
 
 # Cell
 class PandasIO (DataIO):
