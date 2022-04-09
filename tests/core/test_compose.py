@@ -15,8 +15,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_result_parallel1', 'test_pipeline_find_last_result_parallel2',
            'test_pipeline_find_last_result_parallel3', 'test_pipeline_find_last_fitted_model_seq',
            'test_pipeline_find_last_fitted_model_parallel', 'test_pipeline_find_last_fitted_model_parallel_remove',
-           'TransformM', 'test_multi_modality', 'test_column_selector', 'column_transformer_data',
-           'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'TransformM', 'test_multi_modality', 'test_column_selector', 'test_concat', 'test_identity',
+           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
            'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
            'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
@@ -2059,8 +2059,36 @@ def test_column_selector ():
                     'x3': list(range(15,20)),
                     'x4': list(range(25,30))
                    })
-    dfr = ColumnSelector(columns=['x2','x4']).transform(df)
+    dfr = ColumnSelector(columns=['x2','x4'], error_if_apply=True).transform(df)
     assert (dfr==df[['x2','x4']]).all().all()
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_concat ():
+    df = pd.DataFrame ({'x1': list(range(5)),
+                    'x2': list(range(5,10)),
+                    'x3': list(range(15,20)),
+                    'x4': list(range(25,30))
+                   })
+
+    df2 = pd.DataFrame ({'x5': list(range(5)),
+                    'x6': list(range(5,10)),
+                    'x7': list(range(15,20))
+                   })
+    dfr = Concat (error_if_apply=True).transform(df, df2)
+    assert (dfr==pd.concat ([df,df2], axis=1)).all().all()
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_identity ():
+    df = pd.DataFrame ({'x1': list(range(5)),
+                    'x2': list(range(5,10)),
+                    'x3': list(range(15,20)),
+                    'x4': list(range(25,30))
+                   })
+
+    dfr = Identity (error_if_apply=True).transform(df)
+    assert (dfr==df).all().all()
 
 # Comes from compose.ipynb, cell
 def column_transformer_data ():
@@ -2082,12 +2110,17 @@ def test_make_column_transformer (column_transformer_data):
     df, tr1 = column_transformer_data
 
     tr1 = Component(FunctionTransformer (lambda x: x+1), name='tr1')
-    tr2 = PandasComponent(FunctionTransformer (lambda x: x*2), transformed_columns=['cont2_bis','cat_1'], name='tr2')
+    tr2 = PandasComponent(FunctionTransformer (lambda x: x*2),
+                          transformed_columns=['cont2_bis','cat_1'],
+                          name='tr2')
 
     column_transformer = make_column_transformer (
         (tr1, ['cont2', 'cont4']),
-        (tr2, ['cont2', 'cat_1'])
+        (tr2, ['cont2', 'cat_1']),
+        error_if_apply=True,
+        verbose=2
     )
+    print (f'{"-"*100}\n{column_transformer}')
     dfr = column_transformer.transform(df)
 
     # display and test
@@ -2102,8 +2135,11 @@ def test_make_column_transformer (column_transformer_data):
         (tr1, ['cont2', 'cont4']),
         (tr2, ['cont2', 'cat_1']),
         name='test_transformer',
-        class_name='TestTransformer'
+        class_name='TestTransformer',
+        error_if_apply=True,
+        verbose=2
     )
+    print (f'{"-"*100}\n{column_transformer}')
     assert (column_transformer.name, column_transformer.class_name) == ('test_transformer', 'TestTransformer')
 
     # set name of column transformer and parameters that are specific
@@ -2114,8 +2150,11 @@ def test_make_column_transformer (column_transformer_data):
         name='test_transformer',
         class_name='TestTransformer',
         TestTransformer=dict(path_results='mine'),
-        path_results='other'
+        path_results='other',
+        error_if_apply=True,
+        verbose=2
     )
+    print (f'{"-"*100}\n{column_transformer}')
     assert column_transformer.path_results.name=='mine'
     assert column_transformer.components[0].path_results.name=='other'
 
@@ -2126,7 +2165,9 @@ def test_make_column_transformer_passthrough (column_transformer_data):
 
     column_transformer = make_column_transformer (
         (tr1, ['cont1', 'cont4']),
-        ('passthrough', ['cont2', 'cat_1'])
+        ('passthrough', ['cont2', 'cat_1']),
+        error_if_apply=True,
+        verbose=2
     )
     dfr = column_transformer.transform(df)
 
@@ -2147,7 +2188,9 @@ def test_make_column_transformer_remainder (column_transformer_data):
     column_transformer = make_column_transformer (
         (tr1, ['cont1', 'cont4']),
         ('passthrough', ['cont2', 'cat_1']),
-        remainder=tr3
+        remainder=tr3,
+        error_if_apply=True,
+        verbose=2
     )
     dfr = column_transformer.transform(df)
 
@@ -2164,7 +2207,9 @@ def test_make_column_transformer_remainder (column_transformer_data):
     column_transformer = make_column_transformer (
         (tr1, ['cont1', 'cont4']),
         (tr3, ['cont2', 'cat_1']),
-        remainder='passthrough'
+        remainder='passthrough',
+        error_if_apply=True,
+        verbose=2
     )
     dfr = column_transformer.transform(df)
 
@@ -2180,7 +2225,9 @@ def test_make_column_transformer_remainder (column_transformer_data):
     column_transformer = make_column_transformer (
         (tr1, ['cont1', 'cont4']),
         ('drop', ['cont2', 'cat_1']),
-        remainder=tr3
+        remainder=tr3,
+        error_if_apply=True,
+        verbose=2
     )
     dfr = column_transformer.transform(df)
 
@@ -2232,7 +2279,9 @@ def test_make_column_transformer_fit_transform (column_transformer_data):
 
     column_transformer = make_column_transformer (
         (tr1, ['cont2', 'cont4']),
-        (tr2, ['cont2', 'cat_1'])
+        (tr2, ['cont2', 'cat_1']),
+        error_if_apply=True,
+        verbose=2
     )
     dfr = column_transformer.fit_transform(df)
 

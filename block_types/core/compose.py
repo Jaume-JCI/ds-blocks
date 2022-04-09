@@ -488,7 +488,7 @@ class Pipeline (MultiComponent):
         if first > 0:
             self.load_estimator (skip_from=first)
         for component in self.components[first:last]:
-            X = component.fit_apply (X, y, **kwargs)
+            X = component.fit_apply (X, y=y, **kwargs)
         return X
 
     def _apply (self, *X, split=None):
@@ -643,7 +643,7 @@ class Parallel (MultiComponent):
         """
         for i, component in enumerate(self.components):
             Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            component.fit (Xi, yi, **kwargs)
+            component.fit (Xi, y=yi, **kwargs)
 
     def initialize_result (self):
         return []
@@ -677,7 +677,7 @@ class Parallel (MultiComponent):
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
             Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            Xi_r = component.fit_apply (Xi, yi, **kwargs)
+            Xi_r = component.fit_apply (Xi, y=yi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
         Xr = self.finalize_result (Xr)
@@ -749,12 +749,14 @@ class ColumnSelector (NoSaverComponent):
                   verbose=dflt.verbose,
                   force_verbose=False,
                   logger=None,
+                  direct_apply=True,
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
             logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
+                          direct_apply=direct_apply,
                           **kwargs)
 
     def _apply (self, df):
@@ -769,12 +771,14 @@ class Concat (NoSaverComponent):
                   verbose=dflt.verbose,
                   force_verbose=False,
                   logger=None,
+                  direct_apply=True,
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
             logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
+                          direct_apply=direct_apply,
                           **kwargs)
 
     def _apply (self, *dfs):
@@ -782,8 +786,9 @@ class Concat (NoSaverComponent):
 
 # Cell
 class _BaseColumnTransformer (MultiComponent):
-    def __init__ (self, name=None, class_name=None, **kwargs):
-        super().__init__ (name=name, class_name=class_name, **kwargs)
+    def __init__ (self, name=None, class_name=None, direct_apply=True, direct_fit=True,**kwargs):
+        super().__init__ (name=name, class_name=class_name, direct_apply=direct_apply,
+                          direct_fit=direct_fit, **kwargs)
         self.concat = Concat (**kwargs)
         del self.concat.nick_name
 
@@ -820,12 +825,14 @@ class Identity (NoSaverComponent):
                   verbose=dflt.verbose,
                   force_verbose=False,
                   logger=None,
+                  direct_apply=True,
                   **kwargs):
         verbose = 0 if not force_verbose else verbose
         if verbose==0:
             logger = set_empty_logger ()
         super().__init__ (verbose=verbose,
                           logger=logger,
+                          direct_apply=direct_apply,
                           **kwargs)
 
     def _apply (self, X):
@@ -845,6 +852,7 @@ def _append_pipeline (pipelines, name, transformer, columns, remainder= False, *
     if not drop:
         config=kwargs.copy()
         config.update({name:dict(data_io='NoSaverIO')})
+        config.update (direct_apply=True)
         pipeline = make_pipeline(ColumnSelector(columns, remainder=remainder, **kwargs),
                                  transformer,
                                  name=name,

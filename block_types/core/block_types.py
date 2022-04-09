@@ -34,7 +34,7 @@ from ..utils.utils import (set_logger, delete_logger, replace_attr_and_store,
 import block_types.config.bt_defaults as dflt
 
 # Cell
-class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
+class Component ():
     """Base component class used in our Pipeline."""
     def __init__ (self,
                   estimator=None,
@@ -52,6 +52,13 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                   model_plotter: Optional[ModelPlotter] = None,
                   profiler: Optional[Profiler] = None,
                   comparator: Optional[Comparator] = None,
+                  apply = None,
+                  direct_apply: bool = False,
+                  direct_fit: bool = False,
+                  direct_fit_apply: bool = False,
+                  error_if_apply: bool = False,
+                  error_if_fit: bool = False,
+                  error_if_fit_apply: bool = False,
                   logger=None,
                   verbose: int = dflt.verbose,
                   name_logger:str = dflt.name_logger,
@@ -93,9 +100,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         # store __init__ attrs into `self`
         but = ', '.join (but) if isinstance(but, list) else but
         but = (but + ', ') if len(but)>0 else but
-        but = but + 'ignore, but, overwrite_field, error_if_present, path_results, path_models'
+        but = but + 'ignore, but, overwrite_field, error_if_present, path_results, path_models, apply'
         if isinstance (ignore, str): ignore = set(re.split(', *', ignore))
-        ignore.update ({'name', 'class_name', 'suffix'})
+        ignore.update ({'name', 'class_name', 'suffix', 'apply'})
         replace_attr_and_store (base_class=Component, but=but,
                                 error_if_present=error_if_present, overwrite=overwrite_field,
                                 ignore=ignore)
@@ -142,16 +149,11 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         elif type(self.comparator) is type:
             self.comparator = self.comparator (self, **kwargs)
 
-        # determine result and fit functions
-        self._assign_result_func ()
-        self._assign_fit_apply_func ()
-        self._assign_fit_func ()
-        if self.fit_func is None:
-            self._fit = self._fit_
-            self.is_model = False
-        else:
-            self._fit = self.fit_func
-            self.is_model = True
+        # determine and assign apply and fit functions
+        self.assign_apply_and_fit_functions (apply=apply)
+
+    def __repr__ (self):
+        return f'Component {self.class_name} (name={self.name})'
 
     def reset_logger (self):
         delete_logger (self.name_logger)
@@ -215,6 +217,9 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         Uses the previously fitted parameters if they're found in disk and load
         is True.
         """
+        if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
+        if self.error_if_fit_apply and func=='_fit_apply':
+            raise RuntimeError (f'{self.name} should not call fit_apply')
         self.profiler.start_timer ()
 
         if split is not None:
@@ -294,17 +299,26 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
                    load_result=None, save_result=None, func='_fit',
                    validation_data=None, test_data=None, **kwargs):
 
+        if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
+
         if self.fit_apply_func is not None:
             return self.fit_like (X, y=y,
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
                                   test_data=test_data, **kwargs)
         else:
-            return self.fit (X, y=y,
-                             load=load_model, save=save_model,
-                             validation_data=validation_data,
-                             test_data=test_data).apply (X, load=load_result,
-                                                         save=save_result, **kwargs)
+            if not self.direct_fit:
+                kwargs_fit = dict(y=y,
+                                 load=load_model, save=save_model,
+                                 validation_data=validation_data,
+                                 test_data=test_data)
+            else:
+                kwargs_fit = dict(y=y)
+            if not self.direct_apply:
+                kwargs_apply = dict (load=load_result, save=save_result, **kwargs)
+            else:
+                kwargs_apply = kwargs
+            return self.fit (X, **kwargs_fit).apply (X, **kwargs_apply)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
@@ -340,7 +354,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def apply (self, *X, load=None, save=None, **kwargs):
+    def __call__ (self, *X, load=None, save=None, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
@@ -348,6 +362,8 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         is True.
         """
         self.profiler.start_timer ()
+        if self.direct_apply: return self.result_func (*X, **kwargs)
+        if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
         result = self._compute_result (X, self.result_func, load=load, save=save, **kwargs)
         return result
@@ -413,11 +429,33 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             raise AttributeError (f'{self.class_name} must have only one of fit_transform, fit_apply, '
                                   f'or fit_predict methods implemented => found: {implemented}')
 
+    def assign_apply_and_fit_functions (self, apply=None):
+        """Determine and assign apply and fit functions."""
+        if apply is not None: self._apply = apply
+        self._assign_result_func ()
+        self._assign_fit_apply_func ()
+        self._assign_fit_func ()
+        if self.fit_func is None:
+            self._fit = self._fit_
+            if self.fit_apply_func is None:
+                self.is_model = False
+        else:
+            self._fit = self.fit_func
+            self.is_model = True
+        if self.direct_apply:
+            self.set_apply (self.result_func)
+        if not self.is_model:
+            self.fit = self._fit_
+            #self.set_fit_apply (self.apply)
+        elif self.direct_fit:
+            self.fit = self.fit_func
+        elif self.direct_fit_apply:
+            self.set_fit_apply (self.fit_apply_func)
 
     # aliases for transform method
-    __call__ = apply
-    transform = apply
-    predict = partialmethod (apply, converter_args=dict(new_columns=['prediction']))
+    apply = __call__
+    transform = __call__
+    predict = partialmethod (__call__, converter_args=dict(new_columns=['prediction']))
 
     def _compute_result (self, X, result_func, load=None, save=None, split=None,
                          converter_args={}, **kwargs):
@@ -455,7 +493,7 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
         return result
 
     def _fit_ (self, X, y=None, **kwargs):
-        pass
+        return self
 
     def show_result_statistics (self, result=None, split=None) -> None:
         """
@@ -541,6 +579,17 @@ class Component (ClassifierMixin, TransformerMixin, BaseEstimator):
             assert callable (self.fit_func)
             self._fit = self.fit_func
             assert self.is_model
+
+    def set_apply (self, result_func):
+        self.apply = result_func
+        self.__call__ = result_func
+        self.transform = result_func
+        self.predict = result_func
+
+    def set_fit_apply (self, fit_apply_func):
+        self.fit_apply = fit_apply_func
+        self.fit_transform = fit_apply_func
+        self.fit_predict = fit_apply_func
 
 # Cell
 class SamplingComponent (Component):
