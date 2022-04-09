@@ -894,17 +894,9 @@ def test_direct_methods ():
     #assert not component.applied
 
 # Comes from block_types.ipynb, cell
-from block_types.utils.dummies import Multiply10direct
 def test_pass_apply ():
-    # input
+    component = Component (apply=lambda x: x*10, verbose=2, direct_apply=True, error_if_apply=True)
     X = np.array ([1,2,3])
-
-    # example where we do not use direct methods
-    component = Multiply10direct (verbose=2)
-    r = component (X)
-    assert (r==X*10).all()
-
-    component = Component (apply=lambda x: x*10, verbose=2)
     r = component (X)
     assert (r==X*10).all()
 
