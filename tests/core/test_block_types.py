@@ -8,8 +8,9 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
            'MyEstimator', 'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
-           'test_direct_methods', 'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component',
-           'get_data_for_one_class', 'test_one_class_sklearn_component', 'test_pandas_component']
+           'test_direct_methods', 'test_pass_apply', 'test_sampling_component', 'test_sklearn_component',
+           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
+           'test_pandas_component']
 
 # Cell
 import pytest
@@ -891,6 +892,21 @@ def test_direct_methods ():
     r2 = component.fit (X).apply (X)
     assert (r==X*10).all()
     #assert not component.applied
+
+# Comes from block_types.ipynb, cell
+from block_types.utils.dummies import Multiply10direct
+def test_pass_apply ():
+    # input
+    X = np.array ([1,2,3])
+
+    # example where we do not use direct methods
+    component = Multiply10direct (verbose=2)
+    r = component (X)
+    assert (r==X*10).all()
+
+    component = Component (apply=lambda x: x*10, verbose=2)
+    r = component (X)
+    assert (r==X*10).all()
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
