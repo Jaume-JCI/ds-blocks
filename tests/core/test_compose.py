@@ -2342,10 +2342,10 @@ def multi_split_data ():
             test = np.array([100,200,300]).reshape(-1,1)
             )
 
-    multi_transform1 = MultiSplitComponent (component = Transform1())
+    multi_transform1 = MultiSplitDict (component = Transform1())
 
     tr2 = Transform2()
-    multi_transform2 = MultiSplitComponent (component=tr2,
+    multi_transform2 = MultiSplitDict (component=tr2,
                                             fit_additional = ['validation', 'test'])
 
     return data, multi_transform1, multi_transform2, tr2
@@ -2367,10 +2367,10 @@ def test_multi_split_transform (multi_split_data):
     assert multi_transform1.class_name=='Transform1MultiSplit'
 
     # check that we can assign a different name
-    multi_transform1 = MultiSplitComponent (component = Transform1(), name='different', class_name='Yes')
+    multi_transform1 = MultiSplitDict (component = Transform1(), name='different', class_name='Yes')
     assert multi_transform1.name=='different'
     assert multi_transform1.class_name=='Yes'
-    # check that this new name is given only to MultiSplitComponent,
+    # check that this new name is given only to MultiSplitDict,
     # not to the component that it's wrapping
     assert multi_transform1.component.name=='transform1'
     assert multi_transform1.component.class_name=='Transform1'
@@ -2435,14 +2435,14 @@ def test_multi_split_io (multi_split_data):
                     name='times2',
                     path_results=path_results)
 
-    multi_transform = MultiSplitComponent (component=tr,
+    multi_transform = MultiSplitDict (component=tr,
                                            apply_to = ['validation', 'test'],
                                            path_results = path_results,
                                            data_io=PickleIO (path_results = path_results))
 
     result = multi_transform (data)
 
-    multi_transform2 = MultiSplitComponent (data_io=PickleIO (path_results = path_results), name='times2_multi_split')
+    multi_transform2 = MultiSplitDict (data_io=PickleIO (path_results = path_results), name='times2_multi_split')
 
     result2 = multi_transform2.data_io.load_result ()
 
@@ -2471,7 +2471,7 @@ def test_multi_split_non_dict ():
     # check loading / saving
     tr = Component (FunctionTransformer (lambda x: x*2))
 
-    multi_transform = MultiSplitComponent (tr, apply_to = ['test'])
+    multi_transform = MultiSplitDict (tr, apply_to = ['test'])
 
     data = np.array([100,200,300]).reshape(-1,1)
     result = multi_transform (data)
@@ -2484,7 +2484,7 @@ def test_multi_split_non_dict ():
 def test_multi_split_non_dict_bis ():
     tr = Component (FunctionTransformer (lambda x: x*2))
 
-    multi_transform = MultiSplitComponent (tr, apply_to = ['test'])
+    multi_transform = MultiSplitDict (tr, apply_to = ['test'])
 
     # output applied to single split, converted to non-dictionary
     data = dict(training = np.array([1,2,3]).reshape(-1,1),

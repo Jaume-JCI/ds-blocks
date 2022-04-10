@@ -2,9 +2,10 @@
 
 __all__ = ['MultiComponent', 'Pipeline', 'Sequential', 'make_pipeline', 'pipeline_factory', 'PandasPipeline',
            'Parallel', 'MultiModality', 'ColumnSelector', 'Concat', 'ColumnTransformer', 'Identity',
-           'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent']
+           'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict']
 
 # Cell
+import abc
 import warnings
 import sys
 from pathlib import Path
@@ -921,7 +922,7 @@ def make_column_transformer (*transformers, remainder='drop', name=None, class_n
 
 
 # Cell
-class MultiSplitComponent (MultiComponent):
+class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
     def __init__ (self,
                   component=None,
                   name=None,
@@ -946,50 +947,81 @@ class MultiSplitComponent (MultiComponent):
 
         super().__init__ (name=name, class_name=class_name, **kwargs)
 
+    @abc.abstractmethod
+    def _initialize_fit (self, X):
+        pass
+
+    @abc.abstractmethod
+    def _include_split_in_fit (self, additional_data, split, X):
+        pass
+
+    @abc.abstractmethod
+    def _select_training_split (self, X):
+        pass
+
     def _fit (self, X, y=None):
-        if not isinstance(X, dict):
-            X = {self.fit_to: X}
+        X = self._initialize_fit (X)
         component = self.components[0]
         additional_data = {}
         for split in self.fit_additional:
             if split not in ['validation', 'test']:
                 raise ValueError (f'split {split} not valid')
-            if split in X.keys():
-                additional_data[f'{split}_data'] = X[split]
-            else:
-                self._issue_error_or_warning (split, X)
+            self._include_split_in_fit (additional_data, split, X)
+        X_fit = self._select_training_split (X)
+        component.fit(X_fit, y=y, split=self.fit_to, **additional_data)
 
-        component.fit(X[self.fit_to], y=y, split=self.fit_to, **additional_data)
+    @abc.abstractmethod
+    def _get_split_keys (self, X):
+        pass
 
     def _issue_error_or_warning (self, split, X):
-        message = f'split {split} not found in X keys ({X.keys()})'
+        message = f'split {split} not found in X ({self._get_split_keys (X)})'
         if self.raise_error_if_split_doesnot_exist:
             raise RuntimeError (message)
         elif self.raise_warning_if_split_doesnot_exist:
             warnings.warn (message)
 
+    @abc.abstractmethod
+    def _initialize_apply (self, X, apply_to, split):
+        pass
+
+    @abc.abstractmethod
+    def _included_split (self, split, X):
+        pass
+
+    @abc.abstractmethod
+    def _select_split (self, X, split):
+        pass
+
+    @abc.abstractmethod
+    def _convert_result (self, result, input_not_dict, output_not_dict):
+        pass
+
+    @abc.abstractmethod
+    def _initialize_result (self):
+        pass
+
+    @abc.abstractmethod
+    def _add_result (self, result, split, result_split):
+        pass
+
     def _apply (self, X, apply_to = None, output_not_dict=False, split=None, **kwargs):
         apply_to = self.apply_to if apply_to is None else apply_to
         apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
-        if not isinstance(X, dict):
-            key = apply_to[0] if len(apply_to)==1 else split if split is not None else 'test'
-            X = {key: X}
-            input_not_dict = True
-        else:
-            input_not_dict = False
+        X, input_not_dict = self._initialize_apply (X, apply_to, split)
 
         component = self.components[0]
-        result = {}
+        result = self._initialize_result ()
+
         for split in apply_to:
-            if split in X.keys():
-                result[split] = component.apply (X[split], split=split, **kwargs)
+            if self._included_split (split, X):
+                X_split = self._select_split (X, split)
+                result_split = component.apply (X_split, split=split, **kwargs)
+                result = self._add_result (result, split, result_split)
             else:
                 self._issue_error_or_warning (split, X)
 
-        if input_not_dict:
-            result = result[key]
-        elif output_not_dict and len(result)==1:
-            result = list(result.items())[0][1]
+        result = self._convert_result (result, input_not_dict, output_not_dict)
         return result
 
     def find_last_result (self, apply_to = None, split=None, **kwargs):
@@ -1025,3 +1057,56 @@ class MultiSplitComponent (MultiComponent):
         self.all_components_fitted = all_components_fitted
 
         return all_components_fitted
+
+# Cell
+class MultiSplitDict (MultiSplitComponent):
+    def __init__ (self, component=None, **kwargs):
+        super().__init__ (component=component, **kwargs)
+
+    def _initialize_fit (self, X):
+        if not isinstance(X, dict):
+            X = {self.fit_to: X}
+        return X
+
+    def _include_split_in_fit (self, additional_data, split, X):
+        if split in X.keys():
+            additional_data[f'{split}_data'] = X[split]
+        else:
+            self._issue_error_or_warning (split, X)
+
+    def _select_training_split (self, X):
+        return X[self.fit_to]
+
+    def _get_split_keys (self, X):
+        return X.keys()
+
+    def _initialize_apply (self, X, apply_to, split):
+        if not isinstance(X, dict):
+            key = apply_to[0] if len(apply_to)==1 else split if split is not None else 'test'
+            X = {key: X}
+            input_not_dict = True
+            self.key = key
+        else:
+            input_not_dict = False
+
+        return X, input_not_dict
+
+    def _included_split (self, split, X):
+        return split in X.keys()
+
+    def _select_split (self, X, split):
+        return X[split]
+
+    def _initialize_result (self):
+        return {}
+
+    def _add_result (self, result, split, result_split):
+        result[split] = result_split
+        return result
+
+    def _convert_result (self, result, input_not_dict, output_not_dict):
+        if input_not_dict:
+            result = result[self.key]
+        elif output_not_dict and len(result)==1:
+            result = list(result.items())[0][1]
+        return result
