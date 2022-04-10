@@ -25,7 +25,7 @@ from .data_conversion import (DataConverter, NoConverter, PandasConverter,
 from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
                                     save_keras_model,  save_csv_gz, read_csv, read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
-from .utils import data_io_factory
+from .utils import data_io_factory, get_specific_data_io_parameters
 from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake, snake_to_camel
 from ..utils.utils import (set_logger, delete_logger, replace_attr_and_store,
@@ -157,7 +157,7 @@ class Component ():
     def reset_logger (self):
         delete_logger (self.name_logger)
 
-    def obtain_config_params (self, **kwargs):
+    def obtain_config_params (self, tag=None, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
         as the component.
 
@@ -174,6 +174,11 @@ class Component ():
             config.update (config[k])
         else:
             config = kwargs
+
+        if tag is not None:
+            if tag == '__name__': tag = self.name
+            self.tag = tag
+            config.update (get_specific_data_io_parameters (tag, **kwargs))
 
         config.update(verbose=self.verbose,
                       logger=self.logger)

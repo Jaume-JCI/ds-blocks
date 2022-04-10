@@ -8,9 +8,9 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
            'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
-           'test_direct_methods', 'test_pass_apply', 'test_sampling_component', 'test_sklearn_component',
-           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
-           'test_pandas_component']
+           'test_direct_methods', 'test_pass_apply', 'test_get_specific_data_io_parameters_for_component',
+           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
+           'test_one_class_sklearn_component', 'test_pandas_component']
 
 # Cell
 import pytest
@@ -25,7 +25,7 @@ from pathlib import Path
 from block_types.core.block_types import *
 from block_types.core.data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
 from block_types.core.utils import DataIO, SklearnIO, PandasIO, NoSaverIO
-from block_types.utils.utils import remove_previous_results
+from block_types.utils.utils import remove_previous_results, check_last_part
 from block_types.utils.utils import set_logger
 import block_types.config.bt_defaults as dflt
 from block_types.core.data_conversion import DataConverter
@@ -892,6 +892,14 @@ def test_pass_apply ():
     X = np.array ([1,2,3])
     r = component (X)
     assert (r==X*10).all()
+
+# Comes from block_types.ipynb, cell
+def test_get_specific_data_io_parameters_for_component ():
+    component = Component (tag='data', x=3, par=[1,2], path_results='hello', path_results_data='world',
+                           other='yes', load_result_data = False, save_model_data=True)
+    check_last_part(component.path_results, 'world')
+    assert component.data_io.load_result_flag == False
+    assert component.data_io.save_model_flag == True
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
