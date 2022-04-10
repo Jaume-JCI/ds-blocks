@@ -2,7 +2,8 @@
 
 __all__ = ['MultiComponent', 'Pipeline', 'Sequential', 'make_pipeline', 'pipeline_factory', 'PandasPipeline',
            'Parallel', 'MultiModality', 'ColumnSelector', 'Concat', 'ColumnTransformer', 'Identity',
-           'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict']
+           'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict',
+           'MultiSplitDFColumn']
 
 # Cell
 import abc
@@ -1124,4 +1125,61 @@ class MultiSplitDict (MultiSplitComponent):
             result = result[self.key]
         elif output_not_dict and len(result)==1:
             result = list(result.items())[0][1]
+        return result
+
+# Cell
+class MultiSplitDFColumn (MultiSplitComponent):
+    def __init__ (self, component=None, **kwargs):
+        super().__init__ (component=component, **kwargs)
+
+    def __repr__ (self):
+        return f'MultiSplitDF {self.class_name} (name={self.name})'
+
+    def _initialize_fit (self, X):
+        if 'split' not in X.columns:
+            # X.index = pd.MultiIndex.from_arrays ([[self.fit_to]*X.shape[0], X.index], names=('split', 'number'))
+            X['split'] = self.fit_to
+        return X
+
+    def _include_split_in_fit (self, additional_data, split, X):
+        if split in X.split.values:
+            additional_data[f'{split}_data'] = X[X.split==split]
+        else:
+            self._issue_error_or_warning (split, X)
+
+    def _select_training_split (self, X):
+        return X[X.split==self.fit_to]
+
+    def _get_split_keys (self, X):
+        #X.index.get_level_values(0).unique()
+        return X.split.unique()
+
+    def _initialize_apply (self, X, apply_to, split):
+        if 'split' not in X.columns:
+            key = apply_to[0] if len(apply_to)==1 else split if split is not None else 'test'
+            X['split'] = key
+            input_not_dict = True
+            self.key = key
+        else:
+            input_not_dict = False
+
+        return X, input_not_dict
+
+    def _included_split (self, split, X):
+        #split in X.index.get_level_values(0).values
+        return split == 'whole' or split in X.split.values
+
+    def _select_split (self, X, split):
+        return X[X.split==split] if split != 'whole' else X
+
+    def _initialize_result (self):
+        return []
+
+    def _add_result (self, result, split, result_split):
+        result_split['split']=split
+        result.append (result_split)
+        return result
+
+    def _convert_result (self, result, input_not_dict, output_not_dict):
+        result = pd.concat (result, axis=0)
         return result

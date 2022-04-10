@@ -20,7 +20,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
            'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
            'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
-           'test_multi_split_non_dict', 'test_multi_split_non_dict_bis']
+           'test_multi_split_non_dict', 'test_multi_split_non_dict_bis', 'multi_split_data_df_column',
+           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit']
 
 # Cell
 import pytest
@@ -2494,3 +2495,69 @@ def test_multi_split_non_dict_bis ():
 
     assert type(result)==np.ndarray
     assert (result==data['test']*2).all()
+
+# Comes from compose.ipynb, cell
+def multi_split_data_df_column ():
+    data = dict(training = np.array([1,2,3]).reshape(-1,1),
+            validation = np.array([10,20,30]).reshape(-1,1),
+            test = np.array([100,200,300]).reshape(-1,1)
+            )
+
+    values = np.concatenate((data['training'], data['validation'], data['test']))
+    df = pd.DataFrame (data=values)
+    split = [[k]*data[k].shape[0] for k in data]
+    df['split'] = split[0] + split[1] + split[2]
+
+    multi_transform1 = MultiSplitDFColumn (component = Transform1())
+
+    tr2 = Transform2()
+    multi_transform2 = MultiSplitDFColumn (component=tr2,
+                                            fit_additional = ['validation', 'test'])
+
+    return df, data, multi_transform1, multi_transform2, tr2
+
+def test_multi_split_df_column_transform ():
+    # example 1: apply transform on multiple splits
+    df, data, multi_transform1, multi_transform2, tr2 = multi_split_data_df_column ()
+
+    result = multi_transform1.fit_transform (df)
+
+    assert type(result) is pd.DataFrame
+
+    assert (result.split.unique() == list(data.keys())).all()
+
+    for split in data.keys():
+        assert (result[result.split==split].drop(columns='split').values==sum(data['training'].ravel())+data[split]*1000).all()
+
+    # check that automatic name given is based on component
+    assert multi_transform1.name=='transform1_multi_split'
+    assert multi_transform1.class_name=='Transform1MultiSplit'
+
+    # check that we can assign a different name
+    multi_transform1 = MultiSplitDict (component = Transform1(), name='different', class_name='Yes')
+    assert multi_transform1.name=='different'
+    assert multi_transform1.class_name=='Yes'
+    # check that this new name is given only to MultiSplitDict,
+    # not to the component that it's wrapping
+    assert multi_transform1.component.name=='transform1'
+    assert multi_transform1.component.class_name=='Transform1'
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_multi_split_df_column_fit ():
+    """Example 2: fit method gets training, validation and test."""
+    df, data, multi_transform1, multi_transform2, tr2 = multi_split_data_df_column ()
+    # we apply the transform to only test
+
+
+    # we apply the transform to only test data
+    result = multi_transform2.fit_transform (df, apply_to='test')
+
+    assert type(result) is pd.DataFrame
+    assert list(result.split.unique()) == ['test']
+
+    for split in result.split.unique():
+        assert (result[result.split==split].drop(columns='split').values==max(data['training'].ravel())+data[split]*100).all()
+
+    for split in ['validation', 'test']:
+        assert (tr2.data[split] == df[df.split==split]).all().all()
