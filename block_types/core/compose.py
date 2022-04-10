@@ -95,6 +95,9 @@ class MultiComponent (SamplingComponent):
             self.names = {}
             self.set_unique_names ()
 
+    def __repr__ (self):
+        return f'MultiComponent {self.class_name} (name={self.name})'
+
     def register_components (self, *components):
         """
         Registering component in `self.components` list.
@@ -488,6 +491,9 @@ class Pipeline (MultiComponent):
 
         super().__init__ (*components, **kwargs)
 
+    def __repr__ (self):
+        return f'Sequential {self.class_name} (name={self.name})'
+
     def _fit (self, X, y=None):
         """
         Fit components of the pipeline, given data X and labels y.
@@ -649,6 +655,9 @@ class Parallel (MultiComponent):
 
         super().__init__ (*components, **kwargs)
 
+    def __repr__ (self):
+        return f'Parallel {self.class_name} (name={self.name})'
+
     def select_input_to_fit (self, X, y, components, i):
         return X, y
 
@@ -744,6 +753,9 @@ class MultiModality (Parallel):
         super().__init__ (*components, **kwargs)
         for component in components:
             component.key = component.name if use_name else component.data_io.folder
+
+    def __repr__ (self):
+        return f'MultiModality {self.class_name} (name={self.name})'
 
     def select_input_to_fit (self, X, y, components, i):
         return X[components[i].key], y
@@ -1062,6 +1074,9 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
 class MultiSplitDict (MultiSplitComponent):
     def __init__ (self, component=None, **kwargs):
         super().__init__ (component=component, **kwargs)
+
+    def __repr__ (self):
+        return f'MultiSplitDict {self.class_name} (name={self.name})'
 
     def _initialize_fit (self, X):
         if not isinstance(X, dict):
