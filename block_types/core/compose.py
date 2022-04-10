@@ -60,7 +60,7 @@ class MultiComponent (SamplingComponent):
         self.warning_if_nick_name_exists = warning_if_nick_name_exists
 
         if len(components) > 0:
-            self.set_components (*components)
+            self.set_components (*components, **kwargs)
         elif not hasattr (self, 'components'):
             self.components = []
         if not hasattr (self, 'finalized_component_list'):
@@ -138,11 +138,27 @@ class MultiComponent (SamplingComponent):
         self._add_named_attribute (component, component.name)
         self.finalized_component_list = finalized_component_list
 
-    def set_components (self, *components):
+    def set_components (self, *components, **kwargs):
         self.components = components
-        for component in components:
+        for i, component in enumerate(components):
+            component, changed = self.obtain_component (component, **kwargs)
             self._add_named_attribute (component, component.name)
+            if changed:
+                self.components = list(self.components)
+                self.components[i] = component
         self.finalized_component_list = True
+
+    def obtain_component (self, component, **kwargs):
+        if isinstance (component, Component):
+            return component, False
+        elif component.__class__.__name__ == 'function':
+            return Component (apply=component, **kwargs), True
+        elif isinstance(component, tuple):
+            assert (len(component)==2 and isinstance(component[0], str)
+                    and component[1].__class__.__name__ == 'function')
+            return Component (apply=component[1], class_name=component[0], **kwargs), True
+        else:
+            return Component (estimator=component, **kwargs), True
 
     def clear_descendants (self):
         self.cls = Bunch ()

@@ -2,7 +2,8 @@
 
 __all__ = ['save_csv', 'save_parquet', 'save_multi_index_parquet', 'save_keras_model', 'save_csv_gz', 'read_csv',
            'read_csv_gz', 'load_keras_model', 'estimator2io', 'result2io', 'DataIO', 'PandasIO', 'PickleIO',
-           'SklearnIO', 'NoSaverIO', 'data_io_factory', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake']
+           'SklearnIO', 'NoSaverIO', 'data_io_factory', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake',
+           'snake_to_camel']
 
 # Cell
 from pathlib import Path
@@ -847,3 +848,6 @@ def camel_to_snake (name):
     """
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+def snake_to_camel (name):
+    return ''.join(word.title() for word in name.split('_'))

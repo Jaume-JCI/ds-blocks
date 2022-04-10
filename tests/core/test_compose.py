@@ -5,8 +5,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'SimpleMultiComponent', 'test_multi_comp_io', 'test_multi_comp_desc', 'test_athena_pipeline_training',
            'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
            'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
-           'test_set_root', 'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply',
-           'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
+           'test_set_root', 'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
+           'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
            'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
            'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
            'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
@@ -1181,6 +1181,21 @@ def test_set_root ():
     assert [x.name for x in c.higher1.inner2.components] == ['first_1', 'second_1']
     assert [x.data_io.fitting_file_name for x in c.higher1.inner2.components] == ['first_1_estimator.pk', 'second_1_estimator.pk']
     assert [x.data_io.result_file_name for x in c.higher1.inner2.components] == ['first_1_result.pk', 'second_1_result.pk']
+
+# Comes from compose.ipynb, cell
+from block_types.utils.dummies import Sum1, DummyEstimator
+
+def test_pass_functions_to_multi_component ():
+    def myf (x): return x*2
+    pipe = MultiComponent (Sum1 (), myf, lambda x: x+3, ('Minus', lambda x: x-1), DummyEstimator () )
+    X = np.array ([1,2,3])
+    r = X
+    pipe.components[-1].fit (X)
+    for c in pipe.components:
+        r = c (r)
+    assert (r== ( ((X+1)*2+3-1)*3+X.sum() )).all()
+    class_names = ['Sum1', 'Myf', '<Lambda>', 'Minus', 'DummyEstimator']
+    assert all([x.class_name==y for x, y in zip(pipe.components, class_names)])
 
 # Comes from compose.ipynb, cell
 class Transform1 (Component):

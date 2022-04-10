@@ -7,7 +7,7 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'TransformWithoutFitApply2', 'TransformWithFitApply2', 'component_save_data', 'test_component_save_load',
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
-           'MyEstimator', 'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
+           'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
            'test_direct_methods', 'test_pass_apply', 'test_sampling_component', 'test_sklearn_component',
            'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
            'test_pandas_component']
@@ -742,14 +742,7 @@ def test_set_paths ():
     assert_paths (tr, path_results, path_models)
 
 # Comes from block_types.ipynb, cell
-#@pytest.mark.reference_fails
-class MyEstimator ():
-    def __init__ (self, factor=3):
-        self.factor = factor
-    def fit (self, X, y=None):
-        self.sum = sum(X)
-    def transform (self, X):
-        return X * self.factor + self.sum
+from block_types.utils.dummies import DummyEstimator
 
 class TransformWithoutFit (Component):
     def __init__ (self, factor=2, **kwargs):
@@ -768,7 +761,7 @@ def test_determine_fit_function ():
     assert component.is_model
 
     # example when there is estimator
-    component = Component (MyEstimator (2))
+    component = Component (DummyEstimator (2))
     X = np.array ([1,2,3])
     component.fit (X)
     assert component.estimator.sum == 6
@@ -789,13 +782,13 @@ def test_determine_fit_function ():
 
 def test_use_fit_from_loaded_estimator ():
     path_models = 'test_use_fit_from_loaded_estimator'
-    component = Component (MyEstimator (2), path_models=path_models)
+    component = Component (DummyEstimator (2), path_models=path_models)
     X = np.array ([1,2,3])
     component.fit (X)
     assert (Path (path_models) / 'models').exists()
     del component
 
-    estimator1 = MyEstimator (2)
+    estimator1 = DummyEstimator (2)
     print (estimator1)
     component = Component (estimator1, path_models=path_models)
     print ('before loading')

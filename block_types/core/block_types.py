@@ -11,7 +11,6 @@ import pickle
 from pathlib import Path
 import re
 
-from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
 from sklearn.utils import Bunch
 import numpy as np
 import pandas as pd
@@ -28,7 +27,7 @@ from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
 from .utils import data_io_factory
 from .utils import ModelPlotter, Profiler, Comparator
-from .utils import camel_to_snake
+from .utils import camel_to_snake, snake_to_camel
 from ..utils.utils import (set_logger, delete_logger, replace_attr_and_store,
                                      get_specific_dict_param, get_hierarchy_level)
 import block_types.config.bt_defaults as dflt
@@ -92,7 +91,7 @@ class Component ():
         assert not isinstance(estimator, Component), 'estimator cannot be an instance of Component'
 
         # name of current component, for logging and plotting purposes
-        self._determine_component_name (name, estimator, class_name=class_name, suffix=suffix)
+        self._determine_component_name (name, estimator, class_name=class_name, suffix=suffix, apply=apply)
 
         # obtain hierarchy_level
         self.hierarchy_level = get_hierarchy_level (base_class=Component)
@@ -182,7 +181,7 @@ class Component ():
         return config
 
     def _determine_component_name (self, name: str, estimator, class_name:Optional[str]=None,
-                                   suffix:Optional[str]=None) -> None:
+                                   suffix:Optional[str]=None, apply=None) -> None:
         """
         Determines an appropriate name for the component if not provided by input.
 
@@ -193,8 +192,10 @@ class Component ():
             self.class_name = class_name
         else:
             self.class_name = self.__class__.__name__
-            if (self.class_name in __all__) and (estimator is not None):
-                self.class_name = estimator.__class__.__name__
+            if self.class_name in __all__:
+                if estimator is not None: self.class_name = estimator.__class__.__name__
+                if apply is not None and hasattr (apply, '__name__'):
+                    self.class_name = snake_to_camel (apply.__name__)
 
         if name is not None:
             self.name = name
