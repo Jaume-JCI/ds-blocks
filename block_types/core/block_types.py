@@ -214,7 +214,7 @@ class Component ():
     def create_estimator (self, **kwargs):
         self.estimator = Bunch(**kwargs)
 
-    def fit_like (self, X, y=None, load=None, save=None, split=None,
+    def fit_like (self, *X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None,
                   converter_args={}, **kwargs):
         """
@@ -223,10 +223,11 @@ class Component ():
         Uses the previously fitted parameters if they're found in disk and load
         is True.
         """
+        self.profiler.start_timer ()
         if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
         if self.error_if_fit_apply and func=='_fit_apply':
             raise RuntimeError (f'{self.name} should not call fit_apply')
-        self.profiler.start_timer ()
+        X = X + (y, ) if y is not None else X
 
         if split is not None:
             self.original_split = self.data_io.split
@@ -252,29 +253,28 @@ class Component ():
 
         if not already_computed:
             if func=='_fit_apply':
-                (X_original, y_original) = ((copy.deepcopy (X), copy.deepcopy (y))
-                                            if self.data_converter.inplace else (X, y))
-                _ = self.data_converter.convert_before_transforming (X_original, **converter_args)
-            X, y = self.data_converter.convert_before_fitting (X, y)
+                X_original = copy.deepcopy (X) if self.data_converter.inplace else X
+                _ = self.data_converter.convert_before_transforming (*X_original, **converter_args)
+            X = self.data_converter.convert_before_fitting (*X)
             additional_data= self._add_validation_and_test (validation_data, test_data)
             if func=='_fit':
                 if len(kwargs) > 0:
                     raise AttributeError (f'kwargs: {kwargs} not valid')
                 self.profiler.start_no_overhead_timer ()
-                self._fit (X, y, **additional_data)
+                self._fit (*X, **additional_data)
             elif func=='_fit_apply':
                 assert self.fit_apply_func is not None, ('object must have _fit_apply method or one of '
                                                     'its aliases implemented when func="_fit_apply"')
                 self.profiler.start_no_overhead_timer ()
-                result = self.fit_apply_func (X, y=y, **additional_data, **kwargs)
+                result = self.fit_apply_func (*X, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
             self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
             if func=='_fit':
-                _ = self.data_converter.convert_after_fitting (X)
+                _ = self.data_converter.convert_after_fitting (*X)
             elif func=='_fit_apply':
                 if self.data_converter.inplace:
-                    _ = self.data_converter.convert_after_fitting (X)
+                    _ = self.data_converter.convert_after_fitting (*X)
                 result = self.data_converter.convert_after_transforming (result, **converter_args)
                 if self.data_io.can_save_result (save, split):
                     self.data_io.save_result (result, split=split)
@@ -301,30 +301,31 @@ class Component ():
 
     fit = partialmethod (fit_like, func='_fit')
 
-    def fit_apply (self, X, y=None, load_model=None, save_model=None,
+    def fit_apply (self, *X, y=None, load_model=None, save_model=None,
                    load_result=None, save_result=None, func='_fit',
                    validation_data=None, test_data=None, **kwargs):
 
         if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
 
+        X = X + (y, ) if y is not None else X
+
         if self.fit_apply_func is not None:
-            return self.fit_like (X, y=y,
+            return self.fit_like (*X,
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
                                   test_data=test_data, **kwargs)
         else:
             if not self.direct_fit:
-                kwargs_fit = dict(y=y,
-                                 load=load_model, save=save_model,
+                kwargs_fit = dict(load=load_model, save=save_model,
                                  validation_data=validation_data,
                                  test_data=test_data)
             else:
-                kwargs_fit = dict(y=y)
+                kwargs_fit = dict()
             if not self.direct_apply:
                 kwargs_apply = dict (load=load_result, save=save_result, **kwargs)
             else:
                 kwargs_apply = kwargs
-            return self.fit (X, **kwargs_fit).apply (X, **kwargs_apply)
+            return self.fit (*X, **kwargs_fit).apply (*X, **kwargs_apply)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
