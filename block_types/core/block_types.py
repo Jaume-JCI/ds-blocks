@@ -372,7 +372,7 @@ class Component ():
         if self.direct_apply: return self.result_func (*X, **kwargs)
         if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
-        result = self._compute_result (X, self.result_func, load=load, save=save, **kwargs)
+        result = self._compute_result (*X, self.result_func, load=load, save=save, **kwargs)
         return result
 
     def _assign_fit_func (self):
@@ -464,7 +464,7 @@ class Component ():
     transform = __call__
     predict = partialmethod (__call__, converter_args=dict(new_columns=['prediction']))
 
-    def _compute_result (self, X, result_func, load=None, save=None, split=None,
+    def _compute_result (self, *X, result_func, load=None, save=None, split=None,
                          converter_args={}, **kwargs):
 
         if split is not None:
@@ -473,18 +473,13 @@ class Component ():
 
         self.logger.debug (f'applying {self.name} (on {self.data_io.split} data)')
 
-        if len(X) == 1:  # TODO: check if this is really necessary
-            X = X[0]
         previous_result = None
         if self.data_io.can_load_result (load):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
-            X = self.data_converter.convert_before_transforming (X, **converter_args)
+            X = self.data_converter.convert_before_transforming (*X, **converter_args)
             self.profiler.start_no_overhead_timer ()
-            if type(X) is tuple:
-                result = result_func (*X, **kwargs)
-            else:
-                result = result_func (X, **kwargs)
+            result = result_func (*X, **kwargs)
             self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
             result = self.data_converter.convert_after_transforming (result, **converter_args)
             if self.data_io.can_save_result (save, split):
@@ -499,7 +494,7 @@ class Component ():
 
         return result
 
-    def _fit_ (self, X, y=None, **kwargs):
+    def _fit_ (self, *X, **kwargs):
         return self
 
     def show_result_statistics (self, result=None, split=None) -> None:

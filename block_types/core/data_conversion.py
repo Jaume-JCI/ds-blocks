@@ -47,7 +47,7 @@ class DataConverter ():
             convert_before_fitting=convert_before_fitting, convert_after=convert_after,
             convert_after_transforming=convert_after_transforming, convert_after_fitting=convert_after_fitting)
 
-    def convert_before_fitting (self, X, y=None):
+    def convert_before_fitting (self, *X):
         """
         Convert incoming data before running fit method.
 
@@ -55,19 +55,15 @@ class DataConverter ():
         ----------
         X : data (N observations x D dimensions)
             data used for fitting model parameters
-        y : labels (N observations), optional
-            One dimensional array with N groundtruth labels.
 
         Returns
         -------
         X : data (N observations x D dimensions)
             data with transformed format but same content
-        y : labels (N observations)
-            labels with transformed format but same content
         """
-        return X, y
+        return X
 
-    def convert_after_fitting (self, X):
+    def convert_after_fitting (self, *X):
         """
         Convert data after running fit method.
 
@@ -88,7 +84,7 @@ class DataConverter ():
         """
         return X
 
-    def convert_before_transforming (self, X, **kwargs):
+    def convert_before_transforming (self, *X, **kwargs):
         """
         Convert data before running transform method.
 
@@ -118,6 +114,12 @@ class DataConverter ():
         result : data (N' observations x D' dimensions)
             result with transformed format but same content
         """
+        return result
+
+    def convert_before_fit_apply (self, *X, **kwargs):
+        return X
+
+    def convert_after_fit_apply (self, result, **kwargs):
         return result
 
     ## methods based on passed-in functions
