@@ -38,11 +38,10 @@ from sklearn.utils import Bunch
 from sklearn.preprocessing import FunctionTransformer
 
 from block_types.core.compose import *
-from block_types.core.block_types import (Component,
-                                          PandasComponent)
+from block_types.core.block_types import Component, PandasComponent, PickleSaverComponent
 from block_types.core.utils import PickleIO
 from block_types.utils.utils import remove_previous_results
-from block_types.core.block_types import Component, PickleSaverComponent
+from block_types.core.data_conversion import DataConverter, PandasConverter
 
 import block_types.config.bt_defaults as dflt
 from block_types.utils.utils import check_last_part
@@ -361,6 +360,10 @@ def test_pipeline_find_last_fitted_model_parallel_2 ():
     assert (r1==r2).all()
 
     remove_previous_results (path_results=path_results)
+
+# Cell
+from block_types.utils.dummies import (DataSource, SumXY, MaxOfPositiveWithSeparateLabels, Sum1direct,
+                                       Multiply10direct, subtract_xy, MinOfPositiveWithoutSeparateLabels)
 
 # Comes from compose.ipynb, cell
 class SimpleMultiComponent (MultiComponent):
