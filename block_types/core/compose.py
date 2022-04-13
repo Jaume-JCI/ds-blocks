@@ -495,24 +495,29 @@ class Pipeline (MultiComponent):
     def __repr__ (self):
         return f'Sequential {self.class_name} (name={self.name})'
 
-    def _fit (self, X, y=None):
+    def _fit (self, *X):
         """
         Fit components of the pipeline, given data X and labels y.
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
-        X = self._fit_apply (X, y=y, last=-1)
-        self.components[-1].fit (X, y=y)
+        X = self._fit_apply (*X, last=-1)
+        self.components[-1].fit (*X)
 
-    def _fit_apply (self, X, y=None, split=None, last=None, **kwargs):
+    def _fit_apply (self, *X, split=None, last=None, **kwargs):
         split = self.data_io.split if split is None else split
         first = self.start_idx['fit'][split]
         if first >= len(self.components):
             return X
         if first > 0:
             self.load_estimator (skip_from=first)
+
+        if first < len(self.components):
+            component = self.components[first]
+            X = component.fit_apply (*X)
+            first += 1
         for component in self.components[first:last]:
-            X = component.fit_apply (X, y=y, **kwargs)
+            X = component.fit_apply (X, **kwargs)
         return X
 
     def _apply (self, *X, split=None):
@@ -525,13 +530,10 @@ class Pipeline (MultiComponent):
 
         if first < len(self.components):
             component = self.components[first]
-            X = component (*X)
+            X = component.apply (*X)
             first += 1
-        if first >= len(self.components):
-            return X
         for component in self.components[first:]:
-            X = component (X)
-
+            X = component.apply (X)
         return X
 
     def find_last_result (self, split=None, func='apply', first=-1):
@@ -659,23 +661,23 @@ class Parallel (MultiComponent):
     def __repr__ (self):
         return f'Parallel {self.class_name} (name={self.name})'
 
-    def select_input_to_fit (self, X, y, components, i):
-        return X, y
+    def select_input_to_fit (self, *X, components, i):
+        return X
 
-    def _fit (self, X, y=None):
+    def _fit (self, *X):
         """
         Fit components of the pipeline, given data X and labels y.
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
         for i, component in enumerate(self.components):
-            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            component.fit (Xi, y=yi, **kwargs)
+            Xi = self.select_input_to_fit (*X, self.components, i)
+            component.fit (*Xi, **kwargs)
 
     def initialize_result (self):
         return []
 
-    def select_input (self, X, components, i):
+    def select_input (self, *X, components, i):
         return X
 
     def join_result (self, Xr, Xi_r, components, i):
@@ -692,19 +694,19 @@ class Parallel (MultiComponent):
         and therefore a special type of transformation."""
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi = self.select_input (X, self.components, i)
-            Xi_r = component (*Xi)
+            Xi = self.select_input (*X, self.components, i)
+            Xi_r = component.apply (*Xi)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
         Xr = self.finalize_result (Xr)
 
         return Xr
 
-    def _fit_apply (self, X, y=None, **kwargs):
+    def _fit_apply (self, *X, **kwargs):
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            Xi_r = component.fit_apply (Xi, y=yi, **kwargs)
+            Xi = self.select_input_to_fit (*X, self.components, i)
+            Xi_r = component.fit_apply (*Xi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
         Xr = self.finalize_result (Xr)
