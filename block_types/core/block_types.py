@@ -126,7 +126,7 @@ class Component ():
         # data converter
         if self.data_converter is None:
             # TODO: have DataConverter store a reference to component, and use the logger from that reference.
-            self.data_converter = NoConverter (**kwargs)
+            self.data_converter = StandardConverter (**kwargs)
         else:
             if 'data_converter' in kwargs:
                 del kwargs['data_converter']
@@ -227,6 +227,7 @@ class Component ():
         if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
         if self.error_if_fit_apply and func=='_fit_apply':
             raise RuntimeError (f'{self.name} should not call fit_apply')
+        X = self.data_converter.convert_single_tuple (X)
         X = X + (y, ) if y is not None else X
 
         if split is not None:
@@ -252,14 +253,16 @@ class Component ():
                 raise ValueError (f'function {func} not valid')
 
         if not already_computed:
+            X = copy.deepcopy (X) if self.data_converter.inplace else X
             if func=='_fit_apply':
-                X_original = copy.deepcopy (X) if self.data_converter.inplace else X
-                _ = self.data_converter.convert_before_transforming (*X_original, **converter_args)
-            X = self.data_converter.convert_before_fitting (*X)
+                X = self.data_converter.convert_before_fit_apply (*X, **converter_args)
+            elif func=='_fit':
+                X = self.data_converter.convert_before_fitting (*X)
+            else:
+                raise ValueError (f'function {func} not valid')
             additional_data= self._add_validation_and_test (validation_data, test_data)
             if func=='_fit':
-                if len(kwargs) > 0:
-                    raise AttributeError (f'kwargs: {kwargs} not valid')
+                if len(kwargs) > 0: raise AttributeError (f'kwargs: {kwargs} not valid')
                 self.profiler.start_no_overhead_timer ()
                 self._fit (*X, **additional_data)
             elif func=='_fit_apply':
@@ -273,9 +276,7 @@ class Component ():
             if func=='_fit':
                 _ = self.data_converter.convert_after_fitting (*X)
             elif func=='_fit_apply':
-                if self.data_converter.inplace:
-                    _ = self.data_converter.convert_after_fitting (*X)
-                result = self.data_converter.convert_after_transforming (result, **converter_args)
+                result = self.data_converter.convert_after_fit_apply (result, **converter_args)
                 if self.data_io.can_save_result (save, split):
                     self.data_io.save_result (result, split=split)
             else:
@@ -307,6 +308,7 @@ class Component ():
 
         if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
 
+        X = self.data_converter.convert_single_tuple (X)
         X = X + (y, ) if y is not None else X
 
         if self.fit_apply_func is not None:
@@ -477,6 +479,7 @@ class Component ():
         if self.data_io.can_load_result (load):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
+            X = self.data_converter.convert_single_tuple (X)
             X = self.data_converter.convert_before_transforming (*X, **converter_args)
             self.profiler.start_no_overhead_timer ()
             result = result_func (*X, **kwargs)
