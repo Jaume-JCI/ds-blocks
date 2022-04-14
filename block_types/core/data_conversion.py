@@ -136,9 +136,19 @@ class DataConverter ():
         return result
 
     def convert_before_fit_apply (self, *X, **kwargs):
-        return self.convert_before_fitting (*X)
+        #return self.convert_before_fitting (*X)
+        X_original = copy.deepcopy (X) if self.inplace else X
+        _ = self.convert_before_transforming (*X_original, **kwargs)
+        X = self.convert_before_fitting (*X)
+        if self.inplace:
+            self.X = X
+        return X
 
     def convert_after_fit_apply (self, result, **kwargs):
+        #return self.convert_after_transforming (result, **kwargs)
+        if self.inplace:
+            _ = self.data_converter.convert_after_fitting (*self.X)
+            self.X = None
         return self.convert_after_transforming (result, **kwargs)
 
     ## methods based on passed-in functions

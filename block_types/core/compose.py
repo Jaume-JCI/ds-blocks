@@ -661,7 +661,7 @@ class Parallel (MultiComponent):
     def __repr__ (self):
         return f'Parallel {self.class_name} (name={self.name})'
 
-    def select_input_to_fit (self, *X, components, i):
+    def select_input_to_fit (self, components, i, *X):
         return X
 
     def _fit (self, *X):
@@ -671,13 +671,13 @@ class Parallel (MultiComponent):
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
         for i, component in enumerate(self.components):
-            Xi = self.select_input_to_fit (*X, self.components, i)
+            Xi = self.select_input_to_fit (self.components, i, *X)
             component.fit (*Xi, **kwargs)
 
     def initialize_result (self):
         return []
 
-    def select_input (self, *X, components, i):
+    def select_input (self, components, i, *X):
         return X
 
     def join_result (self, Xr, Xi_r, components, i):
@@ -694,7 +694,7 @@ class Parallel (MultiComponent):
         and therefore a special type of transformation."""
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi = self.select_input (*X, self.components, i)
+            Xi = self.select_input (self.components, i, *X)
             Xi_r = component.apply (*Xi)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
@@ -705,7 +705,7 @@ class Parallel (MultiComponent):
     def _fit_apply (self, *X, **kwargs):
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
-            Xi = self.select_input_to_fit (*X, self.components, i)
+            Xi = self.select_input_to_fit (self.components, i, *X)
             Xi_r = component.fit_apply (*Xi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
 
@@ -760,13 +760,13 @@ class MultiModality (Parallel):
     def __repr__ (self):
         return f'MultiModality {self.class_name} (name={self.name})'
 
-    def select_input_to_fit (self, X, y, components, i):
+    def select_input_to_fit (self, components, i, X, y):
         return X[components[i].key], y
 
     def initialize_result (self):
         return {component.key: None for component in self.components}
 
-    def select_input (self, X, components, i):
+    def select_input (self, components, i, X):
         return X[components[i].key]
 
     def join_result (self, Xr, Xi_r, components, i):
