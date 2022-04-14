@@ -502,7 +502,7 @@ class Pipeline (MultiComponent):
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
         X = self._fit_apply (*X, last=-1)
-        self.components[-1].fit (*X)
+        self.components[-1].fit (X)
 
     def _fit_apply (self, *X, split=None, last=None, **kwargs):
         split = self.data_io.split if split is None else split
@@ -685,7 +685,7 @@ class Parallel (MultiComponent):
         return Xr
 
     def finalize_result (self, Xr, components=None):
-        return Xr
+        return tuple(Xr)
 
     def _apply (self, *X):
         """Transform data with components of pipeline, and predict labels with last component.
@@ -760,8 +760,12 @@ class MultiModality (Parallel):
     def __repr__ (self):
         return f'MultiModality {self.class_name} (name={self.name})'
 
-    def select_input_to_fit (self, components, i, X, y):
-        return X[components[i].key], y
+    def select_input_to_fit (self, components, i, *X):
+        X, y = self.data_converter.convert_varargs_to_x_y (X)
+        if y is not None:
+            return X[components[i].key], y
+        else:
+            return (X[components[i].key],)
 
     def initialize_result (self):
         return {component.key: None for component in self.components}

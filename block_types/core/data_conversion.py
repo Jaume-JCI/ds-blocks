@@ -27,6 +27,7 @@ class DataConverter ():
     def __init__ (self, logger=None, verbose: int=dflt.verbose, inplace: bool=True,
                   convert_before=None, convert_before_transforming=None, convert_before_fitting=None,
                   convert_after=None, convert_after_transforming=None, convert_after_fitting=None,
+                  convert_before_transforming_after_fit=None,
                   treat_single_tuple_as_varargs=True, do_convert_no_tuple=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
@@ -45,9 +46,13 @@ class DataConverter ():
             self.logger = logger
         self.inplace = inplace
         self._set_convert_from_functions (
-            convert_before=convert_before, convert_before_transforming=convert_before_transforming,
-            convert_before_fitting=convert_before_fitting, convert_after=convert_after,
-            convert_after_transforming=convert_after_transforming, convert_after_fitting=convert_after_fitting)
+            convert_before=convert_before,
+            convert_before_transforming=convert_before_transforming,
+            convert_before_fitting=convert_before_fitting,
+            convert_after=convert_after,
+            convert_after_transforming=convert_after_transforming,
+            convert_after_fitting=convert_after_fitting,
+            convert_before_transforming_after_fit=convert_before_transforming_after_fit)
         self.convert_single_tuple = (self.convert_single_tuple if treat_single_tuple_as_varargs
                                      else self.do_not_convert_single_tuple)
         self.convert_no_tuple = (self.convert_no_tuple if do_convert_no_tuple
@@ -65,6 +70,11 @@ class DataConverter ():
 
     def do_not_convert_no_tuple (self, X):
         return X
+
+    def convert_varargs_to_x_y (self, X):
+        assert len(X)==1 or len(X)==2
+        X, y = X if len(X)==2 else (X[0], None)
+        return X, y
 
     def convert_before_fitting (self, *X):
         """
@@ -154,16 +164,21 @@ class DataConverter ():
     ## methods based on passed-in functions
     def _set_convert_from_functions (self, convert_before=None, convert_before_transforming=None,
                                      convert_before_fitting=None, convert_after=None,
-                                     convert_after_transforming=None, convert_after_fitting=None):
-                # functions
+                                     convert_after_transforming=None, convert_after_fitting=None,
+                                     convert_before_transforming_after_fit=None):
+        # functions
         if convert_before is not None:
             if convert_before_transforming is None: convert_before_transforming = convert_before
             if convert_before_fitting is None:
                 self._convert_before_fitting = convert_before
-                self.convert_before_fitting = self.convert_only_X_before_fitting_from_function
+                self.convert_before_fitting = self.convert_before_fitting_from_function
+            #if convert_before_fit_apply is None: convert_before_fit_apply=convert_before
+
         if convert_before_transforming is not None:
             self._convert_before_transforming = convert_before_transforming
             self.convert_before_transforming = self.convert_before_transforming_from_function
+            if convert_before_transforming_after_fit is None:
+                self._convert_before_transforming_after_fit = self._convert_before_transforming
         if convert_before_fitting is not None:
             self._convert_before_fitting = convert_before_fitting
             self.convert_before_fitting = self.convert_before_fitting_from_function
@@ -178,18 +193,17 @@ class DataConverter ():
             self._convert_after_fitting = convert_after_fitting
             self.convert_after_fitting = self.convert_after_fitting_from_function
 
-    def convert_before_fitting_from_function (self, X, y=None):
-        return self._convert_before_fitting (X, y)
+    def convert_before_fitting_from_function (self, *X):
+        return self._convert_before_fitting (*X)
 
-    def convert_only_X_before_fitting_from_function (self, X, y=None):
-        X = self._convert_before_fitting (X)
-        return X, y
+    def convert_after_fitting_from_function (self, *X):
+        return self._convert_after_fitting (*X)
 
-    def convert_after_fitting_from_function (self, X):
-        return self._convert_after_fitting (X)
-
-    def convert_before_transforming_from_function (self, X, **kwargs):
-        return self._convert_before_transforming (X, **kwargs)
+    def convert_before_transforming_from_function (self, *X, fit_apply=False, **kwargs):
+        if fit_apply:
+            return self._convert_before_transforming_after_fit (*X, **kwargs)
+        else:
+            return self._convert_before_transforming (*X, **kwargs)
 
     def convert_after_transforming_from_function (self, result, **kwargs):
         return self._convert_after_transforming (result, **kwargs)
@@ -280,6 +294,7 @@ class StandardConverter (DataConverter):
         if not(self.no_labels or self.transform_uses_labels or len(X)<=1):
             self.stored_y = True
             *X, self.y = X
+            X = tuple(X)
             return X
         if self.transform_uses_labels and len(X)>1:
             self.stored_y = True
@@ -445,8 +460,7 @@ class PandasConverter (DataConverter):
           - It also allows to receive numpy arrays instead of DataFrames,
           in which case the data format is preserved.
         """
-        assert len(X)==1 or len(X)==2
-        X, y = X if len(X)==2 else (X[0], None)
+        X, y = self.convert_varargs_to_x_y (X)
         if self.separate_labels and (type(X) is pd.DataFrame) and ('label' in X.columns):
             if y is None:
                 y = X['label']
