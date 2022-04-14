@@ -21,7 +21,7 @@ from IPython.display import display
 
 # block_types
 from .data_conversion import (DataConverter, NoConverter, PandasConverter,
-                                              data_converter_factory)
+                                              StandardConverter, data_converter_factory)
 from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
                                     save_keras_model,  save_csv_gz, read_csv, read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
@@ -256,6 +256,7 @@ class Component ():
             X = copy.deepcopy (X) if self.data_converter.inplace else X
             if func=='_fit_apply':
                 X = self.data_converter.convert_before_fit_apply (*X, **converter_args)
+                X = self.data_converter.convert_no_tuple (X)
             elif func=='_fit':
                 X = self.data_converter.convert_before_fitting (*X)
             else:
@@ -324,7 +325,7 @@ class Component ():
             else:
                 kwargs_fit = dict()
             if not self.direct_apply:
-                kwargs_apply = dict (load=load_result, save=save_result, **kwargs)
+                kwargs_apply = dict (load=load_result, save=save_result, fit_apply=True, **kwargs)
             else:
                 kwargs_apply = kwargs
             return self.fit (*X, **kwargs_fit).apply (*X, **kwargs_apply)
@@ -363,7 +364,7 @@ class Component ():
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def __call__ (self, *X, load=None, save=None, **kwargs):
+    def __call__ (self, *X, load=None, save=None, fit_apply=False, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
@@ -374,7 +375,8 @@ class Component ():
         if self.direct_apply: return self.result_func (*X, **kwargs)
         if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
-        result = self._compute_result (*X, self.result_func, load=load, save=save, **kwargs)
+        result = self._compute_result (X, self.result_func, load=load, save=save, fit_apply=fit_apply,
+                                       **kwargs)
         return result
 
     def _assign_fit_func (self):
@@ -466,8 +468,8 @@ class Component ():
     transform = __call__
     predict = partialmethod (__call__, converter_args=dict(new_columns=['prediction']))
 
-    def _compute_result (self, *X, result_func, load=None, save=None, split=None,
-                         converter_args={}, **kwargs):
+    def _compute_result (self, X, result_func, load=None, save=None, split=None,
+                         converter_args={}, fit_apply=False, **kwargs):
 
         if split is not None:
             self.original_split = self.data_io.split
@@ -480,7 +482,9 @@ class Component ():
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
             X = self.data_converter.convert_single_tuple (X)
-            X = self.data_converter.convert_before_transforming (*X, **converter_args)
+            X = self.data_converter.convert_before_transforming (*X, fit_apply=fit_apply,
+                                                                 **converter_args)
+            X = self.data_converter.convert_no_tuple (X)
             self.profiler.start_no_overhead_timer ()
             result = result_func (*X, **kwargs)
             self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)

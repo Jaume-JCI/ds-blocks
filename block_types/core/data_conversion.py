@@ -7,6 +7,7 @@ __all__ = ['DataConverter', 'NoConverter', 'StandardConverter', 'PandasConverter
 import abc
 import pandas as pd
 import numpy as np
+import warnings
 
 #block-types
 from ..config import bt_defaults as dflt
@@ -26,7 +27,7 @@ class DataConverter ():
     def __init__ (self, logger=None, verbose: int=dflt.verbose, inplace: bool=True,
                   convert_before=None, convert_before_transforming=None, convert_before_fitting=None,
                   convert_after=None, convert_after_transforming=None, convert_after_fitting=None,
-                  treat_single_tuple_as_varargs=True, **kwargs):
+                  treat_single_tuple_as_varargs=True, do_convert_no_tuple=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
 
@@ -49,11 +50,20 @@ class DataConverter ():
             convert_after_transforming=convert_after_transforming, convert_after_fitting=convert_after_fitting)
         self.convert_single_tuple = (self.convert_single_tuple if treat_single_tuple_as_varargs
                                      else self.do_not_convert_single_tuple)
+        self.convert_no_tuple = (self.convert_no_tuple if do_convert_no_tuple
+                                 else self.do_not_convert_no_tuple)
 
     def convert_single_tuple (self, X):
         return X[0] if (len(X)==1 and type(X[0]) is tuple) else X
 
     def do_not_convert_single_tuple (self, X):
+        return X
+
+    def convert_no_tuple (self, X):
+        X = X if type (X) is tuple else (X,)
+        return X
+
+    def do_not_convert_no_tuple (self, X):
         return X
 
     def convert_before_fitting (self, *X):
@@ -199,8 +209,12 @@ class StandardConverter (DataConverter):
         X is provided to transform
         X is returned by transform
     """
+
+    error_warning_message = 'Did not find y as separate argument, but no_labels is False'
+
     def __init__ (self, transform_uses_labels=False, separate_labels=True, no_labels=False,
                   labels_returned_by_transform=None, labels_to_be_returned_by_transform=None,
+                  raise_error_if_no_label_inconsistency=False,
                   inplace=False, **kwargs):
         """
         Initialize attributes and fields.
@@ -226,10 +240,33 @@ class StandardConverter (DataConverter):
                                                    if labels_to_be_returned_by_transform is not None
                                                    else self.transform_uses_labels)
 
-    def convert_before_transforming (self, *X, **kwargs):
+        self.raise_error_if_no_label_inconsistency = raise_error_if_no_label_inconsistency
+
+    def convert_before_fitting (self, *X):
+        """
+        Convert incoming data before running fit method.
+        """
+        if not self.no_labels:
+            self.stored_y = True
+            *_, self.y = X
+        else:
+            self.stored_y = False
+        return X
+
+    def convert_after_fitting (self, *X):
+        """
+        Undo convert_before_fitting after running the fit method.
+        """
+        self.stored_y = False
+        self.y = None
+
+    def convert_before_transforming (self, *X, fit_apply=False, **kwargs):
         """
         By default, remove labels from incoming input.
         """
+        self.stored_y = False
+        if not fit_apply:
+            return X
         if not(self.no_labels or self.transform_uses_labels or len(X)<=1):
             self.stored_y = True
             *X, self.y = X
@@ -237,10 +274,13 @@ class StandardConverter (DataConverter):
         if self.transform_uses_labels and len(X)>1:
             self.stored_y = True
             *_, self.y = X
-            return X
-        if self.no_labels:
-            self.stored_y = False
-            return X
+        if not self.no_labels and not self.stored_y:
+            if self.raise_error_if_no_label_inconsistency:
+                raise TypeError (self.error_warning_message)
+            else:
+                warnings.warn (self.error_warning_message)
+                print (self.error_warning_message)
+        return X
 
     def convert_after_transforming (self, result, **kwargs):
         """
@@ -256,9 +296,12 @@ class StandardConverter (DataConverter):
             or (self.labels_returned_by_transform and (type(result) is tuple) and len(result)>1)):
             return result
         elif type(result) is tuple:
-            return result + (self.y, )
+            result = result + (self.y, )
         else:
-            return (result, self.y)
+            result = (result, self.y)
+        self.stored_y = False
+        self.y = None
+        return result
 
 # Cell
 class PandasConverter (DataConverter):
@@ -369,7 +412,7 @@ class PandasConverter (DataConverter):
         # whether the _fit method receives a DataFrame that includes the labels, or the labels are placed separately in y
         self.separate_labels = separate_labels
 
-    def convert_before_fitting (self, X, y=None):
+    def convert_before_fitting (self, *X):
         """
         By default, convert DataFrame X to numpy arrays X and y
 
@@ -392,6 +435,8 @@ class PandasConverter (DataConverter):
           - It also allows to receive numpy arrays instead of DataFrames,
           in which case the data format is preserved.
         """
+        assert len(X)==1 or len(X)==2
+        X, y = X if len(X)==2 else (X[0], None)
         if self.separate_labels and (type(X) is pd.DataFrame) and ('label' in X.columns):
             if y is None:
                 y = X['label']
@@ -406,7 +451,7 @@ class PandasConverter (DataConverter):
 
         return X, y
 
-    def convert_after_fitting (self, X):
+    def convert_after_fitting (self, *X):
         """Do nothing. Return same data received."""
         return X
 
