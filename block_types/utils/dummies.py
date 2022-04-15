@@ -221,7 +221,7 @@ class MinOfPositiveWithoutSeparateLabels (Component):
         super().__init__ (**kwargs)
         self.create_estimator ()
     def _fit (self, X):
-        self.estimator.update (max=np.min(X[X.label==1], axis=0))
+        self.estimator.update (min=np.min(X[X.label==1].values[:,:-1], axis=0))
     def _apply (self, X):
         return X*10 + self.estimator.min
 

@@ -685,7 +685,8 @@ class Parallel (MultiComponent):
         return Xr
 
     def finalize_result (self, Xr, components=None):
-        return tuple(Xr)
+        if type(Xr) is list: Xr = tuple(Xr)
+        return Xr
 
     def _apply (self, *X):
         """Transform data with components of pipeline, and predict labels with last component.

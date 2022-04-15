@@ -28,6 +28,7 @@ class DataConverter ():
                   convert_before=None, convert_before_transforming=None, convert_before_fitting=None,
                   convert_after=None, convert_after_transforming=None, convert_after_fitting=None,
                   convert_before_transforming_after_fit=None,
+                  convert_after_transforming_after_fit=None,
                   treat_single_tuple_as_varargs=True, do_convert_no_tuple=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
@@ -52,7 +53,8 @@ class DataConverter ():
             convert_after=convert_after,
             convert_after_transforming=convert_after_transforming,
             convert_after_fitting=convert_after_fitting,
-            convert_before_transforming_after_fit=convert_before_transforming_after_fit)
+            convert_before_transforming_after_fit=convert_before_transforming_after_fit,
+            convert_after_transforming_after_fit=convert_after_transforming_after_fit)
         self.convert_single_tuple = (self.convert_single_tuple if treat_single_tuple_as_varargs
                                      else self.do_not_convert_single_tuple)
         self.convert_no_tuple = (self.convert_no_tuple if do_convert_no_tuple
@@ -148,7 +150,7 @@ class DataConverter ():
     def convert_before_fit_apply (self, *X, **kwargs):
         #return self.convert_before_fitting (*X)
         X_original = copy.deepcopy (X) if self.inplace else X
-        _ = self.convert_before_transforming (*X_original, **kwargs)
+        _ = self.convert_before_transforming (*X_original, fit_apply=True, **kwargs)
         X = self.convert_before_fitting (*X)
         if self.inplace:
             self.X = X
@@ -159,13 +161,14 @@ class DataConverter ():
         if self.inplace:
             _ = self.data_converter.convert_after_fitting (*self.X)
             self.X = None
-        return self.convert_after_transforming (result, **kwargs)
+        return self.convert_after_transforming (result, fit_apply=True, **kwargs)
 
     ## methods based on passed-in functions
     def _set_convert_from_functions (self, convert_before=None, convert_before_transforming=None,
                                      convert_before_fitting=None, convert_after=None,
                                      convert_after_transforming=None, convert_after_fitting=None,
-                                     convert_before_transforming_after_fit=None):
+                                     convert_before_transforming_after_fit=None,
+                                     convert_after_transforming_after_fit=None):
         # functions
         if convert_before is not None:
             if convert_before_transforming is None: convert_before_transforming = convert_before
@@ -177,8 +180,9 @@ class DataConverter ():
         if convert_before_transforming is not None:
             self._convert_before_transforming = convert_before_transforming
             self.convert_before_transforming = self.convert_before_transforming_from_function
-            if convert_before_transforming_after_fit is None:
-                self._convert_before_transforming_after_fit = self._convert_before_transforming
+            self._convert_before_transforming_after_fit = (
+                self._convert_before_transforming if convert_before_transforming_after_fit is None
+                else convert_before_transforming_after_fit)
         if convert_before_fitting is not None:
             self._convert_before_fitting = convert_before_fitting
             self.convert_before_fitting = self.convert_before_fitting_from_function
@@ -189,6 +193,9 @@ class DataConverter ():
         if convert_after_transforming is not None:
             self._convert_after_transforming = convert_after_transforming
             self.convert_after_transforming = self.convert_after_transforming_from_function
+            self._convert_after_transforming_after_fit = (
+                self._convert_after_transforming if convert_after_transforming_after_fit is None
+                else convert_after_transforming_after_fit)
         if convert_after_fitting is not None:
             self._convert_after_fitting = convert_after_fitting
             self.convert_after_fitting = self.convert_after_fitting_from_function
@@ -205,8 +212,11 @@ class DataConverter ():
         else:
             return self._convert_before_transforming (*X, **kwargs)
 
-    def convert_after_transforming_from_function (self, result, **kwargs):
-        return self._convert_after_transforming (result, **kwargs)
+    def convert_after_transforming_from_function (self, result, fit_apply=False, **kwargs):
+        if fit_apply:
+            return self._convert_after_transforming_after_fit (result, **kwargs)
+        else:
+            return self._convert_after_transforming (result, **kwargs)
 
 # Cell
 class NoConverter (DataConverter):
@@ -238,7 +248,9 @@ class StandardConverter (DataConverter):
 
     def __init__ (self, transform_uses_labels=False, separate_labels=True, no_labels=False,
                   labels_returned_by_transform=None, labels_to_be_returned_by_transform=None,
+                  labels_included_without_fitting=False,
                   raise_error_if_no_label_inconsistency=False,
+                  raise_warning_if_no_label_inconsistency=False,
                   inplace=False, **kwargs):
         """
         Initialize attributes and fields.
@@ -260,54 +272,39 @@ class StandardConverter (DataConverter):
         self.labels_returned_by_transform = (labels_returned_by_transform
                                              if labels_returned_by_transform is not None
                                              else self.transform_uses_labels)
-        self.labels_to_be_returned_by_transform = (labels_to_be_returned_by_transform
-                                                   if labels_to_be_returned_by_transform is not None
-                                                   else self.transform_uses_labels)
-
+        self.labels_included_without_fitting = labels_included_without_fitting
+        self.labels_to_be_returned_by_transform = (
+            labels_to_be_returned_by_transform if labels_to_be_returned_by_transform is not None
+            else (self.transform_uses_labels or self.labels_included_without_fitting))
         self.raise_error_if_no_label_inconsistency = raise_error_if_no_label_inconsistency
+        self.raise_warning_if_no_label_inconsistency = raise_warning_if_no_label_inconsistency
 
-    def convert_before_fitting (self, *X):
-        """
-        Convert incoming data before running fit method.
-        """
-        if not self.no_labels:
-            self.stored_y = True
-            *_, self.y = X
-        else:
-            self.stored_y = False
-        return X
-
-    def convert_after_fitting (self, *X):
-        """
-        Undo convert_before_fitting after running the fit method.
-        """
-        self.stored_y = False
-        self.y = None
 
     def convert_before_transforming (self, *X, fit_apply=False, **kwargs):
         """
         By default, remove labels from incoming input.
         """
         self.stored_y = False
-        if not fit_apply:
+        if not fit_apply and not self.labels_included_without_fitting:
             return X
         if not(self.no_labels or self.transform_uses_labels or len(X)<=1):
             self.stored_y = True
             *X, self.y = X
+            #if len (X) > 1: X = tuple(X)
             X = tuple(X)
             return X
-        if self.transform_uses_labels and len(X)>1:
+        if (fit_apply or self.transform_uses_labels) and len(X)>1:
             self.stored_y = True
             *_, self.y = X
         if not self.no_labels and not self.stored_y:
             if self.raise_error_if_no_label_inconsistency:
                 raise TypeError (self.error_warning_message)
-            else:
+            elif self.raise_warning_if_no_label_inconsistency:
                 warnings.warn (self.error_warning_message)
                 print (self.error_warning_message)
         return X
 
-    def convert_after_transforming (self, result, **kwargs):
+    def convert_after_transforming (self, result, fit_apply=False, **kwargs):
         """
         Convert the result produced by `transform`to DataFrame format.
 
@@ -317,8 +314,9 @@ class StandardConverter (DataConverter):
         in the input to `transform` and it is not in the output given
         by `transform`, it is appended to the result.
         """
-        if (not self.stored_y or not self.labels_to_be_returned_by_transform or self.no_labels
-            or (self.labels_returned_by_transform and (type(result) is tuple) and len(result)>1)):
+        if ((not fit_apply or not self.stored_y) and
+            (not self.stored_y or not self.labels_to_be_returned_by_transform or self.no_labels
+            or (self.labels_returned_by_transform and (type(result) is tuple) and len(result)>1))):
             return result
         elif type(result) is tuple:
             result = result + (self.y, )

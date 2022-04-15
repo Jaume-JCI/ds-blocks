@@ -488,7 +488,8 @@ class Component ():
             self.profiler.start_no_overhead_timer ()
             result = result_func (*X, **kwargs)
             self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
-            result = self.data_converter.convert_after_transforming (result, **converter_args)
+            result = self.data_converter.convert_after_transforming (result, fit_apply=fit_apply,
+                                                                     **converter_args)
             if self.data_io.can_save_result (save, split):
                 self.data_io.save_result (result, split=split)
         else:
