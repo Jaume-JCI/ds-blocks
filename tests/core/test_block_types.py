@@ -905,33 +905,31 @@ def test_get_specific_data_io_parameters_for_component ():
     assert component.data_io.save_model_flag == True
 
 # Comes from block_types.ipynb, cell
-from block_types.utils.dummies import Min10direct
+from block_types.utils.dummies import Min10direct, SumXY
+
 def test_standard_converter_in_component ():
     component = Min10direct (data_converter='StandardConverter')
 
     X, y = np.array([1,2,3]), np.array([0,1,0])
 
     Xr = component.fit_apply (X, y)
-    assert Xr==X*10+X.min()
+    assert (Xr==X*10+X.min()).all()
 
     Xr, yr = component.fit_apply (X, y, sequential_fit_apply=True)
-    assert Xr==X*10+X.min()
+    assert (Xr==X*10+X.min()).all()
     assert (yr==y).all()
 
+    component = SumXY (data_converter='StandardConverter')
+
     Xr = component.fit_apply ((X,X*2), y=None)
-    assert type(Xr) is tuple and len(Xr)==2
-    assert Xr[0]==X*10+X.min()
-    assert Xr[1]==(X*10+X.min())*2
+    assert (Xr==X+X*2).all()
 
     Xr = component.fit_apply ((X,X*2), y=None, sequential_fit_apply=True)
-    assert type(Xr) is tuple and len(Xr)==2
-    assert Xr[0]==X*10+X.min()
-    assert Xr[1]==(X*10+X.min())*2
+    assert (Xr==X+X*2).all()
 
+    #Xr, yr = component.fit_apply ((X,X*2), y, sequential_fit_apply=True)
     Xr, yr = component.fit_apply ((X,X*2), y, sequential_fit_apply=True)
-    assert type(Xr) is tuple and len(Xr)==2
-    assert Xr[0]==X*10+X.min()
-    assert Xr[1]==(X*10+X.min())*2
+    assert (Xr==X+X*2).all()
     assert (yr==y).all()
 
 # Comes from block_types.ipynb, cell

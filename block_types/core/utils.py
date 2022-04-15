@@ -278,11 +278,6 @@ class DataIO ():
         self.set_folder (folder)
         self.stop_propagation = stop_propagation
 
-    def get_specific_data_io_parameters (self, tag, **kwargs):
-        suffix = f'_{tag}'
-        n = len(suffix)
-        return {k[:-n]:kwargs[k] for k in kwargs if k.endswith (suffix) and k[:-n] in specific_params}
-
     def setup (self, component=None):
         """
         Initialize remaining fields given `component` from which data is saved/loaded.

@@ -215,37 +215,40 @@ def test_standard_converter ():
     dc = StandardConverter ()
 
     Xr, yr = dc.convert_before_fitting (X, y)
-    assert (Xr==X.ravel()).all() and Xr.shape==(3,)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
     assert (yr==y).all()
 
     Xr, yr = dc.convert_before_transforming (X, y)
-    assert (Xr==X.ravel()).all() and Xr.shape==(3,)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
     assert (yr==y).all()
 
     Xr = dc.convert_before_transforming (X, y, fit_apply=True)
-    assert (Xr==X.ravel()).all() and Xr.shape==(3,)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
 
     Xr, yr = dc.convert_after_transforming (X, sequential_fit_apply=True)
-    assert (Xr==X.ravel()).all() and Xr.shape==(3,)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
     assert (yr==y).all()
+
+    Xr = dc.convert_before_transforming (X, y, fit_apply=True)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
 
     Xr = dc.convert_after_transforming (X)
-    assert (Xr==X.ravel()).all() and Xr.shape==(3,)
+    assert (Xr==X).all().all() and Xr.shape==(1, 3)
 
-    Xr, yr = dc.convert_after_transforming ((X,X*2), y)
+    Xr, yr = dc.convert_before_transforming ((X,X*2), y)
     assert type(Xr) is tuple and len(Xr)==2
-    assert (Xr[0]==X.ravel()).all() and Xr[0].shape==(3,)
-    assert (Xr[1]==X.ravel()*2).all() and Xr[1].shape==(3,)
+    assert (Xr[0]==X).all().all() and Xr[0].shape==(1, 3)
+    assert (Xr[1]==X*2).all().all() and Xr[1].shape==(1, 3)
     assert (yr==y).all()
 
-    Xr = dc.convert_after_transforming ((X,X*2), y, fit_apply=True)
+    Xr = dc.convert_before_transforming ((X,X*2), y, fit_apply=True)
     assert type(Xr) is tuple and len(Xr)==2
-    assert (Xr[0]==X.ravel()).all() and Xr[0].shape==(3,)
-    assert (Xr[1]==X.ravel()*2).all() and Xr[1].shape==(3,)
+    assert (Xr[0]==X).all().all() and Xr[0].shape==(1, 3)
+    assert (Xr[1]==X*2).all().all() and Xr[1].shape==(1, 3)
 
     Xr, yr = dc.convert_after_transforming ((X, X*2), sequential_fit_apply=True)
     assert type(Xr) is tuple and len(Xr)==2
-    assert (Xr[0]==X.ravel()).all() and Xr[0].shape==(3,)
+    assert (Xr[0]==X).all().all() and Xr[0].shape==(1, 3)
     assert (yr==y).all()
 
 # Comes from data_conversion.ipynb, cell

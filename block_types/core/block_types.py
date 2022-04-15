@@ -21,7 +21,8 @@ from IPython.display import display
 
 # block_types
 from .data_conversion import (DataConverter, NoConverter, PandasConverter,
-                                              StandardConverter, data_converter_factory)
+                                              StandardConverter, GenericConverter,
+                                              data_converter_factory)
 from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
                                     save_keras_model,  save_csv_gz, read_csv, read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
@@ -157,6 +158,12 @@ class Component ():
     def reset_logger (self):
         delete_logger (self.name_logger)
 
+    def get_specific_data_io_parameters (self, tag, **kwargs):
+        suffix = f'_{tag}'
+        n = len(suffix)
+        return {k[:-n]:kwargs[k]
+                for k in kwargs if k.endswith (suffix) and k[:-n] in DataIO.specific_params}
+
     def obtain_config_params (self, tag=None, **kwargs):
         """Overwrites parameters in kwargs with those found in a dictionary of the same name
         as the component.
@@ -167,7 +174,7 @@ class Component ():
         for multiple components, while parameters specific of one component can be overwritten
         using a dictionary with the name of that component. See example below.
         """
-        k = self.data_io.get_specific_dict_param (self, **kwargs)
+        k = get_specific_dict_param (self, **kwargs)
 
         if k is not None:
             config = kwargs.copy()
@@ -178,7 +185,7 @@ class Component ():
         if tag is not None:
             if tag == '__name__': tag = self.name
             self.tag = tag
-            config.update (self.data_io.get_specific_data_io_parameters (tag, **kwargs))
+            config.update (self.get_specific_data_io_parameters (tag, **kwargs))
 
         config.update(verbose=self.verbose,
                       logger=self.logger)
@@ -324,17 +331,17 @@ class Component ():
         else:
             if not self.direct_fit:
                 kwargs_fit = dict(load=load_model, save=save_model,
-                                 validation_data=validation_data,
-                                 test_data=test_data)
+                                  validation_data=validation_data,
+                                  test_data=test_data,
+                                  sequential_fit_apply=sequential_fit_apply)
             else:
                 kwargs_fit = dict()
             if not self.direct_apply:
-                kwargs_apply = dict (load=load_result, save=save_result, fit_apply=True, **kwargs)
+                kwargs_apply = dict (load=load_result, save=save_result, fit_apply=True,
+                                     sequential_fit_apply=sequential_fit_apply, **kwargs)
             else:
                 kwargs_apply = kwargs
-            return self.fit (*X, sequential_fit_apply=sequential_fit_apply,
-                             **kwargs_fit).apply (*X, sequential_fit_apply=sequential_fit_apply,
-                                                  **kwargs_apply)
+            return self.fit (*X, **kwargs_fit).apply (*X, **kwargs_apply)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
@@ -476,7 +483,7 @@ class Component ():
 
     def _compute_result (self, X, result_func, load=None, save=None, split=None,
                          converter_args={}, fit_apply=False,
-                         sequential_fit_apply=sequential_fit_apply, **kwargs):
+                         sequential_fit_apply=False, **kwargs):
 
         if split is not None:
             self.original_split = self.data_io.split
@@ -493,6 +500,7 @@ class Component ():
                 *X, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
             X = self.data_converter.convert_no_tuple (X)
             self.profiler.start_no_overhead_timer ()
+            X = self.data_converter.convert_single_tuple_for_result_func (X)
             result = result_func (*X, **kwargs)
             self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
             result = self.data_converter.convert_after_transforming (

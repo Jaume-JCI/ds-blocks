@@ -30,7 +30,8 @@ class DataConverter ():
                   convert_before_transforming_after_fit=None,
                   convert_after_transforming_after_fit=None,
                   unpack_single_tuple_for_fitting=True, unpack_single_tuple_for_transforming=True,
-                  unpack_single_tuple=None, ensure_tuple=True, **kwargs):
+                  unpack_single_tuple=None, unpack_single_tuple_for_result_func=False,
+                  ensure_tuple=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
 
@@ -68,6 +69,10 @@ class DataConverter ():
             else self.do_not_convert_single_tuple)
         self.convert_single_tuple_for_transforming = (
             self.convert_single_tuple if unpack_single_tuple_for_transforming
+            else self.do_not_convert_single_tuple)
+
+        self.convert_single_tuple_for_result_func = (
+            self.convert_single_tuple if unpack_single_tuple_for_result_func
             else self.do_not_convert_single_tuple)
 
         self.convert_no_tuple = (self.convert_no_tuple if ensure_tuple
@@ -346,17 +351,19 @@ class GenericConverter (DataConverter):
         return result
 
 # Cell
-class StandardConverter ():
+class StandardConverter (DataConverter):
     """Convert input and output data format.
 
     Assumes that, when fitting, the data is introduced either as a single element or
     as a tuple with more than one element."""
-    def __init__ (self, inplace=False, unpack_single_tuple_for_fitting=False, **kwargs):
+    def __init__ (self, inplace=False, unpack_single_tuple=False,
+                  unpack_single_tuple_for_result_func=True, **kwargs):
         """
         Initialize common attributes and fields, in particular the logger.
         """
         # logger used to display messages
-        super().__init__(inplace=False, unpack_single_tuple_for_fitting=False, **kwargs)
+        super().__init__(inplace=False, unpack_single_tuple=False,
+                         unpack_single_tuple_for_result_func=True, **kwargs)
 
     def convert_before_transforming (self, *X, fit_apply=False, sequential_fit_apply=False, **kwargs):
         """
@@ -373,10 +380,7 @@ class StandardConverter ():
         Convert result obtained after by transform method.
         """
         if sequential_fit_apply and self.y is not None:
-            if type(result) is tuple:
-                result = result + (self.y, )
-            else:
-                result = (result, self.y)
+            result = (result, self.y)
         self.y = None
         return result
 

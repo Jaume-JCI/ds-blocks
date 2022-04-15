@@ -790,14 +790,14 @@ def test_multi_comp_profiling ():
     dfd = higher.gather_times()
 
     values = dfd.avg[('whole','apply')].values
-    assert np.abs(values[1:3].sum() - values[0]) < 0.05
-    assert np.abs(values[3:5].sum() - values[1]) < 0.05
-    assert np.abs(values[5:7].sum() - values[2]) < 0.05
+    assert np.abs(values[1:3].sum() - values[0]) < 0.1
+    assert np.abs(values[3:5].sum() - values[1]) < 0.1
+    assert np.abs(values[5:7].sum() - values[2]) < 0.1
 
     values = dfd.avg[('whole','fit')].values
-    assert np.abs(values[1:3].sum() - values[0]) < 0.05
-    assert np.abs(values[3:5].sum() - values[1]) < 0.05
-    assert np.abs(values[5:7].sum() - values[2]) < 0.05
+    assert np.abs(values[1:3].sum() - values[0]) < 0.1
+    assert np.abs(values[3:5].sum() - values[1]) < 0.1
+    assert np.abs(values[5:7].sum() - values[2]) < 0.1
 
     display('avg', dfd.avg)
 
