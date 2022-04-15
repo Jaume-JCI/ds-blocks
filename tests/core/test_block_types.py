@@ -9,8 +9,9 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
            'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
            'test_direct_methods', 'test_pass_apply', 'test_get_specific_data_io_parameters_for_component',
-           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
-           'test_one_class_sklearn_component', 'test_pandas_component']
+           'test_standard_converter_in_component', 'test_sampling_component', 'test_sklearn_component',
+           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
+           'test_pandas_component']
 
 # Cell
 import pytest
@@ -902,6 +903,36 @@ def test_get_specific_data_io_parameters_for_component ():
     check_last_part(component.path_results, 'world')
     assert component.data_io.load_result_flag == False
     assert component.data_io.save_model_flag == True
+
+# Comes from block_types.ipynb, cell
+from block_types.utils.dummies import Min10direct
+def test_standard_converter_in_component ():
+    component = Min10direct (data_converter='StandardConverter')
+
+    X, y = np.array([1,2,3]), np.array([0,1,0])
+
+    Xr = component.fit_apply (X, y)
+    assert Xr==X*10+X.min()
+
+    Xr, yr = component.fit_apply (X, y, sequential_fit_apply=True)
+    assert Xr==X*10+X.min()
+    assert (yr==y).all()
+
+    Xr = component.fit_apply ((X,X*2), y=None)
+    assert type(Xr) is tuple and len(Xr)==2
+    assert Xr[0]==X*10+X.min()
+    assert Xr[1]==(X*10+X.min())*2
+
+    Xr = component.fit_apply ((X,X*2), y=None, sequential_fit_apply=True)
+    assert type(Xr) is tuple and len(Xr)==2
+    assert Xr[0]==X*10+X.min()
+    assert Xr[1]==(X*10+X.min())*2
+
+    Xr, yr = component.fit_apply ((X,X*2), y, sequential_fit_apply=True)
+    assert type(Xr) is tuple and len(Xr)==2
+    assert Xr[0]==X*10+X.min()
+    assert Xr[1]==(X*10+X.min())*2
+    assert (yr==y).all()
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails

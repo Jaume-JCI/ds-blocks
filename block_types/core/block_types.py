@@ -25,7 +25,7 @@ from .data_conversion import (DataConverter, NoConverter, PandasConverter,
 from .utils import (save_csv,  save_parquet,  save_multi_index_parquet,
                                     save_keras_model,  save_csv_gz, read_csv, read_csv_gz)
 from .utils import DataIO, SklearnIO, PandasIO, NoSaverIO
-from .utils import data_io_factory, get_specific_data_io_parameters
+from .utils import data_io_factory
 from .utils import ModelPlotter, Profiler, Comparator
 from .utils import camel_to_snake, snake_to_camel
 from ..utils.utils import (set_logger, delete_logger, replace_attr_and_store,
@@ -126,7 +126,7 @@ class Component ():
         # data converter
         if self.data_converter is None:
             # TODO: have DataConverter store a reference to component, and use the logger from that reference.
-            self.data_converter = StandardConverter (**kwargs)
+            self.data_converter = GenericConverter (**kwargs)
         else:
             if 'data_converter' in kwargs:
                 del kwargs['data_converter']
@@ -167,7 +167,7 @@ class Component ():
         for multiple components, while parameters specific of one component can be overwritten
         using a dictionary with the name of that component. See example below.
         """
-        k = get_specific_dict_param (self, **kwargs)
+        k = self.data_io.get_specific_dict_param (self, **kwargs)
 
         if k is not None:
             config = kwargs.copy()
@@ -178,7 +178,7 @@ class Component ():
         if tag is not None:
             if tag == '__name__': tag = self.name
             self.tag = tag
-            config.update (get_specific_data_io_parameters (tag, **kwargs))
+            config.update (self.data_io.get_specific_data_io_parameters (tag, **kwargs))
 
         config.update(verbose=self.verbose,
                       logger=self.logger)
@@ -216,7 +216,7 @@ class Component ():
 
     def fit_like (self, *X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None,
-                  converter_args={}, **kwargs):
+                  sequential_fit_apply=False, converter_args={}, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
@@ -227,7 +227,7 @@ class Component ():
         if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
         if self.error_if_fit_apply and func=='_fit_apply':
             raise RuntimeError (f'{self.name} should not call fit_apply')
-        X = self.data_converter.convert_single_tuple (X)
+        X = self.data_converter.convert_single_tuple_for_fitting (X)
         X = X + (y, ) if y is not None else X
 
         if split is not None:
@@ -255,7 +255,8 @@ class Component ():
         if not already_computed:
             X = copy.deepcopy (X) if self.data_converter.inplace else X
             if func=='_fit_apply':
-                X = self.data_converter.convert_before_fit_apply (*X, **converter_args)
+                X = self.data_converter.convert_before_fit_apply (
+                    *X, sequential_fit_apply=sequential_fit_apply, **converter_args)
                 X = self.data_converter.convert_no_tuple (X)
             elif func=='_fit':
                 X = self.data_converter.convert_before_fitting (*X)
@@ -277,7 +278,8 @@ class Component ():
             if func=='_fit':
                 _ = self.data_converter.convert_after_fitting (*X)
             elif func=='_fit_apply':
-                result = self.data_converter.convert_after_fit_apply (result, **converter_args)
+                result = self.data_converter.convert_after_fit_apply (
+                    result, sequential_fit_apply=sequential_fit_apply, **converter_args)
                 if self.data_io.can_save_result (save, split):
                     self.data_io.save_result (result, split=split)
             else:
@@ -305,18 +307,20 @@ class Component ():
 
     def fit_apply (self, *X, y=None, load_model=None, save_model=None,
                    load_result=None, save_result=None, func='_fit',
-                   validation_data=None, test_data=None, **kwargs):
+                   validation_data=None, test_data=None, sequential_fit_apply=False,
+                   **kwargs):
 
         if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
 
-        X = self.data_converter.convert_single_tuple (X)
+        X = self.data_converter.convert_single_tuple_for_fitting (X)
         X = X + (y, ) if y is not None else X
 
         if self.fit_apply_func is not None:
             return self.fit_like (*X,
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
-                                  test_data=test_data, **kwargs)
+                                  test_data=test_data, sequential_fit_apply=sequential_fit_apply,
+                                  **kwargs)
         else:
             if not self.direct_fit:
                 kwargs_fit = dict(load=load_model, save=save_model,
@@ -328,7 +332,9 @@ class Component ():
                 kwargs_apply = dict (load=load_result, save=save_result, fit_apply=True, **kwargs)
             else:
                 kwargs_apply = kwargs
-            return self.fit (*X, **kwargs_fit).apply (*X, **kwargs_apply)
+            return self.fit (*X, sequential_fit_apply=sequential_fit_apply,
+                             **kwargs_fit).apply (*X, sequential_fit_apply=sequential_fit_apply,
+                                                  **kwargs_apply)
 
     def _add_validation_and_test (self, validation_data, test_data):
         additional_data = {}
@@ -364,7 +370,7 @@ class Component ():
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def __call__ (self, *X, load=None, save=None, fit_apply=False, **kwargs):
+    def __call__ (self, *X, load=None, save=None, fit_apply=False, sequential_fit_apply=False, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
@@ -376,7 +382,7 @@ class Component ():
         if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
         result = self._compute_result (X, self.result_func, load=load, save=save, fit_apply=fit_apply,
-                                       **kwargs)
+                                       sequential_fit_apply=sequential_fit_apply, **kwargs)
         return result
 
     def _assign_fit_func (self):
@@ -469,7 +475,8 @@ class Component ():
     predict = partialmethod (__call__, converter_args=dict(new_columns=['prediction']))
 
     def _compute_result (self, X, result_func, load=None, save=None, split=None,
-                         converter_args={}, fit_apply=False, **kwargs):
+                         converter_args={}, fit_apply=False,
+                         sequential_fit_apply=sequential_fit_apply, **kwargs):
 
         if split is not None:
             self.original_split = self.data_io.split
@@ -481,15 +488,15 @@ class Component ():
         if self.data_io.can_load_result (load):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
-            X = self.data_converter.convert_single_tuple (X)
-            X = self.data_converter.convert_before_transforming (*X, fit_apply=fit_apply,
-                                                                 **converter_args)
+            X = self.data_converter.convert_single_tuple_for_transforming (X)
+            X = self.data_converter.convert_before_transforming (
+                *X, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
             X = self.data_converter.convert_no_tuple (X)
             self.profiler.start_no_overhead_timer ()
             result = result_func (*X, **kwargs)
             self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
-            result = self.data_converter.convert_after_transforming (result, fit_apply=fit_apply,
-                                                                     **converter_args)
+            result = self.data_converter.convert_after_transforming (
+                result, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
             if self.data_io.can_save_result (save, split):
                 self.data_io.save_result (result, split=split)
         else:

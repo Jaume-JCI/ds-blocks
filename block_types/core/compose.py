@@ -514,10 +514,10 @@ class Pipeline (MultiComponent):
 
         if first < len(self.components):
             component = self.components[first]
-            X = component.fit_apply (*X)
+            X = component.fit_apply (*X, sequential_fit_apply=True, **kwargs)
             first += 1
         for component in self.components[first:last]:
-            X = component.fit_apply (X, **kwargs)
+            X = component.fit_apply (X, sequential_fit_apply=True, **kwargs)
         return X
 
     def _apply (self, *X, split=None):
