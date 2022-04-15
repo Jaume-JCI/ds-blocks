@@ -266,14 +266,11 @@ def test_component_predict ():
                                      )
 
 # Comes from block_types.ipynb, cell
-#@pytest.mark.reference_fails
 def test_component_multiple_inputs ():
-# test that we can apply tranform to multiple data items
-    class MyTransform (Component):
-        def _apply (self, x, y):
-            return x+y
+    # test that we can apply tranform to multiple data items
+    from block_types.utils.dummies import SumXY
 
-    my_transform = MyTransform ()
+    my_transform = SumXY ()
     result = my_transform.transform (3, 4)
     print (result)
     assert result==7
