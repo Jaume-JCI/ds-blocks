@@ -7,11 +7,11 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'TransformWithoutFitApply2', 'TransformWithFitApply2', 'component_save_data', 'test_component_save_load',
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
-           'TransformWithoutFit', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
-           'test_direct_methods', 'test_pass_apply', 'test_get_specific_data_io_parameters_for_component',
-           'test_standard_converter_in_component', 'test_sampling_component', 'test_sklearn_component',
-           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
-           'test_pandas_component']
+           'TransformWithoutFit', 'TransformWithFitApplyOnly', 'test_determine_fit_function',
+           'test_use_fit_from_loaded_estimator', 'test_direct_methods', 'test_pass_apply',
+           'test_get_specific_data_io_parameters_for_component', 'test_standard_converter_in_component',
+           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
+           'test_one_class_sklearn_component', 'test_pandas_component']
 
 # Cell
 import pytest
@@ -753,6 +753,15 @@ class TransformWithoutFit (Component):
     def _apply (self, X):
         return X * self.factor
 
+class TransformWithFitApplyOnly (Component):
+    def __init__ (self, **kwargs):
+        super().__init__ (**kwargs)
+    def _apply (self, X):
+        return X + self.sum
+    def _fit_apply (self, X, y=None):
+        self.sum = X.sum(axis=0)*10
+        return X + self.sum
+
 def test_determine_fit_function ():
     # example when there is _fit implemented
     component = TransformWithoutFitApply ()
@@ -781,6 +790,14 @@ def test_determine_fit_function ():
     r = component (X2)
     assert (r == (X2*2)).all()
     assert not component.is_model
+    assert component._fit == component._fit_
+
+    # example when there is only fit_apply implemented
+    component = TransformWithFitApplyOnly ()
+    X2 = np.array ([10,20,30])
+    r = component.fit_apply (X2)
+    assert (r == (X2 + X2.sum(axis=0)*10)).all()
+    assert component.is_model
     assert component._fit == component._fit_
 
 def test_use_fit_from_loaded_estimator ():
