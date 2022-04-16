@@ -2,10 +2,11 @@
 
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_fitted_model_seq_others', 'test_pipeline_find_last_fitted_model_parallel_2',
-           'SimpleMultiComponent', 'test_multi_comp_io', 'test_multi_comp_desc', 'test_athena_pipeline_training',
-           'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
-           'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
-           'test_set_root', 'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
+           'test_data_conversion_for_sequential_and_parallel', 'SimpleMultiComponent', 'test_multi_comp_io',
+           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_multi_comp_hierarchy',
+           'test_multi_comp_profiling', 'test_multi_comp_all_equal', 'test_multi_component_setters',
+           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'test_set_root',
+           'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
            'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
            'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
            'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
@@ -364,6 +365,31 @@ def test_pipeline_find_last_fitted_model_parallel_2 ():
 # Cell
 from block_types.utils.dummies import (DataSource, SumXY, MaxOfPositiveWithSeparateLabels, Sum1direct,
                                        Multiply10direct, subtract_xy, MinOfPositiveWithoutSeparateLabels)
+
+def test_data_conversion_for_sequential_and_parallel ():
+    class SumXYConverter (DataConverter):
+        def convert_before_transforming (self, X, **kwargs):
+            self.label = X[2]
+            return X[0], X[1]
+        def convert_after_transforming (self, result, **kwargs):
+            result['label'] = self.label
+            return result
+
+    pipe = Sequential (DataSource (),
+                       SumXY (data_converter=SumXYConverter),
+                       PandasComponent (apply=lambda X: X*2),
+                       MaxOfPositiveWithSeparateLabels (data_converter='PandasConverter'),
+                       Parallel (Sum1direct (data_converter='PandasConverter'),
+                                 Multiply10direct (data_converter='PandasConverter'),
+                                 finalize_result=lambda X: tuple(X)),
+                       PandasComponent(apply=subtract_xy),
+                       MinOfPositiveWithoutSeparateLabels (
+                           data_converter=PandasConverter (separate_labels=False)),
+                       make_column_transformer ((Multiply10direct (), ['a','b']),
+                                                (Sum1direct (), ['c','d'])),
+                       Sum1direct ())
+
+    #result = pipe.fit_apply ()
 
 # Comes from compose.ipynb, cell
 class SimpleMultiComponent (MultiComponent):
