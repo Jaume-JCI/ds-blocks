@@ -459,18 +459,18 @@ class Component ():
         self._assign_result_func ()
         self._assign_fit_apply_func ()
         self._assign_fit_func ()
+        self.is_model = True
         if self.fit_func is None:
             self._fit = self._fit_
             if self.fit_apply_func is None:
                 self.is_model = False
         else:
             self._fit = self.fit_func
-            self.is_model = True
         if self.direct_apply:
             self.set_apply (self.result_func)
-        if not self.is_model:
-            self.fit = self._fit_
-            #self.set_fit_apply (self.apply)
+        #if not self.is_model:
+        #    self.fit = self._fit_
+        #    self.set_fit_apply (self.apply)
         elif self.direct_fit:
             self.fit = self.fit_func
         elif self.direct_fit_apply:
