@@ -834,19 +834,19 @@ class _BaseColumnTransformer (MultiComponent):
         components.append (self.concat)
         super().set_components (*components)
 
-    def _fit (self, df, y=None):
+    def _fit (self, df, y=None, **kwargs):
         assert len(self.components) > 0
         assert self.components[-1] is self.concat
         for component in self.components[:-1]:
-            component.fit (df)
+            component.fit (df, **kwargs)
         return self
 
-    def _apply (self, df):
+    def _apply (self, df, **kwargs):
         dfs = []
         assert len(self.components) > 0
         assert self.components[-1] is self.concat
         for component in self.components[:-1]:
-            dfs.append (component.transform (df))
+            dfs.append (component.transform (df, **kwargs))
         df_result = self.concat.transform (*dfs)
         return df_result
 

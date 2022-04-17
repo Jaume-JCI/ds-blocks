@@ -468,13 +468,14 @@ class Component ():
             self._fit = self.fit_func
         if self.direct_apply:
             self.set_apply (self.result_func)
-        #if not self.is_model:
-        #    self.fit = self._fit_
-        #    self.set_fit_apply (self.apply)
-        elif self.direct_fit:
-            self.fit = self.fit_func
-        elif self.direct_fit_apply:
-            self.set_fit_apply (self.fit_apply_func)
+        if not self.is_model:
+            self.fit = self._fit_
+            # self.set_fit_apply (self.apply)
+        else:
+            if self.direct_fit:
+                self.fit = self.fit_func
+            if self.direct_fit_apply:
+                self.set_fit_apply (self.fit_apply_func)
 
     # aliases for transform method
     apply = __call__
