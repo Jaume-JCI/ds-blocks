@@ -844,7 +844,7 @@ class ColumnSelector (NoSaverComponent):
                           direct_apply=direct_apply,
                           **kwargs)
 
-    def _apply (self, df):
+    def _apply (self, df, **kwargs):
         if self.remainder:
             return df[[c for c in df.columns if c not in self.columns]]
         else:
@@ -866,7 +866,7 @@ class Concat (NoSaverComponent):
                           direct_apply=direct_apply,
                           **kwargs)
 
-    def _apply (self, *dfs):
+    def _apply (self, *dfs, **kwargs):
         return pd.concat(list(dfs), axis=1)
 
 # Cell
@@ -920,7 +920,7 @@ class Identity (NoSaverComponent):
                           direct_apply=direct_apply,
                           **kwargs)
 
-    def _apply (self, X):
+    def _apply (self, X, **kwargs):
         return X
 
 # Cell
