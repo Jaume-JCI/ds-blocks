@@ -32,7 +32,8 @@ jobs:
         #if [ -n "$(git status -uno -s)" ]; then echo -e "!!! Detected unstripped out notebooks\n!!!Remember to run nbdev_install_git_hooks"; false; fi
     - name: Check if there is no diff library/notebooks
       run: |
-        nbdev_diff_nbs  # show differences
+          nbdev_diff_nbs  # show differences
+          # echo "skipping"
           #if [ -n "$(nbdev_diff_nbs)" ]; then echo -e "!!! Detected difference between the notebooks and the library"; false; fi
     - name: Run tests
       run: |
