@@ -3,9 +3,10 @@
 __all__ = ['SumXY', 'DummyEstimator', 'Sum1', 'Multiply10', 'NewParallel', 'make_pipe1', 'make_pipe2', 'MinMaxClass',
            'Min10', 'Max10', 'make_pipe_fit1', 'make_pipe_fit2', 'Min10direct', 'Max10direct', 'Sum1direct',
            'Multiply10direct', 'MaxOfPositiveWithSeparateLabels', 'MinOfPositiveWithoutSeparateLabels', 'DataSource',
-           'subtract_xy']
+           'subtract_xy', 'DummyClassifier']
 
 # Cell
+from functools import partial
 import pandas as pd
 import numpy as np
 from sklearn.utils import Bunch
@@ -243,3 +244,30 @@ class DataSource (Component):
 
 def subtract_xy (X, Y):
     return X-Y
+
+# Cell
+class DummyClassifier (Component):
+
+    op_mapping = {'max': np.max, 'min': np.min, 'mean': np.mean, 'sum': np.sum}
+
+    def __init__ (self, project_op='max', statistic='mean', factor=1000, apply_func='simple', **kwargs):
+        super().__init__ (**kwargs)
+        self.project_op = partial (self.op_mapping[project_op], axis=1)
+        self.statistic = self.op_mapping[statistic]
+        assert apply_func in {'simple', 'distance'}
+        self.apply = (self._apply_simple if apply_func=='simple'
+                      else self._apply_distance)
+
+    def _fit (self, X, y, **kwargs):
+        Xproject = self.project_op (X)
+        statistic_0 = self.statistic (Xproject[y==0])
+        statistic_1 = self.statistic (Xproject[y==1])
+        statistic = (statistic_0 - statistic_1) * self.factor
+        self.create_estimator (statistic_0=statistic_0, statistic_1=statistic_1, statistic=statistic)
+
+    def _apply_simple (self, X, **kwargs):
+        return self.project_op(X) + self.estimator.statistic
+
+    def _apply_distance (self, X, **kwargs):
+        Xproject = self.project_op(X)
+        return np.abs(Xproject - self.estimator.statistic_0) - np.abs(Xproject - self.estimator.statistic_1)
