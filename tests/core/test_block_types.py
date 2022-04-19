@@ -7,8 +7,11 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'TransformWithoutFitApply2', 'TransformWithFitApply2', 'component_save_data', 'test_component_save_load',
            'Transform1', 'test_component_run_depend_on_existence', 'test_component_logger',
            'test_component_data_converter', 'test_component_data_io', 'test_component_equal', 'test_set_paths',
-           'test_sampling_component', 'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
-           'test_one_class_sklearn_component', 'test_pandas_component']
+           'TransformWithoutFit', 'TransformWithFitApplyOnly', 'test_determine_fit_function',
+           'test_use_fit_from_loaded_estimator', 'test_direct_methods', 'test_pass_apply',
+           'test_get_specific_data_io_parameters_for_component', 'test_sampling_component', 'test_sklearn_component',
+           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
+           'test_pandas_component']
 
 # Cell
 import pytest
@@ -23,7 +26,7 @@ from pathlib import Path
 from block_types.core.block_types import *
 from block_types.core.data_conversion import DataConverter, NoConverter, PandasConverter, data_converter_factory
 from block_types.core.utils import DataIO, SklearnIO, PandasIO, NoSaverIO
-from block_types.utils.utils import remove_previous_results
+from block_types.utils.utils import remove_previous_results, check_last_part
 from block_types.utils.utils import set_logger
 import block_types.config.bt_defaults as dflt
 from block_types.core.data_conversion import DataConverter
@@ -180,7 +183,7 @@ def test_component_aliases ():
     # test that we can implement _transform and use all the aliases
     # (transform, predict, apply,  __call__)
     class MyTransform (Component):
-        def _apply (self, x):
+        def _transform (self, x):
             return x*2
 
     my_transform = MyTransform()
@@ -221,7 +224,7 @@ def test_component_aliases ():
     my_transform4 = MyTransform4 ()
 
     import pytest
-    with pytest.raises(Exception):
+    with pytest.raises (AssertionError):
         my_transform4.transform(3)
 
 
@@ -232,11 +235,9 @@ def test_component_aliases ():
         def _apply (self, x):
             return x*2
 
-    my_transform5 = MyTransform5 ()
-
     import pytest
-    with pytest.raises(Exception):
-        my_transform5.transform(3)
+    with pytest.raises(AttributeError):
+        my_transform5 = MyTransform5 ()
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
@@ -266,14 +267,11 @@ def test_component_predict ():
                                      )
 
 # Comes from block_types.ipynb, cell
-#@pytest.mark.reference_fails
 def test_component_multiple_inputs ():
-# test that we can apply tranform to multiple data items
-    class MyTransform (Component):
-        def _apply (self, x, y):
-            return x+y
+    # test that we can apply tranform to multiple data items
+    from block_types.utils.dummies import SumXY
 
-    my_transform = MyTransform ()
+    my_transform = SumXY ()
     result = my_transform.transform (3, 4)
     print (result)
     assert result==7
@@ -423,15 +421,15 @@ def test_component_validation_test ():
 
 # example with _fit_apply implemented
 class TransformWithoutFitApply2 (Component):
-    def __init__ (self, error_if_fit=False, error_if_apply=False,  **kwargs):
+    def __init__ (self, error_if_fit_func=False, error_if_apply_func=False,  **kwargs):
         super().__init__ (data_io='SklearnIO', **kwargs)
         self.estimator = Bunch(sum=None)
     def _fit (self, X, y=None):
-        if self.error_if_fit: raise RuntimeError ('fit should not run')
+        if self.error_if_fit_func: raise RuntimeError ('fit should not run')
         print ('running _fit')
         self.estimator.sum = X.sum(axis=0)
     def _apply (self, X):
-        if self.error_if_apply: raise RuntimeError ('apply should not run')
+        if self.error_if_apply_func: raise RuntimeError ('apply should not run')
         if self.estimator.sum is None: raise RuntimeError ('fit should be called before apply')
         print ('running _apply')
         return X + self.estimator.sum
@@ -439,21 +437,21 @@ class TransformWithoutFitApply2 (Component):
 Transform1 = TransformWithoutFitApply2
 
 class TransformWithFitApply2 (Component):
-    def __init__ (self, error_if_fit=False, error_if_apply=False, error_if_fit_apply=False,
+    def __init__ (self, error_if_fit_func=False, error_if_apply_func=False, error_if_fit_apply_func=False,
                   **kwargs):
         super().__init__ (data_io='SklearnIO', **kwargs)
         self.estimator = Bunch(sum=None)
     def _fit (self, X, y=None):
-        if self.error_if_fit: raise RuntimeError ('fit should not run')
+        if self.error_if_fit_func: raise RuntimeError ('fit should not run')
         print ('running _fit')
         self.estimator.sum = X.sum(axis=0)
     def _apply (self, X):
-        if self.error_if_apply: raise RuntimeError ('apply should not run')
+        if self.error_if_apply_func: raise RuntimeError ('apply should not run')
         if self.estimator.sum is None: raise RuntimeError ('fit should be called before apply')
         print ('running _apply')
         return X + self.estimator.sum
     def _fit_apply (self, X, y=None):
-        if self.error_if_fit_apply: raise RuntimeError ('fit_apply should not run')
+        if self.error_if_fit_apply_func: raise RuntimeError ('fit_apply should not run')
         print ('running _fit_apply')
         self.estimator.sum = X.sum(axis=0)
         return X + self.estimator.sum
@@ -511,7 +509,7 @@ def test_component_run_depend_on_existence ():
     path_results = 'component_run_existence'
     remove_previous_results (path_results=path_results)
 
-    tr1 = TransformWithFitApply2 (path_results=path_results, error_if_fit=True, error_if_apply=True)
+    tr1 = TransformWithFitApply2 (path_results=path_results, error_if_fit_func=True, error_if_apply_func=True)
     X = np.array ([100, 90, 10])
     result = tr1.fit_apply (X)
     assert (result==(X+200)).all()
@@ -520,15 +518,15 @@ def test_component_run_depend_on_existence ():
 
     assert os.listdir(f'{path_results}/whole')==['transform_with_fit_apply2_result.pk']
 
-    tr1 = TransformWithFitApply2 (path_results=path_results, error_if_fit=True, error_if_apply=True,
-                                  error_if_fit_apply=True)
+    tr1 = TransformWithFitApply2 (path_results=path_results, error_if_fit_func=True, error_if_apply_func=True,
+                                  error_if_fit_func_apply=True)
     result2 = tr1.fit_apply (X)
     assert (result2==(X+200)).all()
 
     assert tr1.estimator=={'sum': 200}
 
-    tr2 = TransformWithFitApply2 (path_results=path_results, error_if_fit=True, error_if_apply=True,
-                                  error_if_fit_apply=True)
+    tr2 = TransformWithFitApply2 (path_results=path_results, error_if_fit_func=True, error_if_apply_func=True,
+                                  error_if_fit_apply_func=True)
     result3 = tr2.apply (X)
 
     assert (result3==(X+200)).all()
@@ -539,20 +537,20 @@ def test_component_run_depend_on_existence ():
     with pytest.raises (RuntimeError):
         result3 = tr2.fit_apply (X)
 
-    tr2.error_if_fit_apply = False
+    tr2.error_if_fit_apply_func = False
     result4 = tr2.fit_apply (X)
     assert tr2.estimator=={'sum': 200}
     assert (result4==(X+200)).all()
 
     os.remove (f'{path_results}/whole/transform_with_fit_apply2_result.pk')
 
-    tr3 = TransformWithFitApply2 (path_results=path_results, error_if_fit=True, error_if_apply=True,
-                                  error_if_fit_apply=True)
+    tr3 = TransformWithFitApply2 (path_results=path_results, error_if_fit_func=True, error_if_apply_func=True,
+                                  error_if_fit_apply_func=True)
     with pytest.raises (RuntimeError):
         _ = tr3.apply (X)
     with pytest.raises (RuntimeError):
         _ = tr3.fit_apply (X)
-    tr3.error_if_fit_apply = False
+    tr3.error_if_fit_apply_func = False
     result5 = tr3.fit_apply (X)
     assert tr3.estimator=={'sum': 200}
     assert (result5==(X+200)).all()
@@ -562,8 +560,8 @@ def test_component_run_depend_on_existence ():
 
     remove_previous_results (path_results)
 
-    tr4 = TransformWithFitApply2 (path_results=path_results, error_if_fit=False, error_if_apply=False,
-                                  error_if_fit_apply=True)
+    tr4 = TransformWithFitApply2 (path_results=path_results, error_if_fit_func=False, error_if_apply_func=False,
+                                  error_if_fit_apply_func=True)
     result6 = tr4.fit(X).apply (X)
     assert tr4.estimator=={'sum': 200}
     assert (result6==(X+200)).all()
@@ -572,7 +570,7 @@ def test_component_run_depend_on_existence ():
 
     remove_previous_results (path_results)
 
-    tr5 = TransformWithoutFitApply2 (path_results=path_results, error_if_fit=False, error_if_apply=False)
+    tr5 = TransformWithoutFitApply2 (path_results=path_results, error_if_fit_func=False, error_if_apply_func=False)
     result7 = tr5.fit(X).apply (X)
     assert tr5.estimator=={'sum': 200}
     assert (result7==(X+200)).all()
@@ -740,6 +738,183 @@ def test_set_paths ():
     path_models = 'test_set_paths_models_b'
     tr.data_io.set_path_models (path_models)
     assert_paths (tr, path_results, path_models)
+
+# Comes from block_types.ipynb, cell
+from block_types.utils.dummies import DummyEstimator
+
+class TransformWithoutFit (Component):
+    def __init__ (self, factor=2, **kwargs):
+        super().__init__ (**kwargs)
+    def _apply (self, X):
+        return X * self.factor
+
+class TransformWithFitApplyOnly (Component):
+    def __init__ (self, **kwargs):
+        super().__init__ (**kwargs)
+    def _apply (self, X):
+        return X + self.sum
+    def _fit_apply (self, X, y=None):
+        self.sum = X.sum(axis=0)*10
+        return X + self.sum
+
+def test_determine_fit_function ():
+    # example when there is _fit implemented
+    component = TransformWithoutFitApply ()
+    X = np.array ([1,2,3])
+    component.fit (X)
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2)).all()
+    assert component.is_model
+
+    # example when there is estimator
+    component = Component (DummyEstimator (2))
+    X = np.array ([1,2,3])
+    component.fit (X)
+    assert component.estimator.sum == 6
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2*2)).all()
+    assert component.is_model
+
+    # example when there is no _fit implemented, and there is no estimator
+    component = TransformWithoutFit ()
+    X = np.array ([1,2,3])
+    component.fit (X)
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X2*2)).all()
+    assert not component.is_model
+    assert component._fit == component._fit_
+
+    # example when there is only fit_apply implemented
+    component = TransformWithFitApplyOnly ()
+    X2 = np.array ([10,20,30])
+    r = component.fit_apply (X2)
+    assert (r == (X2 + X2.sum(axis=0)*10)).all()
+    assert component.is_model
+    assert component._fit == component._fit_
+
+def test_use_fit_from_loaded_estimator ():
+    path_models = 'test_use_fit_from_loaded_estimator'
+    component = Component (DummyEstimator (2), path_models=path_models)
+    X = np.array ([1,2,3])
+    component.fit (X)
+    assert (Path (path_models) / 'models').exists()
+    del component
+
+    estimator1 = DummyEstimator (2)
+    print (estimator1)
+    component = Component (estimator1, path_models=path_models)
+    print ('before loading')
+    print (component.estimator)
+    print (component._fit)
+    print (component.result_func)
+
+    component.load_estimator ()
+    print ('after loading')
+    print (component.estimator)
+    print (component._fit)
+    print (component.result_func)
+
+    assert component.estimator.sum == 6
+    assert component.is_model
+
+    X2 = np.array ([10,20,30])
+    r = component (X2)
+    assert (r == (X.sum() + X2*2)).all()
+
+    remove_previous_results (path_models)
+
+# Comes from block_types.ipynb, cell
+from block_types.utils.dummies import Multiply10direct, Max10direct
+def test_direct_methods ():
+    # input
+    X = np.array ([1,2,3])
+
+    # example where we do not use direct methods
+    component = Max10direct (verbose=2)
+    component.fit (X)
+    r = component (X)
+    assert (r==X*10+X.max()).all()
+
+    component = Max10direct (verbose=2, error_if_apply=True)
+    component.fit (X)
+    with pytest.raises (RuntimeError):
+        r = component (X)
+    #assert component.fitted
+    #assert component.applied
+
+    # example where we use direct methods
+    component = Max10direct (direct_apply=True, verbose=2, error_if_apply=True)
+    component.logger.info (f'{"-"*100}')
+    component.logger.info (f'direct_apply={component.direct_apply}, direct_fit={component.direct_fit}, direct_fit_apply={component.direct_fit_apply}\n')
+    component.fit (X)
+    r = component (X)
+    assert (r==X*10+X.max()).all()
+    #assert component.fitted
+    #assert not component.applied
+
+    component = Max10direct (direct_fit=True, verbose=2, error_if_fit=True)
+    component.logger.info (f'{"-"*100}')
+    component.logger.info (f'direct_apply={component.direct_apply}, direct_fit={component.direct_fit}, direct_fit_apply={component.direct_fit_apply}\n')
+    component.fit (X)
+    r = component.apply (X)
+    assert (r==X*10+X.max()).all()
+    #assert not component.fitted
+    #assert component.applied
+
+    component = Max10direct (direct_apply=True, direct_fit=True, verbose=2, error_if_apply=True,
+                             error_if_fit=True)
+    component.logger.info (f'{"-"*100}')
+    component.logger.info (f'direct_apply={component.direct_apply}, direct_fit={component.direct_fit}, direct_fit_apply={component.direct_fit_apply}\n')
+    component.fit (X)
+    r = component.transform (X)
+    assert (r==X*10+X.max()).all()
+    #assert not component.fitted
+    #assert not component.applied
+
+    # example when there is no _fit implemented and we call fit_apply
+    component = Multiply10direct (verbose=2, error_if_fit=True)
+    component.logger.info (f'{"-"*100}')
+    component.logger.info (f'direct_apply={component.direct_apply}, direct_fit={component.direct_fit}, direct_fit_apply={component.direct_fit_apply}\n')
+    r = component.fit_apply (X)
+    assert (r==X*10).all()
+    #assert not component.is_model
+    assert component.fit == component._fit_
+    #assert component.fit_apply == component.apply
+    r2 = component.fit (X).apply (X)
+    assert (r==X*10).all()
+
+    # example when there is no _fit implemented and we want a direct apply call
+    component = Multiply10direct (verbose=2, direct_apply=True, error_if_apply=True, error_if_fit=True)
+    component.logger.info (f'{"-"*100}')
+    component.logger.info (f'direct_apply={component.direct_apply}, direct_fit={component.direct_fit}, direct_fit_apply={component.direct_fit_apply}\n')
+    r = component.fit_apply (X)
+    assert (r==X*10).all()
+    assert not component.is_model
+    assert component.fit == component._fit_
+    #assert component.fit_apply == component._apply
+    #assert component.fit_transform == component._apply
+    #assert not component.applied
+    r2 = component.fit (X).apply (X)
+    assert (r==X*10).all()
+    #assert not component.applied
+
+# Comes from block_types.ipynb, cell
+def test_pass_apply ():
+    component = Component (apply=lambda x: x*10, verbose=2, direct_apply=True, error_if_apply=True)
+    X = np.array ([1,2,3])
+    r = component (X)
+    assert (r==X*10).all()
+
+# Comes from block_types.ipynb, cell
+def test_get_specific_data_io_parameters_for_component ():
+    component = Component (tag='data', x=3, par=[1,2], path_results='hello', path_results_data='world',
+                           other='yes', load_result_data = False, save_model_data=True)
+    check_last_part(component.path_results, 'world')
+    assert component.data_io.load_result_flag == False
+    assert component.data_io.save_model_flag == True
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails
