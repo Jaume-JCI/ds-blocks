@@ -2,7 +2,8 @@
 
 __all__ = ['path_results', 'path_models', 'path_data', 'file_format', 'verbose', 'name_logger', 'save_splits', 'group',
            'error_if_present', 'overwrite_field', 'mode_logger', 'separate_labels', 'warning_if_nick_name_exists',
-           'propagate']
+           'propagate', 'path_session_folder', 'session_filename', 'path_logger_folder', 'logger_filename',
+           'logger_null_filename']
 
 # Cell
 path_results = None
@@ -27,3 +28,10 @@ mode_logger = 'a'
 separate_labels=False
 warning_if_nick_name_exists=False
 propagate=False
+path_session_folder='session'
+session_filename='pipeline.pk'
+
+# Cell
+path_logger_folder='log'
+logger_filename='logs.txt'
+logger_null_filename='null_log.txt'

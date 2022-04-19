@@ -54,7 +54,7 @@ def get_logging_level (verbose):
     return logging.DEBUG if verbose == 2 else logging.INFO if verbose == 1 else logging.WARNING
 
 # Cell
-def delete_logger (name, path_results='log', filename='logs.txt'):
+def delete_logger (name, path_results=dflt.path_logger_folder, filename=dflt.logger_filename):
     if filename is not None and path_results is not None:
         path_to_log_file = f'{path_results}/{filename}'
         if os.path.exists (path_to_log_file):
@@ -62,8 +62,9 @@ def delete_logger (name, path_results='log', filename='logs.txt'):
 
 # Cell
 #import pdb
-def set_logger (name, path_results='log', stdout=True,
-                mode='a', just_message = False, filename='logs.txt', null_file_name='null_log.txt',
+def set_logger (name, path_results=dflt.path_logger_folder, stdout=True,
+                mode='a', just_message = False, filename=dflt.logger_filename,
+                null_file_name=dflt.logger_null_filename,
                 null_name='no_logging', logging_level=logging.WARNING, verbose=None, verbose_out=None,
                 print_path=False):
     """Set logger."""
