@@ -26,9 +26,9 @@ def test_dummy_classifier ():
     X = np.array ([[2,1,3], [4,6,5], [10,20,30], [40, 50, 60]])
     y = np.array ([0, 1, 0, 1])
     cl = DummyClassifier (project_op='min', statistic='min')
-    assert (cl.project_op (X)==np.array([1, 4])).all()
-    assert cl.estimator=={'statistic_0': 1, 'statistic_1': 4, 'statistic': -3000}
+    assert (cl.project_op (X)==np.array([1, 4, 10, 40])).all()
     assert (cl.fit_apply (X, y)==np.array([-2999, -2996, -2990, -2960])).all()
+    assert cl.estimator=={'statistic_0': 1, 'statistic_1': 4, 'statistic': -3000}
 
     cl = DummyClassifier (project_op='max', statistic='sum')
     assert (cl.fit_apply (X, y)==np.array([-32997, -32994, -32970, -32940])).all()
