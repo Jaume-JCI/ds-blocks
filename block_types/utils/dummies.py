@@ -250,7 +250,8 @@ class DummyClassifier (Component):
 
     op_mapping = {'max': np.max, 'min': np.min, 'mean': np.mean, 'sum': np.sum}
 
-    def __init__ (self, project_op='max', statistic='mean', factor=1000, apply_func='simple', **kwargs):
+    def __init__ (self, project_op='max', statistic='mean', factor=1000, apply_func='simple',
+                  data_converter='StandardConverter', **kwargs):
 
         assert apply_func in {'simple', 'distance'}
         self._apply = (self._apply_simple if apply_func=='simple'
@@ -259,7 +260,7 @@ class DummyClassifier (Component):
         self.project_op = partial (self.op_mapping[project_op], axis=1)
         self.statistic = self.op_mapping[statistic]
 
-        super().__init__ (**kwargs)
+        super().__init__ (data_converter='StandardConverter', **kwargs)
 
     def _fit (self, X, y, **kwargs):
         Xproject = self.project_op (X)
