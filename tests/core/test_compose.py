@@ -3,10 +3,10 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_fitted_model_seq_others', 'test_pipeline_find_last_fitted_model_parallel_2',
            'test_data_conversion_for_sequential_and_parallel', 'SimpleMultiComponent', 'test_multi_comp_io',
-           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_multi_comp_hierarchy',
-           'test_multi_comp_profiling', 'test_multi_comp_all_equal', 'test_multi_component_setters',
-           'test_show_result_statistics', 'test_pass_components', 'test_chain_folders', 'test_set_root',
-           'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
+           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_gather_and_save_info',
+           'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
+           'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
+           'test_set_root', 'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
            'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
            'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
            'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
@@ -451,7 +451,6 @@ def test_multi_comp_io ():
     remove_previous_results (path_results=path_results)
 
 # Comes from compose.ipynb, cell
-#@pytest.mark.reference_fails
 def test_multi_comp_desc ():
     class Intermediate (MultiComponent):
         def __init__ (self, name=None, **kwargs):
@@ -613,6 +612,7 @@ def test_athena_pipeline_training ():
             self.second = Intermediate (name='second_intermediate', **kwargs)
             self.gather_descendants(nick_name=False)
 
+
     higher = Higher()
 
     assert sorted(higher.obj.keys())==['first_intermediate', 'first_intermediate_first_component', 'first_intermediate_second_component', 'second_intermediate', 'second_intermediate_first_component', 'second_intermediate_second_component']
@@ -704,20 +704,61 @@ def test_athena_pipeline_training ():
     assert higher.first.hierarchy_path=='higher.first_intermediate'
 
 # Comes from compose.ipynb, cell
+def test_gather_and_save_info ():
+    from block_types.utils.dummies import Intermediate, Higher
+    higher = Higher(x=20, y=30, z=60)
+
+    path_results = 'test_gather_and_save_info'
+    path_session = f'{path_results}_session'
+    remove_previous_results (path_results)
+    remove_previous_results (path_session)
+    with pytest.raises (FileNotFoundError):
+        os.listdir (path_session)
+
+    higher.gather_and_save_info (path_session=path_session)
+
+    assert os.listdir (path_session)==['last_run']
+    assert os.listdir (f'{path_session}/last_run')==['pipeline.pk']
+
+    pipe = joblib.load (f'{path_session}/last_run/pipeline.pk')
+    assert pipe.x==20
+    assert pipe.first.z==60
+    assert pipe.first.x==3
+
+    with pytest.raises (FileNotFoundError):
+        os.listdir (path_results)
+
+    remove_previous_results (path_session)
+    higher = Higher(x=20, y=30, z=60, path_results=path_results)
+
+    path_results = 'test_gather_and_save_info'
+    path_session = f'{path_results}_session'
+
+    with pytest.raises (FileNotFoundError):
+        os.listdir (path_session)
+
+    higher.gather_and_save_info (path_session=path_session)
+
+    assert os.listdir (path_session)==['last_run']
+    assert os.listdir (f'{path_session}/last_run')==['pipeline.pk']
+    pipe = joblib.load (f'{path_session}/last_run/pipeline.pk')
+    assert pipe.x==20
+    assert pipe.first.z==60
+    assert pipe.first.x==3
+
+    assert 'pipeline.pk' in os.listdir (path_results)
+    pipe = joblib.load (f'{path_results}/pipeline.pk')
+    assert pipe.x==20
+    assert pipe.first.z==60
+    assert pipe.first.x==3
+
+    remove_previous_results (path_results)
+    remove_previous_results (path_session)
+
+# Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
 def test_multi_comp_hierarchy ():
-    class Intermediate (MultiComponent):
-        def __init__ (self, name=None, z=6, h=10, x=3, **kwargs):
-            super().__init__ (name=name, **kwargs)
-            self.first = Component (name='first_component', **kwargs)
-            self.second = Component (name='second_component', **kwargs)
-
-    class Higher (MultiComponent):
-        def __init__ (self, x=2, y=3, **kwargs):
-            super().__init__ (**kwargs)
-            self.first = Intermediate (name='first_intermediate', **kwargs)
-            self.second = Intermediate (name='second_intermediate', **kwargs)
-            self.gather_descendants()
+    from block_types.utils.dummies import Intermediate, Higher
 
     higher = Higher()
 

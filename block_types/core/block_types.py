@@ -528,6 +528,9 @@ class Component ():
                 df = pd.DataFrame (df)
                 display (df.describe())
 
+    def remove_non_pickable_fields (self):
+        pass
+
     # ********************************
     # exposing some data_io and data_converters methods
     # ********************************

@@ -10,6 +10,10 @@ import abc
 import warnings
 import sys
 from pathlib import Path
+import shutil
+import copy
+
+import joblib
 from sklearn.utils import Bunch
 import pandas as pd
 
@@ -98,6 +102,14 @@ class MultiComponent (SamplingComponent):
 
     def __repr__ (self):
         return f'MultiComponent {self.class_name} (name={self.name})'
+
+    def gather_and_save_info (self, path_results=None, path_session=None, split=None,
+                              remove_non_pickable=False):
+        self.gather_descendants ()
+        self.find_last_result (split=split)
+        self.find_last_fitted_model (split=split)
+        self.save_object (path_results=path_results, path_session=path_session,
+                          remove_non_pickable=remove_non_pickable)
 
     def register_components (self, *components):
         """
@@ -362,6 +374,48 @@ class MultiComponent (SamplingComponent):
             else:
                 component.data_io.save_result (result, split=split, path_results=path_results,
                                                result_file_name=result_file_name)
+
+    def save_object (self, save_run=True, path_results=None, path_session=None,
+                     remove_non_pickable=False):
+        if remove_non_pickable:
+            pipe = copy.deepcopy (self)
+            pipe.remove_non_pickable_fields ()
+        else:
+            pipe = self
+        if path_results is None:  path_results = pipe.data_io.path_results
+        if path_results is not None:
+            path_results.mkdir (parents=True, exist_ok=True)
+            joblib.dump (pipe, path_results / 'pipeline.pk')
+        if save_run:
+            if path_session is None: path_session = dflt.path_session_folder
+            path_session = Path (path_session) / f'last_run/{dflt.session_filename}'
+            path_session.parent.mkdir (parents=True, exist_ok=True)
+            joblib.dump (pipe, path_session)
+
+    def save_logs (self, save_run=True, path_results=None, path_session=None):
+        path_log_file = f'{dflt.path_logger_folder}/{dflt.logger_filename}'
+        if Path(path_log_file).exists():
+            if path_results is None:  path_results = self.data_io.path_results
+            if path_results is not None:
+                path_results.mkdir (parents=True, exist_ok=True)
+                shutil.copy (path_log_file, path_results)
+            if save_run:
+                if path_session is None: path_session = dflt.path_session_folder
+                path_session_log_file = Path (path_session) / f'last_run/{dflt.logger_filename}'
+                path_session_log_file.parent.mkdir (parents=True, exist_ok=True)
+                shutil.copy (path_log_file, path_session_log_file)
+
+
+    def remove_non_pickable_fields (self):
+        for component in self.components:
+            component.remove_non_pickable_fields ()
+
+    def find_last_result (self, split=None):
+        return False
+
+    def find_last_fitted_model (self, split=None):
+        return False
+
     # *************************
     # setters
     # *************************
@@ -446,12 +500,6 @@ class MultiComponent (SamplingComponent):
                 component.set_unique_names ()
             else:
                 self.register_global_name (component)
-
-    def find_last_result (self, split=None):
-        return False
-
-    def find_last_fitted_model (self, split=None):
-        return False
 
 # Cell
 class Pipeline (MultiComponent):
