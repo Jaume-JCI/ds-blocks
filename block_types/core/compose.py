@@ -1097,6 +1097,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
         apply_to = apply_to if isinstance(apply_to, list) else [apply_to]
 
         self.is_data_source = True
+        component = self.component
         for split in apply_to:
             if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
                 if isinstance (component, MultiComponent):
@@ -1112,6 +1113,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
         all_components_fitted = True
         self.load_all_estimators = False
         split = self.fit_to
+        component = self.component
         if isinstance (component, MultiComponent):
             if not component.find_last_fitted_model (split=split):
                 all_components_fitted = False
