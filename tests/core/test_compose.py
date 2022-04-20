@@ -723,7 +723,7 @@ def test_gather_and_save_info ():
     higher.gather_and_save_info (path_session=path_session)
 
     assert os.listdir (path_session)==['last_run']
-    assert sorted(os.listdir (f'{path_session}/last_run'))==['logs.txt', 'pipeline.pk']
+    assert os.listdir (f'{path_session}/last_run')==['pipeline.pk']
 
     pipe = joblib.load (f'{path_session}/last_run/pipeline.pk')
     assert pipe.x==20
@@ -745,13 +745,13 @@ def test_gather_and_save_info ():
     higher.gather_and_save_info (path_session=path_session)
 
     assert os.listdir (path_session)==['last_run']
-    assert sorted(os.listdir (f'{path_session}/last_run'))==['logs.txt', 'pipeline.pk']
+    assert os.listdir (f'{path_session}/last_run')==['pipeline.pk']
     pipe = joblib.load (f'{path_session}/last_run/pipeline.pk')
     assert pipe.x==20
     assert pipe.first.z==60
     assert pipe.first.x==3
 
-    assert {'pipeline.pk', 'logs.txt'}.issubset (set(os.listdir (path_results)))
+    assert 'pipeline.pk' in os.listdir (path_results)
     pipe = joblib.load (f'{path_results}/pipeline.pk')
     assert pipe.x==20
     assert pipe.first.z==60
