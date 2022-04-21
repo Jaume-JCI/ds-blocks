@@ -3,7 +3,7 @@
 __all__ = ['path_results', 'path_models', 'path_data', 'file_format', 'verbose', 'name_logger', 'save_splits', 'group',
            'error_if_present', 'overwrite_field', 'mode_logger', 'separate_labels', 'warning_if_nick_name_exists',
            'propagate', 'path_session_folder', 'session_filename', 'path_logger_folder', 'logger_filename',
-           'logger_null_filename']
+           'logger_null_filename', 'mode_logger', 'stdout_logger', 'null_name_logger']
 
 # Cell
 path_results = None
@@ -35,3 +35,6 @@ session_filename='pipeline.pk'
 path_logger_folder='log'
 logger_filename='logs.txt'
 logger_null_filename='null_log.txt'
+mode_logger='w'
+stdout_logger=True
+null_name_logger='no_logging'
