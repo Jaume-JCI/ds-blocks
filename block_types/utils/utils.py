@@ -62,11 +62,11 @@ def delete_logger (name, path_results=dflt.path_logger_folder, filename=dflt.log
 
 # Cell
 #import pdb
-def set_logger (name, path_results=dflt.path_logger_folder, stdout=True,
-                mode='a', just_message = False, filename=dflt.logger_filename,
+def set_logger (name, path_results=dflt.path_logger_folder, stdout=dflt.stdout_logger,
+                mode=dflt.mode_logger, just_message = False, filename=dflt.logger_filename,
                 null_file_name=dflt.logger_null_filename,
-                null_name='no_logging', logging_level=logging.WARNING, verbose=None, verbose_out=None,
-                print_path=False):
+                null_name=dflt.null_name_logger, logging_level=logging.WARNING, verbose=None,
+                verbose_out=None, print_path=False):
     """Set logger."""
     name= name if verbose is not None else null_name
     filename= filename if verbose is not None else null_file_name
