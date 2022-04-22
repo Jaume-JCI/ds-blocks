@@ -102,7 +102,7 @@ class Component ():
         but = (but + ', ') if len(but)>0 else but
         but = but + 'ignore, but, overwrite_field, error_if_present, path_results, path_models, apply'
         if isinstance (ignore, str): ignore = set(re.split(', *', ignore))
-        ignore.update ({'name', 'class_name', 'suffix', 'apply'})
+        ignore.update ({'name', 'class_name', 'suffix', 'apply', 'data_converter'})
         replace_attr_and_store (base_class=Component, but=but,
                                 error_if_present=error_if_present, overwrite=overwrite_field,
                                 ignore=ignore)
