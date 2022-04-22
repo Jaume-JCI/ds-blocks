@@ -127,7 +127,7 @@ class Component ():
         # data converter
         if self.data_converter is None:
             # TODO: have DataConverter store a reference to component, and use the logger from that reference.
-            self.data_converter = GenericConverter (**kwargs)
+            self.data_converter = StandardConverter (**kwargs)
         else:
             if 'data_converter' in kwargs:
                 del kwargs['data_converter']
