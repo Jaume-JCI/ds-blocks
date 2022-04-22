@@ -223,14 +223,18 @@ class Component ():
 
     def fit_like (self, *X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None,
-                  sequential_fit_apply=False, converter_args={}, **kwargs):
+                  sequential_fit_apply=False, fit_apply=False, converter_args={}, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
         Uses the previously fitted parameters if they're found in disk and load
         is True.
         """
-        self.profiler.start_timer ()
+        if not fit_apply:
+            self.profiler.start_timer ()
+            profiler_method = 'fit'
+        else:
+            profiler_method = 'fit_apply'
         if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
         if self.error_if_fit_apply and func=='_fit_apply':
             raise RuntimeError (f'{self.name} should not call fit_apply')
@@ -281,7 +285,7 @@ class Component ():
                 result = self.fit_apply_func (*X, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
-            self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
+            self.profiler.finish_no_overhead_timer (method=profiler_method, split=self.data_io.split)
             if func=='_fit':
                 _ = self.data_converter.convert_after_fitting (*X)
             elif func=='_fit_apply':
@@ -300,7 +304,8 @@ class Component ():
                 result = previous_result
                 self.logger.info (f'loaded pre-computed result')
 
-        self.profiler.finish_timer (method=func, split=self.data_io.split)
+        if not (fit_apply and func == '_fit'):
+            self.profiler.finish_timer (method=profiler_method, split=self.data_io.split)
 
         if split is not None:
             self.set_split (self.original_split)
@@ -317,6 +322,7 @@ class Component ():
                    validation_data=None, test_data=None, sequential_fit_apply=False,
                    **kwargs):
 
+        self.profiler.start_timer ()
         if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
 
         X = self.data_converter.convert_single_tuple_for_fitting (X)
@@ -327,13 +333,14 @@ class Component ():
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
                                   test_data=test_data, sequential_fit_apply=sequential_fit_apply,
-                                  **kwargs)
+                                  fit_apply=True, **kwargs)
         else:
             if not self.direct_fit:
                 kwargs_fit = dict(load=load_model, save=save_model,
                                   validation_data=validation_data,
                                   test_data=test_data,
-                                  sequential_fit_apply=sequential_fit_apply)
+                                  sequential_fit_apply=sequential_fit_apply,
+                                  fit_apply=True)
             else:
                 kwargs_fit = dict()
             if not self.direct_apply:
@@ -384,7 +391,7 @@ class Component ():
         Uses the previously transformed data if it's found in disk and load
         is True.
         """
-        self.profiler.start_timer ()
+        if not fit_apply: self.profiler.start_timer ()
         if self.direct_apply: return self.result_func (*X, **kwargs)
         if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
@@ -486,6 +493,7 @@ class Component ():
                          converter_args={}, fit_apply=False,
                          sequential_fit_apply=False, **kwargs):
 
+        profiler_method = 'fit_apply' if fit_apply else 'apply'
         if split is not None:
             self.original_split = self.data_io.split
             self.set_split (split)
@@ -500,10 +508,10 @@ class Component ():
             X = self.data_converter.convert_before_transforming (
                 *X, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
             X = self.data_converter.convert_no_tuple (X)
-            self.profiler.start_no_overhead_timer ()
             X = self.data_converter.convert_single_tuple_for_result_func (X)
+            self.profiler.start_no_overhead_timer ()
             result = result_func (*X, **kwargs)
-            self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
+            self.profiler.finish_no_overhead_timer (profiler_method, self.data_io.split)
             result = self.data_converter.convert_after_transforming (
                 result, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
             if self.data_io.can_save_result (save, split):
@@ -512,7 +520,7 @@ class Component ():
             result = previous_result
             self.logger.info (f'loaded pre-computed result')
 
-        self.profiler.finish_timer ('apply', self.data_io.split)
+        self.profiler.finish_timer (profiler_method, self.data_io.split)
         if split is not None:
             self.set_split (self.original_split)
 
