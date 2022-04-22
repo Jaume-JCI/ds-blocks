@@ -274,7 +274,7 @@ class DummyClassifier (Component):
         self.project_op = partial (self.op_mapping[project_op], axis=1)
         self.statistic = self.op_mapping[statistic]
 
-        super().__init__ (**kwargs)
+        super().__init__ (data_converter=data_converter, **kwargs)
 
     def _fit (self, X, y, **kwargs):
         Xproject = self.project_op (X)
