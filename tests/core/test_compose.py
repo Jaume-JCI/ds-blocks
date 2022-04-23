@@ -9,15 +9,16 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_set_root', 'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
            'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
            'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
-           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary', 'test_make_pipeline',
-           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
-           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
-           'test_pandas_pipeline', 'test_parallel', 'test_pipeline_find_last_result',
-           'test_pipeline_find_last_result_parallel1', 'test_pipeline_find_last_result_parallel2',
-           'test_pipeline_find_last_result_parallel3', 'test_pipeline_find_last_fitted_model_seq',
-           'test_pipeline_find_last_fitted_model_parallel', 'test_pipeline_find_last_fitted_model_parallel_remove',
-           'TransformM', 'test_multi_modality', 'test_column_selector', 'test_concat', 'test_identity',
-           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary',
+           'test_multi_comp_profiling2', 'test_make_pipeline', 'test_pipeline_factory', 'PandasTransformWithLabels1',
+           'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1', 'TransformWithLabels2',
+           'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
+           'test_pipeline_find_last_result', 'test_pipeline_find_last_result_parallel1',
+           'test_pipeline_find_last_result_parallel2', 'test_pipeline_find_last_result_parallel3',
+           'test_pipeline_find_last_fitted_model_seq', 'test_pipeline_find_last_fitted_model_parallel',
+           'test_pipeline_find_last_fitted_model_parallel_remove', 'TransformM', 'test_multi_modality',
+           'test_column_selector', 'test_concat', 'test_identity', 'column_transformer_data',
+           'test_make_column_transformer', 'test_make_column_transformer_passthrough',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
            'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
            'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
@@ -786,7 +787,6 @@ def test_multi_comp_hierarchy ():
     assert higher.verbose==1 and higher.first.verbose==1 and higher.first.first.verbose==1
 
 # Comes from compose.ipynb, cell
-#@pytest.mark.reference_fails
 def test_multi_comp_profiling ():
     class A(Component):
         def __init__ (self, time=1, **kwargs):
@@ -1558,6 +1558,71 @@ def test_show_summary ():
     pipeline.show_summary ()
 
     remove_previous_results (path_results=path_results)
+
+# Comes from compose.ipynb, cell
+def test_multi_comp_profiling2 ():
+    class SpendTime (Component):
+        def __init__ (self, time_fit=1, time_apply=1, time_fit_apply=1, **kwargs):
+            super().__init__(**kwargs)
+
+    class HasFitApply(SpendTime):
+        def __init__ (self, **kwargs):
+            super().__init__(**kwargs)
+
+        def _fit (self, X, y=None):
+            time.sleep(self.time_fit)
+
+        def _apply (self, X):
+            time.sleep(self.time_apply)
+            return 1
+
+        def _fit_apply (self, X, y=None):
+            time.sleep(self.time_fit_apply)
+            return 1
+
+    class HasFitAndApply(SpendTime):
+        def __init__ (self, **kwargs):
+            super().__init__(**kwargs)
+
+        def _fit (self, X, y=None):
+            time.sleep(self.time_fit)
+
+        def _apply (self, X):
+            time.sleep(self.time_apply)
+            return 1
+
+    class HasOnlyApply(SpendTime):
+        def __init__ (self, **kwargs):
+            super().__init__(**kwargs)
+
+        def _apply (self, X):
+            time.sleep(self.time_apply)
+            return 1
+
+    class AllCombined (Sequential):
+        def __init__ (self, **kwargs):
+            super().__init__(**kwargs)
+            self.has_fit_and_apply = HasFitAndApply (time_fit=0.1, time_apply=0.15)
+            self.has_fit_apply1 = HasFitApply (time_fit_apply=0.3)
+            self.has_only_apply = HasOnlyApply (time_apply=0.2)
+            self.has_fit_apply2 = HasFitApply (time_fit_apply=0.25)
+
+    all_combined = AllCombined ()
+    all_combined.fit_apply (1)
+    dfd = all_combined.gather_times()
+
+    display('sum', dfd.sum)
+    display('no_overhead_total', dfd.no_overhead_total)
+    display('overhead_total', dfd.overhead_total)
+    display ('sum - novh_sum', dfd.sum['whole']-dfd.novh_sum['whole'])
+
+    if False:
+        all_combined.fit (1)
+        dfd = all_combined.gather_times()
+
+        display('sum', dfd.sum)
+        display('no_overhead_total', dfd.no_overhead_total)
+        display('overhead_total', dfd.overhead_total)
 
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
