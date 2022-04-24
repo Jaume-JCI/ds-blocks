@@ -367,7 +367,7 @@ class Component ():
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def __call__ (self, *X, load=None, save=None, **kwargs):
+    def __call__ (self, *X, load=None, save=None, fit_apply=False, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
