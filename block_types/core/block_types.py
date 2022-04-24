@@ -216,17 +216,21 @@ class Component ():
 
     def fit_like (self, X, y=None, load=None, save=None, split=None,
                   func='_fit', validation_data=None, test_data=None,
-                  converter_args={}, **kwargs):
+                  fit_apply=False, converter_args={}, **kwargs):
         """
         Estimates the parameters of the component based on given data X and labels y.
 
         Uses the previously fitted parameters if they're found in disk and load
         is True.
         """
+        if not fit_apply:
+            self.profiler.start_timer ()
+            profiler_method = 'fit'
+        else:
+            profiler_method = 'fit_apply'
         if self.error_if_fit and func=='_fit': raise RuntimeError (f'{self.name} should not call fit')
         if self.error_if_fit_apply and func=='_fit_apply':
             raise RuntimeError (f'{self.name} should not call fit_apply')
-        self.profiler.start_timer ()
 
         if split is not None:
             self.original_split = self.data_io.split
@@ -269,7 +273,7 @@ class Component ():
                 result = self.fit_apply_func (X, y=y, **additional_data, **kwargs)
             else:
                 raise ValueError (f'function {func} not valid')
-            self.profiler.finish_no_overhead_timer (method=func, split=self.data_io.split)
+            self.profiler.finish_no_overhead_timer (method=profiler_method, split=self.data_io.split)
             if func=='_fit':
                 _ = self.data_converter.convert_after_fitting (X)
             elif func=='_fit_apply':
@@ -289,7 +293,8 @@ class Component ():
                 result = previous_result
                 self.logger.info (f'loaded pre-computed result')
 
-        self.profiler.finish_timer (method=func, split=self.data_io.split)
+        if not (fit_apply and func == '_fit'):
+            self.profiler.finish_timer (method=profiler_method, split=self.data_io.split)
 
         if split is not None:
             self.set_split (self.original_split)
@@ -305,23 +310,25 @@ class Component ():
                    load_result=None, save_result=None, func='_fit',
                    validation_data=None, test_data=None, **kwargs):
 
+        self.profiler.start_timer ()
         if self.error_if_fit_apply: raise RuntimeError (f'{self.name} should not call fit_apply')
 
         if self.fit_apply_func is not None:
             return self.fit_like (X, y=y,
                                   load=load_model, save=save_model,
                                   func='_fit_apply', validation_data=validation_data,
-                                  test_data=test_data, **kwargs)
+                                  test_data=test_data, fit_apply=True, **kwargs)
         else:
             if not self.direct_fit:
                 kwargs_fit = dict(y=y,
                                  load=load_model, save=save_model,
                                  validation_data=validation_data,
-                                 test_data=test_data)
+                                 test_data=test_data,
+                                 fit_apply=True)
             else:
                 kwargs_fit = dict(y=y)
             if not self.direct_apply:
-                kwargs_apply = dict (load=load_result, save=save_result, **kwargs)
+                kwargs_apply = dict (load=load_result, save=save_result, fit_apply=True, **kwargs)
             else:
                 kwargs_apply = kwargs
             return self.fit (X, **kwargs_fit).apply (X, **kwargs_apply)
@@ -360,18 +367,18 @@ class Component ():
     fit_transform = fit_apply
     fit_predict = fit_apply
 
-    def __call__ (self, *X, load=None, save=None, **kwargs):
+    def __call__ (self, *X, load=None, save=None, fit_apply=False, **kwargs):
         """
         Transforms the data X and returns the transformed data.
 
         Uses the previously transformed data if it's found in disk and load
         is True.
         """
-        self.profiler.start_timer ()
+        if not fit_apply: self.profiler.start_timer ()
         if self.direct_apply: return self.result_func (*X, **kwargs)
         if self.error_if_apply: raise RuntimeError (f'{self.name} should not call apply')
         assert self.result_func is not None, 'apply function not implemented'
-        result = self._compute_result (X, self.result_func, load=load, save=save, **kwargs)
+        result = self._compute_result (X, self.result_func, load=load, save=save, fit_apply=fit_apply, **kwargs)
         return result
 
     def _assign_fit_func (self):
@@ -465,8 +472,9 @@ class Component ():
     predict = partialmethod (__call__, converter_args=dict(new_columns=['prediction']))
 
     def _compute_result (self, X, result_func, load=None, save=None, split=None,
-                         converter_args={}, **kwargs):
+                         converter_args={}, fit_apply=False, **kwargs):
 
+        profiler_method = 'fit_apply' if fit_apply else 'apply'
         if split is not None:
             self.original_split = self.data_io.split
             self.set_split (split)
@@ -485,7 +493,7 @@ class Component ():
                 result = result_func (*X, **kwargs)
             else:
                 result = result_func (X, **kwargs)
-            self.profiler.finish_no_overhead_timer ('apply', self.data_io.split)
+            self.profiler.finish_no_overhead_timer (profiler_method, self.data_io.split)
             result = self.data_converter.convert_after_transforming (result, **converter_args)
             if self.data_io.can_save_result (save, split):
                 self.data_io.save_result (result, split=split)
@@ -493,7 +501,7 @@ class Component ():
             result = previous_result
             self.logger.info (f'loaded pre-computed result')
 
-        self.profiler.finish_timer ('apply', self.data_io.split)
+        self.profiler.finish_timer (profiler_method, self.data_io.split)
         if split is not None:
             self.set_split (self.original_split)
 
