@@ -1609,7 +1609,6 @@ def test_multi_comp_profiling2 ():
 
     all_combined = AllCombined ()
     all_combined.fit_apply (1)
-    global dfd
     dfd = all_combined.gather_times()
 
     display('sum', dfd.sum)
@@ -1618,6 +1617,7 @@ def test_multi_comp_profiling2 ():
     display('overhead_total', dfd.overhead_total)
     display ('sum - novh_sum', dfd.sum['whole']-dfd.novh_sum['whole'])
     display('overhead summary', dfd.overhead_summary)
+
     if False:
         all_combined.fit (1)
         dfd = all_combined.gather_times()
@@ -1625,7 +1625,6 @@ def test_multi_comp_profiling2 ():
         display('sum', dfd.sum)
         display('no_overhead_total', dfd.no_overhead_total)
         display('overhead_total', dfd.overhead_total)
-
 
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
