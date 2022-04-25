@@ -725,6 +725,34 @@ class Profiler ():
         df_avg = self.retrieve_times ()['avg']
         df_dict['overhead_total'] = df_avg -  df_dict['no_overhead_total']
         df_dict['no_overhead_total'] = df_dict['no_overhead_total'].to_frame().T
+        df_dict = self.analyze_overhead (df_dict)
+        return df_dict
+
+    def analyze_overhead (self, df_dict):
+        def data (df):
+            df = df[[c for c in df if c[0] != 'leaf']]
+            return df.values
+        component_ovh = data (df_dict.avg)-data(df_dict.novh_avg)
+
+        df_dict['component_ovh'] = pd.DataFrame (component_ovh,
+                                                 columns=[c for c in df_dict.avg if c[0] != 'leaf'],
+                                                 index=df_dict.avg.index)
+        is_leaf=df_dict.avg[('leaf','')]
+
+        total_non_leaf_time = data(df_dict.avg[~is_leaf]).ravel().sum()
+        total_leaf_time = data(df_dict.avg[is_leaf]).ravel().sum(axis=0)
+        total_non_leaf_ovh = total_non_leaf_time - total_leaf_time
+
+        total_ovh=data(df_dict.overhead_total).ravel().sum()
+
+        total_leaf_ovh = component_ovh[is_leaf.values].ravel().sum()
+
+        df_dict['overhead_summary'] = pd.DataFrame ({'total': [total_ovh],
+                                                     'total leaf': [total_leaf_ovh],
+                                                     'total non-leaf': [total_non_leaf_ovh],
+                                                     'remaining / unexplained': [
+                                                         total_ovh-total_leaf_ovh-total_non_leaf_ovh]},
+                                                    index=[0])
         return df_dict
 
 # Cell
