@@ -1888,7 +1888,6 @@ def test_pipeline_find_last_result_parallel2 ():
     remove_previous_results (path_results=path_results)
 
 def test_pipeline_find_last_result_parallel3 ():
-    global pipe2
     path_results = 'test_pipeline_find_last_result_parallel3'
 
     remove_previous_results (path_results=path_results)
