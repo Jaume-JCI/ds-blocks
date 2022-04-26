@@ -725,7 +725,6 @@ class Profiler ():
         df_avg = self.retrieve_times ()['avg']
         df_dict['overhead_total'] = df_avg -  df_dict['no_overhead_total']
         df_dict['no_overhead_total'] = df_dict['no_overhead_total'].to_frame().T
-        df_dict = self.analyze_overhead (df_dict)
         return df_dict
 
     def analyze_overhead (self, df_dict):
