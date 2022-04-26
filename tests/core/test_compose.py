@@ -1604,7 +1604,6 @@ def test_multi_comp_profiling2 ():
 
     all_combined = AllCombined ()
     all_combined.fit_apply (1)
-    global dfd
     dfd = all_combined.gather_times()
 
     display('sum', dfd.sum)
