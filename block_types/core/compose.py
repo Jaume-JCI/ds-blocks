@@ -230,14 +230,16 @@ class MultiComponent (SamplingComponent):
             else:
                 cmp_dict[name] = component
 
-    def gather_times (self):
+    def gather_times (self, root=True):
         dfs = [self.profiler.retrieve_times ()]
         for component in self.components:
             if isinstance(component, MultiComponent):
-                dfs.append(component.gather_times ())
+                dfs.append(component.gather_times (root=False))
             else:
                 dfs.append(component.profiler.retrieve_times (is_leaf=True))
         dfs = self.profiler.combine_times (dfs)
+        if root:
+            dfs = self.profiler.analyze_overhead (dfs)
         return dfs
 
     def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
