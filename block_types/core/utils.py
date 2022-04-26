@@ -745,13 +745,13 @@ class Profiler ():
                                                  index=df_dict.avg.index)
         is_leaf=df_dict.avg[('leaf','')]
 
-        total_non_leaf_time = data(df_dict.avg[~is_leaf]).ravel().sum()
-        total_leaf_time = data(df_dict.avg[is_leaf]).ravel().sum(axis=0)
+        total_non_leaf_time = np.nansum(data(df_dict.avg[~is_leaf]).ravel())
+        total_leaf_time = np.nansum(data(df_dict.avg[is_leaf]).ravel())
         total_non_leaf_ovh = total_non_leaf_time - total_leaf_time
 
-        total_ovh=data(df_dict.overhead_total).ravel().sum()
+        total_ovh=np.nansum(data(df_dict.overhead_total).ravel())
 
-        total_leaf_ovh = component_ovh[is_leaf.values].ravel().sum()
+        total_leaf_ovh = np.nansum(component_ovh[is_leaf.values].ravel())
 
         df_dict['overhead_summary'] = pd.DataFrame ({'total': [total_ovh],
                                                      'total leaf': [total_leaf_ovh],
