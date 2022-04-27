@@ -231,14 +231,35 @@ class MultiComponent (SamplingComponent):
                 cmp_dict[name] = component
 
     def gather_times (self, root=True):
-        dfs = [self.profiler.retrieve_times ()]
+        times = self.profiler.retrieve_times ()
+        multi_comp_ovh = times.avg.drop(columns='leaf')
+        index = multi_comp_ovh.index
+        multi_comp_ovh = multi_comp_ovh.reset_index(drop=True)
+        multi_comp_ovh_aggregated = multi_comp_ovh.sum(axis=1)
+        times['multi_comp_ovh'] = multi_comp_ovh
+        times['multi_comp_ovh_aggregated'] = multi_comp_ovh_aggregated
+        dfs = [times]
         for component in self.components:
+            c_times = component.profiler.retrieve_times ()
+            c_multi_comp_ovh = c_times.avg.drop(columns='leaf').reset_index(drop=True)
+            c_multi_comp_ovh_aggregated = c_multi_comp_ovh.sum(axis=1)
+            times['multi_comp_ovh'] -= c_multi_comp_ovh
+            times['multi_comp_ovh_aggregated'] -= c_multi_comp_ovh_aggregated
             if isinstance(component, MultiComponent):
-                dfs.append(component.gather_times (root=False))
+                dfs.extend(component.gather_times (root=False))
             else:
-                dfs.append(component.profiler.retrieve_times (is_leaf=True))
-        dfs = self.profiler.combine_times (dfs)
+                c_times = component.profiler.retrieve_times (is_leaf=True)
+                c_multi_comp_ovh = c_times.avg.drop(columns='leaf')
+                c_multi_comp_ovh.loc[:] = None
+                c_multi_comp_ovh_aggregated = c_multi_comp_ovh.sum(axis=1)
+                c_multi_comp_ovh_aggregated.loc[:] = None
+                c_times['multi_comp_ovh'] = c_multi_comp_ovh
+                c_times['multi_comp_ovh_aggregated'] = c_multi_comp_ovh_aggregated
+                dfs.append(c_times)
+        multi_comp_ovh.index = index
+        multi_comp_ovh_aggregated.index = index
         if root:
+            dfs = self.profiler.combine_times (dfs)
             dfs = self.profiler.analyze_overhead (dfs)
         return dfs
 
