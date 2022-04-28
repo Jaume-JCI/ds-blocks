@@ -23,7 +23,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
            'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
            'test_multi_split_non_dict', 'test_multi_split_non_dict_bis', 'multi_split_data_df_column',
-           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit']
+           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'test_cross_validator_1',
+           'test_cross_validator_2']
 
 # Cell
 import pytest
@@ -38,6 +39,7 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import Bunch
 from sklearn.preprocessing import FunctionTransformer
+from sklearn.model_selection import KFold
 
 from block_types.core.compose import *
 from block_types.core.block_types import Component, PandasComponent, PickleSaverComponent
@@ -2697,3 +2699,100 @@ def test_multi_split_df_column_fit ():
 
     for split in ['validation', 'test']:
         assert (tr2.data[split] == df[df.split==split]).all().all()
+
+# Comes from compose.ipynb, cell
+from block_types.utils.dummies import DummyClassifier
+from block_types.blocks.blocks import SkSplitGenerator
+from block_types.blocks.blocks import PandasEvaluator
+
+def test_cross_validator_1 ():
+
+    class MetaDataConverter (PandasConverter):
+        def __init__ (self, metadata, **kwargs):
+            self.metadata=metadata
+            super().__init__ (**kwargs)
+        def convert_before_fitting (self, X, y=None):
+            X, y = super().convert_before_fitting (X, y=y)
+            self.df = X[self.metadata]
+            X = X.drop(columns=self.metadata)
+            return X, y
+        def convert_before_transforming (self, X, **kwargs):
+            X = super().convert_before_transforming (X, **kwargs)
+            self.df = X[self.metadata]
+            X = X.drop(columns=self.metadata)
+            return X
+        def convert_after_transforming (self, result, **kwargs):
+            result = result.values
+            result = super().convert_after_transforming (result, **kwargs)
+            result[self.metadata] = self.df
+            del self.df
+            return result
+
+    df = pd.DataFrame ({'a': list(range(10)),
+                           'b': list (range(10)),
+                           'label': [0]*5+[1]*5})
+
+    splitter = SkSplitGenerator (KFold (n_splits=5),
+                                  label_column='label',
+                                      split_column='split')
+    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+                                  project_op='min', statistic='min')
+    classifier = MultiSplitDFColumn (classifier)
+    dfr = splitter.fit_apply (df)
+    r = classifier.fit_apply (dfr)
+
+
+    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+                                  project_op='min', statistic='min')
+    classifier = MultiSplitDFColumn (classifier)
+
+    df = pd.DataFrame ({'a': list(range(10)),
+                           'b': list (range(10)),
+                           'label': [0]*5+[1]*5})
+    splitter = SkSplitGenerator (KFold (n_splits=5),
+                                  label_column='label',
+                                      split_column='split')
+    cv = CrossValidator (classifier, splitter=splitter)
+    result = cv.fit_apply (df)
+    assert len(result)==5
+
+    assert (result[0].columns == [0,'label','split']).all()
+
+    statistics = [-3000, -5000, -6000, -5000, -5000]
+    i=0
+    assert (result[i][0].values == np.r_[statistics[i]+df['a'].values[2:],statistics[i]+df['a'].values[:2]]).all()
+    for i in range(1,4):
+        assert (result[i][0].values == np.r_[statistics[i]+df['a'].values[0:2*i],statistics[i]+df['a'].values[2*(i+1):], statistics[i]+df['a'].values[2*i:2*(i+1)]]).all()
+    i=4
+    assert (result[i][0].values == statistics[i]+df['a'].values).all()
+
+def test_cross_validator_2 ():
+    def classifier_func (X):
+        return pd.DataFrame ({'label': X.label,
+                              'classification': np.floor(X['a'].values / 2) % 2})
+
+    classifier_comp = Component (apply=classifier_func)
+    classifier = MultiSplitDFColumn (classifier_comp)
+
+    df = pd.DataFrame ({'a': list(range(10)),
+                           'b': list (range(10)),
+                           'label': [0]*5+[1]*5})
+    splitter = SkSplitGenerator (KFold (n_splits=5),
+                                  label_column='label',
+                                      split_column='split')
+    cv = CrossValidator (classifier, splitter=splitter)
+    result = cv.fit_apply (df)
+
+    df = pd.DataFrame ({'a': list(range(10)),
+                           'b': list (range(10)),
+                           'label': [0]*5+[1]*5})
+    splitter = SkSplitGenerator (KFold (n_splits=5),
+                                  label_column='label',
+                                      split_column='split')
+    evaluator = MultiSplitDFColumn(PandasEvaluator(convert_after=lambda x: pd.DataFrame (x, index=[0]))
+                                  )
+    cv = CrossValidator (classifier, splitter=splitter, evaluator=evaluator)
+    result = cv.fit_apply (df)
+    results = pd.concat(result)
+    assert (results.loc[results.split=='test', 'accuracy_score'] == [1, 0, 0.5, 1, 0]).all()
+    assert (results.loc[results.split=='training', 'accuracy_score'] == [0.375, 0.625, 0.5, 0.375, 0.625]).all()

@@ -584,6 +584,10 @@ class Component ():
         self.name = name
         self.data_io.set_file_names (name)
 
+    def set_suffix (self, suffix):
+        self.suffix = suffix
+        self.set_name (f'{self.name}_{suffix}')
+
     def set_estimator (self, estimator):
         self.estimator = estimator
         if self.estimator_result_func is not None:
