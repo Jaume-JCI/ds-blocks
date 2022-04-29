@@ -2815,11 +2815,15 @@ def test_cross_validator_3 ():
     df = pd.DataFrame ({'a': list(range(10)),
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
-    splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_column='label',
-                                      split_column='split')
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_column='label', split_column='split')
     cv = CrossValidator (classifier, splitter=splitter, score_method='history')
     result = cv.fit_apply (df)
 
     assert (list(result.keys()) == ['score']
             and (result['score'] == np.array([3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6])).all())
+
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_column='label', split_column='split')
+    cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True)
+    result = cv.fit_apply (df)
+
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}

@@ -1315,7 +1315,8 @@ class ParallelInstances (Parallel):
         """Assigns attributes and calls parent constructor.
         """
         n_iterations = len(configs) if n_iterations is None else n_iterations
-        super().__init__ ([component]*n_iterations, **kwargs)
+        components = (component, ) * n_iterations
+        super().__init__ (*components, **kwargs)
         self.create_component_storage_info ()
 
     def __repr__ (self):
@@ -1396,12 +1397,14 @@ class CrossValidator (ParallelInstances):
         else:
             return super().finalize_result (Xr, components=components)
         if self.select_epoch:
+            final_dict_results = self.dict_results.copy()
             for k in self.dict_results:
                 if isinstance (self.dict_results[k], np.ndarray):
-                    self.dict_results[f'last_{k}'] = self.dict_results[k][-1]
-                    self.dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
-                    self.dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
-                    self.dict_results[f'max_{k}'] = np.max(self.dict_results[k])
-                    self.dict_results[f'min_{k}'] = np.min(self.dict_results[k])
-                    del self.dict_results[k]
+                    final_dict_results[f'last_{k}'] = self.dict_results[k][-1]
+                    final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
+                    final_dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
+                    final_dict_results[f'max_{k}'] = np.max(self.dict_results[k])
+                    final_dict_results[f'min_{k}'] = np.min(self.dict_results[k])
+                    del final_dict_results[k]
+            self.dict_results = final_dict_results
         return self.dict_results
