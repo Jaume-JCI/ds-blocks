@@ -3,7 +3,7 @@
 __all__ = ['MultiComponent', 'Pipeline', 'Sequential', 'make_pipeline', 'pipeline_factory', 'PandasPipeline',
            'Parallel', 'MultiModality', 'ColumnSelector', 'Concat', 'ColumnTransformer', 'Identity',
            'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict',
-           'MultiSplitDFColumn']
+           'MultiSplitDFColumn', 'ParallelInstances', 'CrossValidator']
 
 # Cell
 import abc
@@ -31,8 +31,10 @@ from .data_conversion import PandasConverter
 from .utils import PandasIO
 from ..utils.utils import get_logging_level, set_empty_logger
 import block_types.config.bt_defaults as dflt
+from ..blocks.blocks import SkSplitGenerator
 
 # Cell
+import pdb
 class MultiComponent (SamplingComponent):
     """
     Component containing a list of components inside.
@@ -439,6 +441,18 @@ class MultiComponent (SamplingComponent):
     def find_last_fitted_model (self, split=None):
         return False
 
+    def find_method (self, method):
+        #pdb.set_trace()
+        if callable(getattr (self, method, None)):
+            return getattr (self, method, None)
+        elif (isinstance (self, Sequential) or isinstance (self, MultiSplitComponent) or
+             isinstance (self, ParallelInstances)):
+            if isinstance (self.components[-1], MultiComponent):
+                return self.components[-1].find_method (method)
+            elif callable(getattr (self.components[-1], method, None)):
+                return getattr (self.components[-1], method, None)
+        return None
+
     # *************************
     # setters
     # *************************
@@ -523,6 +537,11 @@ class MultiComponent (SamplingComponent):
                 component.set_unique_names ()
             else:
                 self.register_global_name (component)
+
+    def set_suffix (self, suffix):
+        super().set_suffix (suffix)
+        for component in self.components:
+            component.set_suffix (suffix)
 
 # Cell
 class Pipeline (MultiComponent):
@@ -1256,3 +1275,191 @@ class MultiSplitDFColumn (MultiSplitComponent):
     def _convert_result (self, result, input_not_dict, output_not_dict):
         result = pd.concat (result, axis=0)
         return result
+
+# Cell
+class ParallelInstances (Parallel):
+    """
+    Runs the same instance in a parallel loop.
+
+    The main difference with parallal, is that information specific about each iteration of the loop
+    is held in the ParallelInstances object, instead of the component object. Examples of this are:
+        - start_idx, is_data_source, all_components_fitted, load_all_estimators
+        - In ParallelCV, the train / test indexes to use for cross-validation.
+        - The suffix to be used for each component.
+        - Other things.
+    """
+    def __init__ (self, component, configs=[], n_iterations=None, **kwargs):
+        """Assigns attributes and calls parent constructor.
+        """
+        n_iterations = len(configs) if n_iterations is None else n_iterations
+        super().__init__ (component, **kwargs)
+        self.create_component_storage_info ()
+
+    def __repr__ (self):
+        return f'ParallelInstances {self.class_name} (name={self.name})'
+
+    def create_component_storage_info (self):
+        self.storage = Bunch (start_idx=[self.start_idx]*self.n_iterations,
+                              is_data_source=[self.is_data_source]*self.n_iterations,
+                              all_components_fitted=[self.all_components_fitted]*self.n_iterations,
+                              load_all_estimators=[self.load_all_estimators]*self.n_iterations)
+
+    def set_component_info (self, component, i, suffix=''):
+        component.set_suffix (suffix)
+        component.start_idx = copy.deepcopy(self.storage.start_idx[i])
+        component.is_data_source = self.storage.is_data_source[i]
+        component.all_components_fitted = self.storage.all_components_fitted[i]
+        component.load_all_estimators = self.storage.load_all_estimators[i]
+
+    def store_component_fit_info (self, component, i):
+        pass
+    def store_component_apply_info (self, component, i):
+        pass
+    def store_component_fit_apply_info (self, component, i):
+        pass
+    def store_component_find_last_result_info (self, component, i):
+        self.storage.start_idx[i] = component.start_idx
+        self.storage.is_data_source[i] = component.is_data_source
+    def store_component_find_last_fitted_model_info (self, component, i):
+        self.storage.start_idx[i] = component.start_idx
+        self.storage.is_data_source[i] = component.is_data_source
+        self.storage.all_components_fitted[i] = component.all_components_fitted
+        self.storage.load_all_estimators[i] = component.load_all_estimators
+
+    def _fit (self, X, y=None):
+        """
+        Fit components of the pipeline, given data X and labels y.
+
+        By default, y will be None, and the labels are part of `X`, as a variable.
+        """
+        component = self.component
+        for i, config in enumerate(self.configs):
+            self.set_component_info (component, i, **config)
+            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
+            component.fit (Xi, y=yi, **kwargs)
+            self.store_component_fit_info (component, i)
+
+    def _apply (self, *X):
+        """Transform data with components of pipeline, and predict labels with last component.
+
+        In the current implementation, we consider prediction a form of mapping,
+        and therefore a special type of transformation."""
+        Xr = self.initialize_result ()
+        component = self.component
+        for i, config in enumerate(self.configs):
+            self.set_component_info (component, i, **config)
+            Xi = self.select_input (X, self.components, i)
+            Xi_r = component (*Xi)
+            Xr = self.join_result (Xr, Xi_r, self.components, i)
+            self.store_component_apply_info (component, i)
+
+        Xr = self.finalize_result (Xr)
+
+        return Xr
+
+    def _fit_apply (self, X, y=None, **kwargs):
+        Xr = self.initialize_result ()
+        component = self.component
+        for i, config in enumerate(self.configs):
+            self.set_component_info (component, i, **config)
+            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
+            Xi_r = component.fit_apply (Xi, y=yi, **kwargs)
+            Xr = self.join_result (Xr, Xi_r, self.components, i)
+            self.store_component_fit_apply_info (component, i)
+
+        Xr = self.finalize_result (Xr)
+
+        return Xr
+
+    def find_last_result (self, split=None):
+        self.is_data_source = True
+        component = self.component
+        for i, config in enumerate(self.configs):
+            self.set_component_info (component, i, **config)
+            if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
+                if isinstance (component, MultiComponent):
+                    self.is_data_source = self.is_data_source and component.find_last_result (split=split)
+                else:
+                    self.is_data_source = False
+            self.store_component_find_last_result_info (component, i)
+        return self.is_data_source
+
+    def find_last_fitted_model (self, split=None):
+        self.load_all_estimators = False
+        all_components_fitted = True
+        component = self.component
+        for i, config in enumerate(self.configs):
+            self.set_component_info (component, i, **config)
+            if isinstance (component, MultiComponent):
+                if not component.find_last_fitted_model (split=split):
+                    all_components_fitted = False
+            elif (component.is_model and
+                  not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
+                    all_components_fitted = False
+            self.store_component_find_last_fitted_model_info (component, i)
+        if all_components_fitted and self.data_io.exists_result (split=split):
+            self.data_io.load_estimator = self.data_io.load_estimators
+            self.load_all_estimators = True
+        self.all_components_fitted = all_components_fitted
+        return all_components_fitted
+
+# Cell
+class CrossValidator (ParallelInstances):
+    """
+    Runs cross-validation on given pipeline.
+    """
+    def __init__ (self, component, splitter=None, evaluator=None, n_iterations=None, score_method=None,
+                  select_epoch=False, add_evaluation=True, **kwargs):
+        """Assigns attributes and calls parent constructor.
+        """
+        components = (splitter, component) if splitter is not None else (component, )
+        components += (evaluator, ) if evaluator is not None else ()
+        pipeline = Sequential (*components, **kwargs)
+
+        n_iterations = splitter.split_generator.get_n_splits() if n_iterations is None else n_iterations
+        configs = [dict(suffix=i) for i in range(n_iterations)]
+
+        super().__init__ (pipeline, configs=configs, n_iterations=n_iterations, **kwargs)
+        self.dict_results = None
+
+    def store_component_fit_info (self, component, i):
+        if self.score_method is not None:
+            score_method = self.find_method (self.score_method)
+            if score_method is None:
+                raise ValueError (f'score method {self.score_method} not found in {component}')
+
+            self._add_dict_results (score_method())
+
+    def _add_dict_results (self, dict_results):
+        dict_results = copy.deepcopy(dict_results)
+        if self.dict_results is None:
+            self.dict_results = dict_results
+        else:
+            for k in dict_results:
+                self.dict_results[k] += dict_results[k]
+
+    store_component_fit_apply_info = store_component_fit_info
+
+    def join_result (self, Xr, Xi_r, components, i):
+        if self.evaluator is not None and self.add_evaluation:
+            self._add_dict_results (Xi_r)
+            return None
+        elif self.dict_results is None:
+            return super().join_result (Xr, Xi_r, components, i)
+
+    def finalize_result (self, Xr, components=None):
+        if self.dict_results is not None:
+            for k in self.dict_results:
+                self.dict_results[k] = self.dict_results[k] / self.n_iterations
+        else:
+            return super().finalize_result (Xr, components=components)
+        if self.select_epoch:
+            for k in self.dict_results:
+                if isinstance (self.dict_results[k], np.ndarray):
+                    self.dict_results[f'last_{k}'] = self.dict_results[k][-1]
+                    self.dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
+                    self.dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
+                    self.dict_results[f'max_{k}'] = np.max(self.dict_results[k])
+                    self.dict_results[f'min_{k}'] = np.min(self.dict_results[k])
+                    del self.dict_results[k]
+        return self.dict_results
