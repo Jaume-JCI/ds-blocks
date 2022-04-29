@@ -752,16 +752,6 @@ class Parallel (MultiComponent):
     def select_input_to_fit (self, X, y, components, i):
         return X, y
 
-    def _fit (self, X, y=None):
-        """
-        Fit components of the pipeline, given data X and labels y.
-
-        By default, y will be None, and the labels are part of `X`, as a variable.
-        """
-        for i, component in enumerate(self.components):
-            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            component.fit (Xi, y=yi, **kwargs)
-
     def initialize_result (self):
         return []
 
@@ -775,6 +765,31 @@ class Parallel (MultiComponent):
     def finalize_result (self, Xr, components=None):
         return Xr
 
+    def set_component_info (self, component, i):
+        pass
+    def store_component_fit_info (self, component, i):
+        pass
+    def store_component_apply_info (self, component, i):
+        pass
+    def store_component_fit_apply_info (self, component, i):
+        pass
+    def store_component_find_last_result_info (self, component, i):
+        pass
+    def store_component_find_last_fitted_model_info (self, component, i):
+        pass
+
+    def _fit (self, X, y=None):
+        """
+        Fit components of the pipeline, given data X and labels y.
+
+        By default, y will be None, and the labels are part of `X`, as a variable.
+        """
+        for i, component in enumerate(self.components):
+            self.set_component_info (component, i)
+            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
+            component.fit (Xi, y=yi, **kwargs)
+            self.store_component_fit_info (component, i)
+
     def _apply (self, *X):
         """Transform data with components of pipeline, and predict labels with last component.
 
@@ -782,9 +797,11 @@ class Parallel (MultiComponent):
         and therefore a special type of transformation."""
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
+            self.set_component_info (component, i)
             Xi = self.select_input (X, self.components, i)
             Xi_r = component (*Xi)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
+            self.store_component_apply_info (component, i)
 
         Xr = self.finalize_result (Xr)
 
@@ -793,9 +810,11 @@ class Parallel (MultiComponent):
     def _fit_apply (self, X, y=None, **kwargs):
         Xr = self.initialize_result ()
         for i, component in enumerate(self.components):
+            self.set_component_info (component, i)
             Xi, yi = self.select_input_to_fit (X, y, self.components, i)
             Xi_r = component.fit_apply (Xi, y=yi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
+            self.store_component_fit_apply_info (component, i)
 
         Xr = self.finalize_result (Xr)
 
@@ -804,23 +823,27 @@ class Parallel (MultiComponent):
     def find_last_result (self, split=None):
         self.is_data_source = True
         for i, component in enumerate(self.components):
+            self.set_component_info (component, i)
             if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
                 if isinstance (component, MultiComponent):
                     self.is_data_source = self.is_data_source and component.find_last_result (split=split)
                 else:
                     self.is_data_source = False
+            self.store_component_find_last_result_info (component, i)
         return self.is_data_source
 
     def find_last_fitted_model (self, split=None):
         self.load_all_estimators = False
         all_components_fitted = True
         for i, component in enumerate(self.components):
+            self.set_component_info (component, i)
             if isinstance (component, MultiComponent):
                 if not component.find_last_fitted_model (split=split):
                     all_components_fitted = False
             elif (component.is_model and
                   not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                     all_components_fitted = False
+            self.store_component_find_last_fitted_model_info (component, i)
         if all_components_fitted and self.data_io.exists_result (split=split):
             self.data_io.load_estimator = self.data_io.load_estimators
             self.load_all_estimators = True
@@ -1292,7 +1315,7 @@ class ParallelInstances (Parallel):
         """Assigns attributes and calls parent constructor.
         """
         n_iterations = len(configs) if n_iterations is None else n_iterations
-        super().__init__ (component, **kwargs)
+        super().__init__ ([component]*n_iterations, **kwargs)
         self.create_component_storage_info ()
 
     def __repr__ (self):
@@ -1304,104 +1327,23 @@ class ParallelInstances (Parallel):
                               all_components_fitted=[self.all_components_fitted]*self.n_iterations,
                               load_all_estimators=[self.load_all_estimators]*self.n_iterations)
 
-    def set_component_info (self, component, i, suffix=''):
+    def set_component_info (self, component, i):
+        suffix = self.configs[i].get('suffix', '')
         component.set_suffix (suffix)
         component.start_idx = copy.deepcopy(self.storage.start_idx[i])
         component.is_data_source = self.storage.is_data_source[i]
         component.all_components_fitted = self.storage.all_components_fitted[i]
         component.load_all_estimators = self.storage.load_all_estimators[i]
 
-    def store_component_fit_info (self, component, i):
-        pass
-    def store_component_apply_info (self, component, i):
-        pass
-    def store_component_fit_apply_info (self, component, i):
-        pass
     def store_component_find_last_result_info (self, component, i):
         self.storage.start_idx[i] = component.start_idx
         self.storage.is_data_source[i] = component.is_data_source
+
     def store_component_find_last_fitted_model_info (self, component, i):
         self.storage.start_idx[i] = component.start_idx
         self.storage.is_data_source[i] = component.is_data_source
         self.storage.all_components_fitted[i] = component.all_components_fitted
         self.storage.load_all_estimators[i] = component.load_all_estimators
-
-    def _fit (self, X, y=None):
-        """
-        Fit components of the pipeline, given data X and labels y.
-
-        By default, y will be None, and the labels are part of `X`, as a variable.
-        """
-        component = self.component
-        for i, config in enumerate(self.configs):
-            self.set_component_info (component, i, **config)
-            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            component.fit (Xi, y=yi, **kwargs)
-            self.store_component_fit_info (component, i)
-
-    def _apply (self, *X):
-        """Transform data with components of pipeline, and predict labels with last component.
-
-        In the current implementation, we consider prediction a form of mapping,
-        and therefore a special type of transformation."""
-        Xr = self.initialize_result ()
-        component = self.component
-        for i, config in enumerate(self.configs):
-            self.set_component_info (component, i, **config)
-            Xi = self.select_input (X, self.components, i)
-            Xi_r = component (*Xi)
-            Xr = self.join_result (Xr, Xi_r, self.components, i)
-            self.store_component_apply_info (component, i)
-
-        Xr = self.finalize_result (Xr)
-
-        return Xr
-
-    def _fit_apply (self, X, y=None, **kwargs):
-        Xr = self.initialize_result ()
-        component = self.component
-        for i, config in enumerate(self.configs):
-            self.set_component_info (component, i, **config)
-            Xi, yi = self.select_input_to_fit (X, y, self.components, i)
-            Xi_r = component.fit_apply (Xi, y=yi, **kwargs)
-            Xr = self.join_result (Xr, Xi_r, self.components, i)
-            self.store_component_fit_apply_info (component, i)
-
-        Xr = self.finalize_result (Xr)
-
-        return Xr
-
-    def find_last_result (self, split=None):
-        self.is_data_source = True
-        component = self.component
-        for i, config in enumerate(self.configs):
-            self.set_component_info (component, i, **config)
-            if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
-                if isinstance (component, MultiComponent):
-                    self.is_data_source = self.is_data_source and component.find_last_result (split=split)
-                else:
-                    self.is_data_source = False
-            self.store_component_find_last_result_info (component, i)
-        return self.is_data_source
-
-    def find_last_fitted_model (self, split=None):
-        self.load_all_estimators = False
-        all_components_fitted = True
-        component = self.component
-        for i, config in enumerate(self.configs):
-            self.set_component_info (component, i, **config)
-            if isinstance (component, MultiComponent):
-                if not component.find_last_fitted_model (split=split):
-                    all_components_fitted = False
-            elif (component.is_model and
-                  not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
-                    all_components_fitted = False
-            self.store_component_find_last_fitted_model_info (component, i)
-        if all_components_fitted and self.data_io.exists_result (split=split):
-            self.data_io.load_estimator = self.data_io.load_estimators
-            self.load_all_estimators = True
-        self.all_components_fitted = all_components_fitted
-        return all_components_fitted
 
 # Cell
 class CrossValidator (ParallelInstances):
