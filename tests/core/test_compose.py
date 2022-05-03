@@ -2,7 +2,7 @@
 
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_fitted_model_seq_others', 'test_pipeline_find_last_fitted_model_parallel_2',
-           'test_data_conversion_for_sequential_and_parallel', 'SimpleMultiComponent', 'test_multi_comp_io',
+           'test_data_conversion_sequential_parallel_column_transformer', 'SimpleMultiComponent', 'test_multi_comp_io',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_gather_and_save_info',
            'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
            'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
@@ -368,31 +368,36 @@ def test_pipeline_find_last_fitted_model_parallel_2 ():
 # Cell
 from block_types.utils.dummies import (DataSource, SumXY, MaxOfPositiveWithSeparateLabels, Sum1direct,
                                        Multiply10direct, subtract_xy, MinOfPositiveWithoutSeparateLabels)
+def test_data_conversion_sequential_parallel_column_transformer ():
+    class MinDC (PandasConverter):
+        def convert_before_fitting (self, *X):
+            df, label = X
+            df=df.copy()
+            df['label']=label
+            return (df,)
 
-def test_data_conversion_for_sequential_and_parallel ():
-    class SumXYConverter (DataConverter):
-        def convert_before_transforming (self, X, **kwargs):
-            self.label = X[2]
-            return X[0], X[1]
-        def convert_after_transforming (self, result, **kwargs):
-            result['label'] = self.label
-            return result
+        def convert_before_transforming (self, *X, **kwargs):
+            df, label = X
+            df=df.copy()
+            df['label']=label
+            return super().convert_before_transforming (df)
 
-    pipe = Sequential (DataSource (),
-                       SumXY (data_converter=SumXYConverter),
-                       PandasComponent (apply=lambda X: X*2),
-                       MaxOfPositiveWithSeparateLabels (data_converter='PandasConverter'),
-                       Parallel (Sum1direct (data_converter='PandasConverter'),
-                                 Multiply10direct (data_converter='PandasConverter'),
-                                 finalize_result=lambda X: tuple(X)),
-                       PandasComponent(apply=subtract_xy),
-                       MinOfPositiveWithoutSeparateLabels (
-                           data_converter=PandasConverter (separate_labels=False)),
+    pipe = Sequential (DataSource (convert_after=lambda x: (x[0],x[1],np.array(x[2]))),
+                       SumXY (),
+                       lambda X: X*2,
+                       MaxOfPositiveWithSeparateLabels (),
+                       Parallel (Sum1direct (),
+                                 Multiply10direct (),
+                                 finalize_result=lambda x: (x[0][0], x[1][0])),
+                       Component(apply=subtract_xy),
+                       MinOfPositiveWithoutSeparateLabels (data_converter=MinDC),
                        make_column_transformer ((Multiply10direct (), ['a','b']),
                                                 (Sum1direct (), ['c','d'])),
                        Sum1direct ())
 
-    #result = pipe.fit_apply ()
+    x = pipe.fit_apply()
+
+    print (x)
 
 # Comes from compose.ipynb, cell
 class SimpleMultiComponent (MultiComponent):
@@ -828,14 +833,14 @@ def test_multi_comp_profiling ():
     dfd = higher.gather_times()
 
     values = dfd.avg[('whole','apply')].values
-    assert np.abs(values[1:3].sum() - values[0]) < 0.05
-    assert np.abs(values[3:5].sum() - values[1]) < 0.05
-    assert np.abs(values[5:7].sum() - values[2]) < 0.05
+    assert np.abs(values[1:3].sum() - values[0]) < 0.1
+    assert np.abs(values[3:5].sum() - values[1]) < 0.1
+    assert np.abs(values[5:7].sum() - values[2]) < 0.1
 
     values = dfd.avg[('whole','fit')].values
-    assert np.abs(values[1:3].sum() - values[0]) < 0.05
-    assert np.abs(values[3:5].sum() - values[1]) < 0.05
-    assert np.abs(values[5:7].sum() - values[2]) < 0.05
+    assert np.abs(values[1:3].sum() - values[0]) < 0.1
+    assert np.abs(values[3:5].sum() - values[1]) < 0.1
+    assert np.abs(values[5:7].sum() - values[2]) < 0.1
 
     display('avg', dfd.avg)
 
@@ -1614,6 +1619,7 @@ def test_multi_comp_profiling2 ():
     display('overhead_total', dfd.overhead_total)
     display ('sum - novh_sum', dfd.sum['whole']-dfd.novh_sum['whole'])
     display('overhead summary', dfd.overhead_summary)
+
     if False:
         all_combined.fit (1)
         dfd = all_combined.gather_times()
@@ -1621,7 +1627,6 @@ def test_multi_comp_profiling2 ():
         display('sum', dfd.sum)
         display('no_overhead_total', dfd.no_overhead_total)
         display('overhead_total', dfd.overhead_total)
-
 
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
@@ -2419,7 +2424,7 @@ def test_make_column_transformer_fit_transform (column_transformer_data):
     df, tr1 = column_transformer_data
 
     class SumTimes100 (Component):
-        def _fit (self, X, y=None):
+        def _fit (self, X):
             self.sum = X.sum(axis=0)
         def _apply (self, X):
 
@@ -2711,8 +2716,8 @@ def test_cross_validator_1 ():
         def __init__ (self, metadata, **kwargs):
             self.metadata=metadata
             super().__init__ (**kwargs)
-        def convert_before_fitting (self, X, y=None):
-            X, y = super().convert_before_fitting (X, y=y)
+        def convert_before_fitting (self, *X):
+            X, y = super().convert_before_fitting (*X)
             self.df = X[self.metadata]
             X = X.drop(columns=self.metadata)
             return X, y
@@ -2735,14 +2740,14 @@ def test_cross_validator_1 ():
     splitter = SkSplitGenerator (KFold (n_splits=5),
                                   label_column='label',
                                       split_column='split')
-    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+    classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
     classifier = MultiSplitDFColumn (classifier)
     dfr = splitter.fit_apply (df)
     r = classifier.fit_apply (dfr)
 
 
-    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+    classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
     classifier = MultiSplitDFColumn (classifier)
 

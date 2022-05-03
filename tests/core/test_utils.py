@@ -23,11 +23,12 @@ from block_types.core.block_types import Component
 #def example_people_data_fixture():
 #    return example_people_data()
 
-# Comes from utils.ipynb, cell
+# Comes from block_types.ipynb, cell
 def test_get_specific_data_io_parameters ():
-    config = get_specific_data_io_parameters ('data', **dict(x=3, par=[1,2], path_results='hello',
-                                                             path_results_data='world', other='yes',
-                                                             load_result_data = True))
+    component = Component ()
+    config = component.get_specific_data_io_parameters (
+        'data', **dict(x=3, par=[1,2], path_results='hello', path_results_data='world', other='yes',
+                       load_result_data = True))
     assert config == dict (path_results='world', load_result=True)
 
 # Comes from utils.ipynb, cell
