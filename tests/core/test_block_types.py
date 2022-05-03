@@ -257,7 +257,7 @@ def test_component_predict ():
 
     df = pd.DataFrame ({'a': [10,20,30],'b':[4,5,6]})
 
-    pd.testing.assert_frame_equal(my_transform.transform (df).to_frame(),
+    pd.testing.assert_frame_equal(my_transform.transform (df),
                                   pd.DataFrame ({0: [14,25,36]})
                                  )
 

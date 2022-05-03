@@ -441,7 +441,7 @@ class PandasConverter (DataConverter):
         the list of columns in the DataFrame which contain the rest of metadata.
     """
     def __init__ (self, transform_uses_labels=False, transformed_index=None, transformed_columns=None,
-                  separate_labels=True, inplace=False, **kwargs):
+                  separate_labels=True, inplace=False, metadata=None, **kwargs):
         """
         Initialize attributes and fields.
 
@@ -493,6 +493,8 @@ class PandasConverter (DataConverter):
         # whether the _fit method receives a DataFrame that includes the labels, or the labels are placed separately in y
         self.separate_labels = separate_labels
 
+        self.metadata=metadata
+
     def convert_before_fitting (self, *X):
         """
         By default, convert DataFrame X to numpy arrays X and y
@@ -528,6 +530,10 @@ class PandasConverter (DataConverter):
             self.y_fitting = y
         else:
             self.restore_label_fitting = False
+
+        if self.metadata is not None:
+            self.df = X[self.metadata]
+            X = X.drop(columns=self.metadata)
 
         return X, y
 
@@ -571,6 +577,11 @@ class PandasConverter (DataConverter):
             self.X_columns = X.columns
             if 'label' in self.X_columns:
                 self.X_label = X['label']
+
+        if self.metadata is not None:
+            self.df = X[self.metadata]
+            X = X.drop(columns=self.metadata)
+
         return X
 
     def convert_after_transforming (self, result, **kwargs):
@@ -593,13 +604,17 @@ class PandasConverter (DataConverter):
             else:
                 self.logger.warning ('result is not DataFrame')
 
+        if self.metadata is not None:
+            result[self.metadata] = self.df
+            del self.df
+
         return result
 
     def convert_to_dataframe (self, result):
         """Convert the `result` produced by `transform`to DataFrame format."""
 
         if self.type_X is pd.DataFrame:
-            if type(result) is np.ndarray:
+            if type(result) is np.ndarray or type(result) is pd.Series:
                 if result.shape[0] == self.X_shape[0]:
                     index = self.X_index
                 else:

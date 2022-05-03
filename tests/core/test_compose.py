@@ -2740,14 +2740,14 @@ def test_cross_validator_1 ():
     splitter = SkSplitGenerator (KFold (n_splits=5),
                                   label_column='label',
                                       split_column='split')
-    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+    classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
     classifier = MultiSplitDFColumn (classifier)
     dfr = splitter.fit_apply (df)
     r = classifier.fit_apply (dfr)
 
 
-    classifier = DummyClassifier (data_converter=MetaDataConverter (['split']),
+    classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
     classifier = MultiSplitDFColumn (classifier)
 
