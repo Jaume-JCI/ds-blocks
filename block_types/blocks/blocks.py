@@ -24,7 +24,7 @@ class Splitter (Component):
 # Cell
 class SkSplitGenerator (Component):
     def __init__ (self, split_generator, group_column=None, label_column=None, split_column=None,
-                  use_splitter=False, **kwargs):
+                  use_splitter=False, training='training', test='test', **kwargs):
         super ().__init__ (**kwargs)
         self.splitter = Splitter () if use_splitter else None
         self.generator = None
@@ -48,8 +48,8 @@ class SkSplitGenerator (Component):
     def _create_split (self, X, train, test):
         if self.split_column is not None:
             X[self.split_column] = None
-            X[self.split_column].iloc[train] = 'training'
-            X[self.split_column].iloc[test] = 'test'
+            X[self.split_column].iloc[train] = self.training
+            X[self.split_column].iloc[test] = self.test
         else:
             X = (X, (train, test))
         if self.use_splitter:
