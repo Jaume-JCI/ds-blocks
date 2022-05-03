@@ -178,7 +178,7 @@ class DataConverter ():
     def convert_after_fit_apply (self, result, sequential_fit_apply=False, **kwargs):
         #return self.convert_after_transforming (result, **kwargs)
         if self.inplace:
-            _ = self.data_converter.convert_after_fitting (*self.X)
+            _ = self.convert_after_fitting (*self.X)
             self.X = None
         return self.convert_after_transforming (
             result, fit_apply=True, sequential_fit_apply=sequential_fit_apply, **kwargs)

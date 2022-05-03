@@ -264,7 +264,6 @@ class Component ():
                 raise ValueError (f'function {func} not valid')
 
         if not already_computed:
-            X = copy.deepcopy (X) if self.data_converter.inplace else X
             if func=='_fit_apply':
                 X = self.data_converter.convert_before_fit_apply (
                     *X, sequential_fit_apply=sequential_fit_apply, **converter_args)

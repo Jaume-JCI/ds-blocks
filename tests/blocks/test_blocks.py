@@ -25,7 +25,7 @@ def test_splitter ():
                         'b': list (range(10)),
                         'split': (['test','training','test','validation','test','training','validation']+
                                   ['test']*3)
-                        }))
+                        })
     dict_results = Splitter (training='training')(df)
 
     reference = dict(training=[1,5],
