@@ -383,17 +383,18 @@ def test_data_conversion_sequential_parallel_column_transformer ():
             return super().convert_before_transforming (df)
 
     pipe = Sequential (DataSource (convert_after=lambda x: (x[0],x[1],np.array(x[2]))),
-                       SumXY (),
-                       lambda X: X*2,
-                       MaxOfPositiveWithSeparateLabels (),
-                       Parallel (Sum1direct (),
-                                 Multiply10direct (),
-                                 finalize_result=lambda x: (x[0][0], x[1][0])),
-                       Component(apply=subtract_xy),
+                       SumXY (data_converter='GenericConverter'),
+                       Component(apply=lambda X: X*2, data_converter='GenericConverter'),
+                       MaxOfPositiveWithSeparateLabels (data_converter='GenericConverter'),
+                       Parallel (Sum1direct (data_converter='GenericConverter'),
+                                 Multiply10direct (data_converter='GenericConverter'),
+                                 finalize_result=lambda x: (x[0][0], x[1][0]),
+                                 data_converter='GenericConverter'),
+                       Component(apply=subtract_xy, data_converter='GenericConverter'),
                        MinOfPositiveWithoutSeparateLabels (data_converter=MinDC),
-                       make_column_transformer ((Multiply10direct (), ['a','b']),
-                                                (Sum1direct (), ['c','d'])),
-                       Sum1direct ())
+                       make_column_transformer ((Multiply10direct (data_converter='GenericConverter'), ['a','b']),
+                                                (Sum1direct (data_converter='GenericConverter'), ['c','d'])),
+                       Sum1direct (data_converter='GenericConverter'))
 
     x = pipe.fit_apply()
 
@@ -2712,34 +2713,14 @@ from block_types.blocks.blocks import PandasEvaluator
 
 def test_cross_validator_1 ():
 
-    class MetaDataConverter (PandasConverter):
-        def __init__ (self, metadata, **kwargs):
-            self.metadata=metadata
-            super().__init__ (**kwargs)
-        def convert_before_fitting (self, *X):
-            X, y = super().convert_before_fitting (*X)
-            self.df = X[self.metadata]
-            X = X.drop(columns=self.metadata)
-            return X, y
-        def convert_before_transforming (self, X, **kwargs):
-            X = super().convert_before_transforming (X, **kwargs)
-            self.df = X[self.metadata]
-            X = X.drop(columns=self.metadata)
-            return X
-        def convert_after_transforming (self, result, **kwargs):
-            result = result.values
-            result = super().convert_after_transforming (result, **kwargs)
-            result[self.metadata] = self.df
-            del self.df
-            return result
 
     df = pd.DataFrame ({'a': list(range(10)),
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
 
     splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_column='label',
-                                      split_column='split')
+                                  label_col='label',
+                                      split_col='split')
     classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
     classifier = MultiSplitDFColumn (classifier)
@@ -2755,8 +2736,8 @@ def test_cross_validator_1 ():
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
     splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_column='label',
-                                      split_column='split')
+                                  label_col='label',
+                                      split_col='split')
     cv = CrossValidator (classifier, splitter=splitter)
     result = cv.fit_apply (df)
     assert len(result)==5
@@ -2783,8 +2764,8 @@ def test_cross_validator_2 ():
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
     splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_column='label',
-                                      split_column='split')
+                                  label_col='label',
+                                      split_col='split')
     cv = CrossValidator (classifier, splitter=splitter)
     result = cv.fit_apply (df)
 
@@ -2792,8 +2773,8 @@ def test_cross_validator_2 ():
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
     splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_column='label',
-                                      split_column='split')
+                                  label_col='label',
+                                      split_col='split')
     evaluator = MultiSplitDFColumn(PandasEvaluator(convert_after=lambda x: pd.DataFrame (x, index=[0]))
                                   )
     cv = CrossValidator (classifier, splitter=splitter, evaluator=evaluator, add_evaluation=False)
@@ -2820,14 +2801,14 @@ def test_cross_validator_3 ():
     df = pd.DataFrame ({'a': list(range(10)),
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
-    splitter = SkSplitGenerator (KFold (n_splits=5), label_column='label', split_column='split')
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
     cv = CrossValidator (classifier, splitter=splitter, score_method='history')
     result = cv.fit_apply (df)
 
     assert (list(result.keys()) == ['score']
             and (result['score'] == np.array([3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6])).all())
 
-    splitter = SkSplitGenerator (KFold (n_splits=5), label_column='label', split_column='split')
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True)
     result = cv.fit_apply (df)
 
