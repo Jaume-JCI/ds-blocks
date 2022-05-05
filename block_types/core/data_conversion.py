@@ -570,6 +570,10 @@ class PandasConverter (DataConverter):
         else:
             self.restore_label_transform = False
 
+        if self.metadata is not None:
+            self.df = X[self.metadata]
+            X = X.drop(columns=self.metadata)
+
         self.type_X = type(X)
         if self.type_X is pd.DataFrame:
             self.X_shape = X.shape
@@ -577,10 +581,6 @@ class PandasConverter (DataConverter):
             self.X_columns = X.columns
             if 'label' in self.X_columns:
                 self.X_label = X['label']
-
-        if self.metadata is not None:
-            self.df = X[self.metadata]
-            X = X.drop(columns=self.metadata)
 
         return X
 
