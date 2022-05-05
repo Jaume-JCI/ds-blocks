@@ -583,14 +583,14 @@ class Pipeline (MultiComponent):
     def __repr__ (self):
         return f'Sequential {self.class_name} (name={self.name})'
 
-    def _fit (self, *X):
+    def _fit (self, *X, **kwargs):
         """
         Fit components of the pipeline, given data X and labels y.
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
-        X = self._fit_apply (*X, last=-1)
-        self.components[-1].fit (X)
+        X = self._fit_apply (*X, last=-1, **kwargs)
+        self.components[-1].fit (X, **kwargs)
 
     def _fit_apply (self, *X, split=None, last=None, **kwargs):
         split = self.data_io.split if split is None else split
@@ -608,7 +608,7 @@ class Pipeline (MultiComponent):
             X = component.fit_apply (X, sequential_fit_apply=True, **kwargs)
         return X
 
-    def _apply (self, *X, split=None):
+    def _apply (self, *X, split=None, **kwargs):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
@@ -618,10 +618,10 @@ class Pipeline (MultiComponent):
 
         if first < len(self.components):
             component = self.components[first]
-            X = component.apply (*X)
+            X = component.apply (*X, **kwargs)
             first += 1
         for component in self.components[first:]:
-            X = component.apply (X)
+            X = component.apply (X, **kwargs)
         return X
 
     def find_last_result (self, split=None, func='apply', first=-1):
@@ -779,7 +779,7 @@ class Parallel (MultiComponent):
     def store_component_find_last_fitted_model_info (self, component, i):
         pass
 
-    def _fit (self, *X):
+    def _fit (self, *X, **kwargs):
         """
         Fit components of the pipeline, given data X and labels y.
 
@@ -791,7 +791,7 @@ class Parallel (MultiComponent):
             component.fit (*Xi, **kwargs)
             self.store_component_fit_info (component, i)
 
-    def _apply (self, *X):
+    def _apply (self, *X, **kwargs):
         """Transform data with components of pipeline, and predict labels with last component.
 
         In the current implementation, we consider prediction a form of mapping,
@@ -800,7 +800,7 @@ class Parallel (MultiComponent):
         for i, component in enumerate(self.components):
             self.set_component_info (component, i)
             Xi = self.select_input (self.components, i, *X)
-            Xi_r = component.apply (*Xi)
+            Xi_r = component.apply (*Xi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
             self.store_component_apply_info (component, i)
 
@@ -1378,6 +1378,8 @@ class CrossValidator (ParallelInstances):
 
             self._add_dict_results (score_method())
 
+    store_component_fit_apply_info = store_component_fit_info
+
     def _add_dict_results (self, dict_results):
         dict_results = copy.deepcopy(dict_results)
         if self.dict_results is None:
@@ -1385,8 +1387,6 @@ class CrossValidator (ParallelInstances):
         else:
             for k in dict_results:
                 self.dict_results[k] += dict_results[k]
-
-    store_component_fit_apply_info = store_component_fit_info
 
     def join_result (self, Xr, Xi_r, components, i):
         if self.evaluator is not None and self.add_evaluation:
