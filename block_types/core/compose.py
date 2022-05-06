@@ -16,6 +16,7 @@ import copy
 import joblib
 from sklearn.utils import Bunch
 import pandas as pd
+import numpy as np
 
 try:
     from graphviz import *
@@ -1400,10 +1401,10 @@ class CrossValidator (ParallelInstances):
     def _add_dict_results (self, dict_results):
         dict_results = copy.deepcopy(dict_results)
         if self.dict_results is None:
-            self.dict_results = dict_results
+            self.dict_results = {k: np.array(v) if isinstance(v, list) else v
+                                 for k, v in dict_results.items()}
         else:
-            for k in dict_results:
-                self.dict_results[k] += dict_results[k]
+            for k in dict_results: self.dict_results[k] += dict_results[k]
 
     def join_result (self, Xr, Xi_r, components, i):
         if self.evaluator is not None and self.add_evaluation:
