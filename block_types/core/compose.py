@@ -749,36 +749,6 @@ class Parallel (MultiComponent):
     def __repr__ (self):
         return f'Parallel {self.class_name} (name={self.name})'
 
-    def select_input_to_fit (self, components, i, *X):
-        return X
-
-    def initialize_result (self):
-        return []
-
-    def select_input (self, components, i, *X):
-        return X
-
-    def join_result (self, Xr, Xi_r, components, i):
-        Xr.append (Xi_r)
-        return Xr
-
-    def finalize_result (self, Xr, components=None):
-        if type(Xr) is list: Xr = tuple(Xr)
-        return Xr
-
-    def set_component_info (self, component, i):
-        pass
-    def store_component_fit_info (self, component, i):
-        pass
-    def store_component_apply_info (self, component, i):
-        pass
-    def store_component_fit_apply_info (self, component, i):
-        pass
-    def store_component_find_last_result_info (self, component, i):
-        pass
-    def store_component_find_last_fitted_model_info (self, component, i):
-        pass
-
     def _fit (self, *X, **kwargs):
         """
         Fit components of the pipeline, given data X and labels y.
@@ -790,6 +760,7 @@ class Parallel (MultiComponent):
             Xi = self.select_input_to_fit (self.components, i, *X)
             component.fit (*Xi, **kwargs)
             self.store_component_fit_info (component, i)
+        self.store_fit_info ()
 
     def _apply (self, *X, **kwargs):
         """Transform data with components of pipeline, and predict labels with last component.
@@ -805,6 +776,7 @@ class Parallel (MultiComponent):
             self.store_component_apply_info (component, i)
 
         Xr = self.finalize_result (Xr)
+        self.store_apply_info ()
 
         return Xr
 
@@ -818,6 +790,7 @@ class Parallel (MultiComponent):
             self.store_component_fit_apply_info (component, i)
 
         Xr = self.finalize_result (Xr)
+        self.store_fit_apply_info ()
 
         return Xr
 
@@ -850,6 +823,49 @@ class Parallel (MultiComponent):
             self.load_all_estimators = True
         self.all_components_fitted = all_components_fitted
         return all_components_fitted
+
+    # *****************************************
+    # hook functions for results handling
+    # *****************************************
+    def initialize_result (self):
+        return []
+
+    def select_input (self, components, i, *X):
+        return X
+
+    def select_input_to_fit (self, components, i, *X):
+        return X
+
+    def join_result (self, Xr, Xi_r, components, i):
+        Xr.append (Xi_r)
+        return Xr
+
+    def finalize_result (self, Xr, components=None):
+        if type(Xr) is list: Xr = tuple(Xr)
+        return Xr
+
+    # **********************************************************************************
+    # hook functions setting and storing information at the beginning of each method,
+    # at each iteration, and at the end of each method
+    # **********************************************************************************
+    def set_component_info (self, component, i):
+        pass
+    def store_component_fit_info (self, component, i):
+        pass
+    def store_component_apply_info (self, component, i):
+        pass
+    def store_component_fit_apply_info (self, component, i):
+        pass
+    def store_component_find_last_result_info (self, component, i):
+        pass
+    def store_component_find_last_fitted_model_info (self, component, i):
+        pass
+    def store_fit_info (self):
+        pass
+    def store_fit_apply_info (self):
+        pass
+    def store_apply_info (self):
+        pass
 
 # Cell
 class MultiModality (Parallel):
@@ -1369,6 +1385,7 @@ class CrossValidator (ParallelInstances):
 
         super().__init__ (pipeline, configs=configs, n_iterations=n_iterations, **kwargs)
         self.dict_results = None
+        self.stored_fit_info = False
 
     def store_component_fit_info (self, component, i):
         if self.score_method is not None:
@@ -1395,12 +1412,13 @@ class CrossValidator (ParallelInstances):
         elif self.dict_results is None:
             return super().join_result (Xr, Xi_r, components, i)
 
-    def finalize_result (self, Xr, components=None):
+    def store_fit_info (self):
+        if self.stored_fit_info:
+            return
         if self.dict_results is not None:
             for k in self.dict_results:
                 self.dict_results[k] = self.dict_results[k] / self.n_iterations
-        else:
-            return super().finalize_result (Xr, components=components)
+        self.data_io.save_result (self.dict_results, result_file_name='cross_validation_metrics.pk')
         if self.select_epoch:
             final_dict_results = self.dict_results.copy()
             for k in self.dict_results:
@@ -1412,4 +1430,12 @@ class CrossValidator (ParallelInstances):
                     final_dict_results[f'min_{k}'] = np.min(self.dict_results[k])
                     del final_dict_results[k]
             self.dict_results = final_dict_results
-        return self.dict_results
+        self.stored_fit_info = True
+        self.data_io.save_result (self.dict_results, result_file_name='cross_validation_final_metrics.pk')
+
+    def finalize_result (self, Xr, components=None):
+        if self.dict_results is not None:
+            self.store_fit_info ()
+            return self.dict_results
+        else:
+            return super().finalize_result (Xr, components=components)

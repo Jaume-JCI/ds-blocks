@@ -9,9 +9,9 @@ __all__ = ['component_save_data_fixture', 'test_component_config', 'test_compone
            'test_component_data_io', 'test_component_equal', 'test_set_paths', 'TransformWithoutFit',
            'TransformWithFitApplyOnly', 'test_determine_fit_function', 'test_use_fit_from_loaded_estimator',
            'test_direct_methods', 'test_pass_apply', 'test_get_specific_data_io_parameters_for_component',
-           'test_standard_converter_in_component', 'test_sampling_component', 'test_sklearn_component',
-           'test_no_saver_component', 'get_data_for_one_class', 'test_one_class_sklearn_component',
-           'test_pandas_component']
+           'test_standard_converter_in_component', 'test_set_suffix', 'test_sampling_component',
+           'test_sklearn_component', 'test_no_saver_component', 'get_data_for_one_class',
+           'test_one_class_sklearn_component', 'test_pandas_component']
 
 # Cell
 import pytest
@@ -953,6 +953,17 @@ def test_standard_converter_in_component ():
     Xr, yr = component.fit_apply ((X,X*2), y, sequential_fit_apply=True)
     assert (Xr==X+X*2).all()
     assert (yr==y).all()
+
+# Comes from block_types.ipynb, cell
+def test_set_suffix ():
+    component = Component (name='my_component')
+    assert component.name == 'my_component'
+    component.set_suffix ('first')
+    assert component.name == 'my_component_first'
+    component.set_suffix ('second')
+    assert component.name == 'my_component_second'
+    component.set_suffix ('third')
+    assert component.name == 'my_component_third'
 
 # Comes from block_types.ipynb, cell
 #@pytest.mark.reference_fails

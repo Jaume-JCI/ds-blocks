@@ -6,13 +6,13 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_gather_and_save_info',
            'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
            'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
-           'test_set_root', 'test_pass_functions_to_multi_component', 'Transform1', 'Transform2', 'SimplePipeline',
-           'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
-           'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
-           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary',
-           'test_multi_comp_profiling2', 'test_make_pipeline', 'test_pipeline_factory', 'PandasTransformWithLabels1',
-           'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1', 'TransformWithLabels2',
-           'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
+           'test_set_root', 'test_pass_functions_to_multi_component', 'test_set_suffix', 'Transform1', 'Transform2',
+           'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp',
+           'test_pipeline_set_comp', 'test_athena_pipeline_training', 'test_pipeline_load_estimator',
+           'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2', 'test_construct_diagram',
+           'test_show_summary', 'test_multi_comp_profiling2', 'test_make_pipeline', 'test_pipeline_factory',
+           'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1',
+           'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
            'test_pipeline_find_last_result', 'test_pipeline_find_last_result_parallel1',
            'test_pipeline_find_last_result_parallel2', 'test_pipeline_find_last_result_parallel3',
            'test_pipeline_find_last_fitted_model_seq', 'test_pipeline_find_last_fitted_model_parallel',
@@ -1275,6 +1275,38 @@ def test_pass_functions_to_multi_component ():
     assert (r== ( ((X+1)*2+3-1)*3+X.sum() )).all()
     class_names = ['Sum1', 'Myf', '<Lambda>', 'Minus', 'DummyEstimator']
     assert all([x.class_name==y for x, y in zip(pipe.components, class_names)])
+
+# Comes from compose.ipynb, cell
+def test_set_suffix ():
+    from block_types.utils.dummies import Higher
+
+    higher = Higher ()
+    assert higher.name=='higher'
+    assert higher.first_intermediate.name=='first_intermediate'
+    assert higher.second_intermediate.name=='second_intermediate'
+    assert higher.second_intermediate.first_component.name == 'first_component'
+    assert higher.second_intermediate.second_component.name == 'second_component'
+
+    higher.set_suffix ('a')
+    assert higher.name=='higher_a'
+    assert higher.first_intermediate.name=='first_intermediate_a'
+    assert higher.second_intermediate.name=='second_intermediate_a'
+    assert higher.second_intermediate.first_component.name == 'first_component_a'
+    assert higher.second_intermediate.second_component.name == 'second_component_a'
+
+    higher.set_suffix ('b')
+    assert higher.name=='higher_b'
+    assert higher.first_intermediate.name=='first_intermediate_b'
+    assert higher.second_intermediate.name=='second_intermediate_b'
+    assert higher.second_intermediate.first_component.name == 'first_component_b'
+    assert higher.second_intermediate.second_component.name == 'second_component_b'
+
+    higher.set_suffix ('c')
+    assert higher.name=='higher_c'
+    assert higher.first_intermediate.name=='first_intermediate_c'
+    assert higher.second_intermediate.name=='second_intermediate_c'
+    assert higher.second_intermediate.first_component.name == 'first_component_c'
+    assert higher.second_intermediate.second_component.name == 'second_component_c'
 
 # Comes from compose.ipynb, cell
 class Transform1 (Component):
@@ -2712,8 +2744,6 @@ from block_types.blocks.blocks import SkSplitGenerator
 from block_types.blocks.blocks import PandasEvaluator
 
 def test_cross_validator_1 ():
-
-
     df = pd.DataFrame ({'a': list(range(10)),
                            'b': list (range(10)),
                            'label': [0]*5+[1]*5})
@@ -2813,3 +2843,30 @@ def test_cross_validator_3 ():
     result = cv.fit_apply (df)
 
     assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+
+    # ************************************************
+    # ************************************************
+    path_results = 'test_cross_validator_3'
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
+                         path_results=path_results)
+    result = cv.fit_apply (df)
+
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+
+    result = joblib.load (f'{path_results}/whole/cross_validation_final_metrics.pk')
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+
+    result = joblib.load (f'{path_results}/whole/cross_validation_metrics.pk')
+    assert list(result.keys())==['score'] and (result['score']==[3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6]).all()
+
+    assert sorted (os.listdir(f'{path_results}/whole'))==['cross_validation_final_metrics.pk',
+                                                     'cross_validation_metrics.pk',
+                                                     'cross_validator_result.pk',
+                                                     'pipeline_0_result.pk',
+                                                     'pipeline_1_result.pk',
+                                                     'pipeline_2_result.pk',
+                                                     'pipeline_3_result.pk',
+                                                     'pipeline_4_result.pk']
+
+    remove_previous_results (path_results)

@@ -604,7 +604,12 @@ class Component ():
 
     def set_suffix (self, suffix):
         self.suffix = suffix
-        self.set_name (f'{self.name}_{suffix}')
+        if hasattr (self, 'original_name'):
+            base_name = self.original_name
+        else:
+            base_name = self.name
+            self.original_name = self.name
+        self.set_name (f'{base_name}_{suffix}')
 
     def set_estimator (self, estimator):
         self.estimator = estimator
