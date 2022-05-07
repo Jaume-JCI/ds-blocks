@@ -13,17 +13,17 @@ import pandas as pd
 import numpy as np
 import time
 
-from block_types.core.utils import *
-from block_types.utils.utils import remove_previous_results
-import block_types.config.bt_defaults as dflt
-from block_types.core.block_types import Component
+from dsblocks.core.utils import *
+from dsblocks.utils.utils import remove_previous_results
+import dsblocks.config.bt_defaults as dflt
+from dsblocks.core.components import Component
 
 # Cell
 #@pytest.fixture (name='example_people_data')
 #def example_people_data_fixture():
 #    return example_people_data()
 
-# Comes from block_types.ipynb, cell
+# Comes from components.ipynb, cell
 def test_get_specific_data_io_parameters ():
     component = Component ()
     config = component.get_specific_data_io_parameters (

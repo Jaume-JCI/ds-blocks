@@ -15,7 +15,7 @@ try:
 except:
     keras_not_imported = True
 
-from ..core.block_types import PandasComponent, SamplingComponent
+from ..core.components import PandasComponent, SamplingComponent
 from ..config import bt_defaults as dflt
 
 # Cell

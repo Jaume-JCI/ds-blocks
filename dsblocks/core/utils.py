@@ -27,7 +27,7 @@ try:
 except:
     imported_graphviz = False
 
-# block_types
+# dsblocks
 from .data_conversion import PandasConverter
 from ..config import bt_defaults as dflt
 from ..utils.utils import set_logger, get_logging_level

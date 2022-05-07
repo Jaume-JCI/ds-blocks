@@ -41,14 +41,14 @@ from sklearn.utils import Bunch
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.model_selection import KFold
 
-from block_types.core.compose import *
-from block_types.core.block_types import Component, PandasComponent, PickleSaverComponent
-from block_types.core.utils import PickleIO
-from block_types.utils.utils import remove_previous_results
-from block_types.core.data_conversion import DataConverter, PandasConverter
+from dsblocks.core.compose import *
+from dsblocks.core.components import Component, PandasComponent, PickleSaverComponent
+from dsblocks.core.utils import PickleIO
+from dsblocks.utils.utils import remove_previous_results
+from dsblocks.core.data_conversion import DataConverter, PandasConverter
 
-import block_types.config.bt_defaults as dflt
-from block_types.utils.utils import check_last_part
+import dsblocks.config.bt_defaults as dflt
+from dsblocks.utils.utils import check_last_part
 
 # Cell
 @pytest.fixture (name='column_transformer_data')
@@ -60,7 +60,7 @@ def multi_split_data_fixture():
     return multi_split_data()
 
 # Cell
-from block_types.utils.dummies import make_pipe_fit1
+from dsblocks.utils.dummies import make_pipe_fit1
 
 def test_pipeline_find_last_fitted_model_seq_others ():
     path_results = 'test_pipeline_find_last_fitted_model_seq_start'
@@ -108,7 +108,7 @@ def test_pipeline_find_last_fitted_model_seq_others ():
     remove_previous_results (path_results=path_results)
 
 # Cell
-from block_types.utils.dummies import make_pipe_fit2
+from dsblocks.utils.dummies import make_pipe_fit2
 
 def test_pipeline_find_last_fitted_model_parallel_2 ():
     path_results = 'test_pipeline_find_last_fitted_model_parallel_2'
@@ -366,7 +366,7 @@ def test_pipeline_find_last_fitted_model_parallel_2 ():
     remove_previous_results (path_results=path_results)
 
 # Cell
-from block_types.utils.dummies import (DataSource, SumXY, MaxOfPositiveWithSeparateLabels, Sum1direct,
+from dsblocks.utils.dummies import (DataSource, SumXY, MaxOfPositiveWithSeparateLabels, Sum1direct,
                                        Multiply10direct, subtract_xy, MinOfPositiveWithoutSeparateLabels)
 def test_data_conversion_sequential_parallel_column_transformer ():
     class MinDC (PandasConverter):
@@ -714,7 +714,7 @@ def test_athena_pipeline_training ():
 
 # Comes from compose.ipynb, cell
 def test_gather_and_save_info ():
-    from block_types.utils.dummies import Intermediate, Higher
+    from dsblocks.utils.dummies import Intermediate, Higher
     higher = Higher(x=20, y=30, z=60)
 
     path_results = 'test_gather_and_save_info'
@@ -767,7 +767,7 @@ def test_gather_and_save_info ():
 # Comes from compose.ipynb, cell
 #@pytest.mark.reference_fails
 def test_multi_comp_hierarchy ():
-    from block_types.utils.dummies import Intermediate, Higher
+    from dsblocks.utils.dummies import Intermediate, Higher
 
     higher = Higher()
 
@@ -1262,7 +1262,7 @@ def test_set_root ():
     assert [x.data_io.result_file_name for x in c.higher1.inner2.components] == ['first_1_result.pk', 'second_1_result.pk']
 
 # Comes from compose.ipynb, cell
-from block_types.utils.dummies import Sum1, DummyEstimator
+from dsblocks.utils.dummies import Sum1, DummyEstimator
 
 def test_pass_functions_to_multi_component ():
     def myf (x): return x*2
@@ -1278,7 +1278,7 @@ def test_pass_functions_to_multi_component ():
 
 # Comes from compose.ipynb, cell
 def test_set_suffix ():
-    from block_types.utils.dummies import Higher
+    from dsblocks.utils.dummies import Higher
 
     higher = Higher ()
     assert higher.name=='higher'
@@ -1817,7 +1817,7 @@ def test_parallel ():
     assert (r1['transform2']==r_ref[1]).all()
 
 # Comes from compose.ipynb, cell
-from block_types.utils.dummies import make_pipe1, make_pipe2
+from dsblocks.utils.dummies import make_pipe1, make_pipe2
 def test_pipeline_find_last_result ():
     path_results = 'test_pipeline_find_last_result'
 
@@ -1950,7 +1950,7 @@ def test_pipeline_find_last_result_parallel3 ():
     remove_previous_results (path_results=path_results)
 
 # Comes from compose.ipynb, cell
-from block_types.utils.dummies import make_pipe_fit1
+from dsblocks.utils.dummies import make_pipe_fit1
 
 def test_pipeline_find_last_fitted_model_seq ():
     path_results = 'test_pipeline_find_last_fitted_model_seq'
@@ -1985,7 +1985,7 @@ def test_pipeline_find_last_fitted_model_seq ():
     remove_previous_results (path_results=path_results)
 
 # Comes from compose.ipynb, cell
-from block_types.utils.dummies import make_pipe_fit2
+from dsblocks.utils.dummies import make_pipe_fit2
 
 def test_pipeline_find_last_fitted_model_parallel ():
     path_results = 'test_pipeline_find_last_fitted_model_parallel'
@@ -2601,8 +2601,8 @@ def test_multi_split_io (multi_split_data):
     data, multi_transform1, multi_transform2, tr2 = multi_split_data
 
     # check loading / saving
-    from block_types.utils.utils import remove_previous_results
-    from block_types.core.utils import PickleIO
+    from dsblocks.utils.utils import remove_previous_results
+    from dsblocks.core.utils import PickleIO
 
     path_results = 'results_multi_split'
 
@@ -2739,9 +2739,9 @@ def test_multi_split_df_column_fit ():
         assert (tr2.data[split] == df[df.split==split]).all().all()
 
 # Comes from compose.ipynb, cell
-from block_types.utils.dummies import DummyClassifier
-from block_types.blocks.blocks import SkSplitGenerator
-from block_types.blocks.blocks import PandasEvaluator
+from dsblocks.utils.dummies import DummyClassifier
+from dsblocks.blocks.blocks import SkSplitGenerator
+from dsblocks.blocks.blocks import PandasEvaluator
 
 def test_cross_validator_1 ():
     df = pd.DataFrame ({'a': list(range(10)),

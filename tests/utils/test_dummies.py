@@ -13,8 +13,8 @@ import logging
 import shutil
 from pathlib import Path
 
-from block_types.utils.dummies import *
-import block_types.config.bt_defaults as dflt
+from dsblocks.utils.dummies import *
+import dsblocks.config.bt_defaults as dflt
 
 # Cell
 #@pytest.fixture (name='example_people_data')

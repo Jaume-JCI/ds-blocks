@@ -10,8 +10,8 @@ import os
 import joblib
 from IPython.display import display
 
-from block_types.utils.nbdev_utils import *
-from block_types.utils.utils import remove_previous_results
+from dsblocks.utils.nbdev_utils import *
+from dsblocks.utils.utils import remove_previous_results
 
 # Cell
 @pytest.fixture (name='example_people_data')

@@ -11,12 +11,12 @@ import pandas as pd
 import numpy as np
 from sklearn.utils import Bunch
 
-from ..core.block_types import (Component,
+from ..core.components import (Component,
                                           PandasComponent,
                                           SamplingComponent,
                                           NoSaverComponent)
 from ..core.compose import MultiComponent, Sequential, Parallel
-import block_types.config.bt_defaults as dflt
+import dsblocks.config.bt_defaults as dflt
 
 # Cell
 class SumXY (Component):

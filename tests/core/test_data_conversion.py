@@ -12,10 +12,10 @@ from IPython.display import display
 import pandas as pd
 import numpy as np
 
-from block_types.core.data_conversion import *
-from block_types.core.block_types import Component
-from block_types.utils.utils import remove_previous_results
-import block_types.config.bt_defaults as dflt
+from dsblocks.core.data_conversion import *
+from dsblocks.core.components import Component
+from dsblocks.utils.utils import remove_previous_results
+import dsblocks.config.bt_defaults as dflt
 
 # Cell
 #@pytest.fixture (name='example_people_data')
@@ -303,7 +303,7 @@ def generate_input_for_window_generator ():
 
 # Comes from data_conversion.ipynb, cell
 def test_window2d_to_3d_converter ():
-    from block_types.blocks.preprocessing import WindowGenerator
+    from dsblocks.blocks.preprocessing import WindowGenerator
 
     df = generate_input_for_window_generator ()
     window_generator = WindowGenerator(sequence_length=3, sequence_stride=1, sampling_interval=60)

@@ -7,7 +7,7 @@ import abc
 import sklearn
 import numpy as np
 
-from ..core.block_types import Component
+from ..core.components import Component
 from ..config import bt_defaults as dflt
 
 # Cell

@@ -17,7 +17,7 @@ import numpy as np
 import copy
 
 # block-types
-import block_types.config.bt_defaults as dflt
+import dsblocks.config.bt_defaults as dflt
 
 # Cell
 def make_reproducible ():

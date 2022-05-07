@@ -13,7 +13,7 @@ from IPython.display import display
 
 from sklearn.model_selection import KFold
 
-from block_types.blocks.blocks import *
+from dsblocks.blocks.blocks import *
 
 # Cell
 #@pytest.fixture (name='example_people_data')

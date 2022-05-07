@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import logging
 
-# block_types API
+# dsblocks API
 from ..config import bt_defaults as dflt
 from ..utils.utils import set_logger
 
@@ -28,7 +28,7 @@ class DataSet (metaclass=abc.ABCMeta):
             Verbosity, 0: warning or critical, 1: info, 2: debug.
         """
         if logger is None:
-            self.logger = set_logger ('block_types', verbose=verbose)
+            self.logger = set_logger ('dsblocks', verbose=verbose)
         else:
             self.logger = logger
     @abc.abstractmethod

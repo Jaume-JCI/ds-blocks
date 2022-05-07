@@ -9,7 +9,7 @@ import joblib
 from IPython.display import display
 import logging
 
-from block_types.datasets.datasets import *
+from dsblocks.datasets.datasets import *
 
 # Cell
 #@pytest.fixture (name='example_people_data')

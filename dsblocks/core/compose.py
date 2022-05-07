@@ -24,14 +24,14 @@ try:
 except:
     imported_graphviz = False
 
-from .block_types import (Component,
+from .components import (Component,
                                           PandasComponent,
                                           SamplingComponent,
                                           NoSaverComponent)
 from .data_conversion import PandasConverter
 from .utils import PandasIO
 from ..utils.utils import get_logging_level, set_empty_logger
-import block_types.config.bt_defaults as dflt
+import dsblocks.config.bt_defaults as dflt
 from ..blocks.blocks import SkSplitGenerator
 
 # Cell
@@ -265,7 +265,7 @@ class MultiComponent (SamplingComponent):
             dfs = self.profiler.analyze_overhead (dfs)
         return dfs
 
-    def construct_diagram (self, split=None, include_url=False, port=4000, project='block_types'):
+    def construct_diagram (self, split=None, include_url=False, port=4000, project='dsblocks'):
         """
         Construct diagram of the pipeline components, data flow and dimensionality.
 

@@ -10,7 +10,7 @@ import os
 import joblib
 from IPython.display import display
 
-from block_types.blocks.preprocessing import *
+from dsblocks.blocks.preprocessing import *
 
 # Cell
 #@pytest.fixture (name='example_people_data')

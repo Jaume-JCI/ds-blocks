@@ -44,7 +44,7 @@ class DataConverter ():
         """
         # logger used to display messages
         if logger is None:
-            self.logger = set_logger ('block_types', verbose=verbose)
+            self.logger = set_logger ('dsblocks', verbose=verbose)
         else:
             self.logger = logger
         self.inplace = inplace
@@ -452,7 +452,7 @@ class PandasConverter (DataConverter):
             one of the columns is `label`, containing the ground-truth labels. This allows
             the transform method to modify the number of observations,
             changing the number of rows in the data and in the labels.
-            See `SamplingComponent` class in `block_types.core.component_types`.
+            See `SamplingComponent` class in `dsblocks.core.component_types`.
             If False, the input data `X` only contains data consumed by , without
             ground-truth labels.
         transformed_index : array-like or None, optional
