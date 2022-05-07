@@ -22,4 +22,4 @@ pip install dsblocks
 
 ## Documentation
 
-Documenation can be found [here](https://jaume-jci.github.io/ds-blocks/)
+Documentation can be found [here](https://jaume-jci.github.io/ds-blocks/)

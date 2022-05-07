@@ -2,11 +2,11 @@
 SHELL := /bin/bash
 SRC = $(wildcard nbs/*.ipynb)
 
-all: block-types docs
+all: ds-blocks docs
 
-block-types: $(SRC)
+ds-blocks: $(SRC)
 	nbdev_build_lib
-	touch block-types
+	touch ds-blocks
 
 sync:
 	nbdev_update_lib
