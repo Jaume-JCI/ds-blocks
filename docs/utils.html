@@ -44,7 +44,7 @@ nb_path: "nbs/core/utils.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span> 
-<span class="kn">from</span> <span class="nn">block_types.core.block_types</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">dsblocks.core.components</span> <span class="kn">import</span> <span class="n">Component</span>
 </pre></div>
 
     </div>
@@ -71,7 +71,7 @@ nb_path: "nbs/core/utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_csv" class="doc_header"><code>save_csv</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L35" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_csv</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_csv" class="doc_header"><code>save_csv</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L36" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_csv</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Save DataFrame `df` to csv file indicated in `path`.
@@ -107,7 +107,7 @@ as joblib.dump, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_parquet" class="doc_header"><code>save_parquet</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L45" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_parquet</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_parquet" class="doc_header"><code>save_parquet</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L46" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_parquet</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Save DataFrame `df` to parquet file indicated in `path`.
@@ -143,7 +143,7 @@ as joblib.dump, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_multi_index_parquet" class="doc_header"><code>save_multi_index_parquet</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L55" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_multi_index_parquet</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_multi_index_parquet" class="doc_header"><code>save_multi_index_parquet</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L56" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_multi_index_parquet</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Save DataFrame `df` to multi-index parquet file indicated in `path`.
@@ -179,7 +179,7 @@ as joblib.dump, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_keras_model" class="doc_header"><code>save_keras_model</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L66" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_keras_model</code>(<strong><code>model</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_keras_model" class="doc_header"><code>save_keras_model</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L67" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_keras_model</code>(<strong><code>model</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Save keras `model` to file indicated in `path`.
@@ -215,7 +215,7 @@ as joblib.dump, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_csv_gz" class="doc_header"><code>save_csv_gz</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L76" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_csv_gz</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="save_csv_gz" class="doc_header"><code>save_csv_gz</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L77" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_csv_gz</code>(<strong><code>df</code></strong>, <strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Save DataFrame `df` to csv.gz file indicated in `path`.
@@ -251,7 +251,7 @@ as joblib.dump, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="read_csv" class="doc_header"><code>read_csv</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L86" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>read_csv</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="read_csv" class="doc_header"><code>read_csv</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L87" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>read_csv</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Read DataFrame from csv file indicated in `path`.
@@ -287,7 +287,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="read_csv_gz" class="doc_header"><code>read_csv_gz</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L96" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>read_csv_gz</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="read_csv_gz" class="doc_header"><code>read_csv_gz</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L97" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>read_csv_gz</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Read DataFrame from csv.gz file indicated in `path`.
@@ -323,7 +323,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_keras_model" class="doc_header"><code>load_keras_model</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L106" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_keras_model</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="load_keras_model" class="doc_header"><code>load_keras_model</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L107" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_keras_model</code>(<strong><code>path</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -362,6 +362,12 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="DataIO">DataIO<a class="anchor-link" href="#DataIO"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -373,7 +379,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DataIO" class="doc_header"><code>class</code> <code>DataIO</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L135" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataIO</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="DataIO" class="doc_header"><code>class</code> <code>DataIO</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L136" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataIO</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -389,6 +395,250 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="get_path_result_file,-get_path_model_file">get_path_result_file, get_path_model_file<a class="anchor-link" href="#get_path_result_file,-get_path_model_file"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="DummyComponent" class="doc_header"><code>class</code> <code>DummyComponent</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L36" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DummyComponent</code>(<strong>**<code>kwargs</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="test_data_io_folder" class="doc_header"><code>test_data_io_folder</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_io_folder</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@pytest.mark.my_mark</span>
+<span class="k">class</span> <span class="nc">DummyComponent</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;my_component&#39;</span>
+    <span class="k">def</span> <span class="nf">obtain_config_params</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">kwargs</span>
+
+<span class="n">dummy_component</span> <span class="o">=</span> <span class="n">DummyComponent</span> <span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">test_data_io_folder</span> <span class="p">():</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_result_file</span> <span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span> 
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_model_file</span> <span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span> 
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">,</span> 
+            <span class="n">path_results</span> <span class="o">=</span><span class="s1">&#39;/path/to/results&#39;</span><span class="p">,</span>
+            <span class="n">path_models</span><span class="o">=</span><span class="s1">&#39;/other_path/example&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_result_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/path/to/results/whole/my_component_result.pk&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_model_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/other_path/example/models/my_component_estimator.pk&#39;</span><span class="p">)</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="s1">&#39;my_folder&#39;</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_result_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/path/to/results/my_folder/whole/my_component_result.pk&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_model_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/other_path/example/my_folder/models/my_component_estimator.pk&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span><span class="o">.</span><span class="n">run</span> <span class="p">(</span><span class="n">test_data_io_folder</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>running test_data_io_folder
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="folder-chaining">folder chaining<a class="anchor-link" href="#folder-chaining"> </a></h4>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="test_data_io_chaining" class="doc_header"><code>test_data_io_chaining</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L65" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_io_chaining</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@pytest.mark.my_mark</span>
+<span class="k">def</span> <span class="nf">test_data_io_chaining</span> <span class="p">():</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;first&#39;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;second&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;second/first&#39;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;third&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;third/second/first&#39;</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">folder</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;third/second/first&#39;</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;&#39;</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s1">&#39;new&#39;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;new&#39;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span><span class="o">==</span><span class="s1">&#39;other/new&#39;</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s1">&#39;new&#39;</span><span class="p">,</span>
+                <span class="n">path_results</span> <span class="o">=</span><span class="s1">&#39;/path/to/results&#39;</span><span class="p">,</span>
+                <span class="n">path_models</span><span class="o">=</span><span class="s1">&#39;/other_path/example&#39;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_result_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/path/to/results/other/new/whole/my_component_result.pk&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">get_path_model_file</span> <span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/other_path/example/other/new/models/my_component_estimator.pk&#39;</span><span class="p">)</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DataIO</span> <span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">dummy_component</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s1">&#39;__class__&#39;</span><span class="p">,</span>
+                <span class="n">path_results</span> <span class="o">=</span><span class="s1">&#39;/path/to/results&#39;</span><span class="p">,</span>
+                <span class="n">path_models</span><span class="o">=</span><span class="s1">&#39;/other_path/example&#39;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">chain_folders</span> <span class="p">(</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">folder</span> <span class="o">==</span> <span class="s1">&#39;other/my_component&#39;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span><span class="o">.</span><span class="n">run</span> <span class="p">(</span><span class="n">test_data_io_chaining</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>running test_data_io_chaining
+</pre>
+</div>
+</div>
+
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -416,7 +666,7 @@ as joblib.load, which is needed by `DataIO`.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasIO" class="doc_header"><code>class</code> <code>PandasIO</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L461" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasIO</code>(<strong><code>result_file_extension</code></strong>=<em><code>'.parquet'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>read_parquet</code></em>, <strong><code>result_save_func</code></strong>=<em><code>save_multi_index_parquet</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
+<h2 id="PandasIO" class="doc_header"><code>class</code> <code>PandasIO</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L528" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasIO</code>(<strong><code>result_file_extension</code></strong>=<em><code>'.parquet'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>read_parquet</code></em>, <strong><code>result_save_func</code></strong>=<em><code>save_multi_index_parquet</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>Saves results in parquet format by default.
@@ -457,7 +707,7 @@ Results are supposed to be in Pandas DataFrame format.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PickleIO" class="doc_header"><code>class</code> <code>PickleIO</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L479" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PickleIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
+<h2 id="PickleIO" class="doc_header"><code>class</code> <code>PickleIO</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L546" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PickleIO</code>(<strong><code>fitting_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>fitting_load_func</code></strong>=<em><code>load</code></em>, <strong><code>fitting_save_func</code></strong>=<em><code>dump</code></em>, <strong><code>result_file_extension</code></strong>=<em><code>'.pk'</code></em>, <strong><code>result_load_func</code></strong>=<em><code>load</code></em>, <strong><code>result_save_func</code></strong>=<em><code>dump</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that uses pickle format for saving / loading the estimator.
@@ -499,7 +749,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L509" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverIO</code>(<strong><code>load</code></strong>=<em><code>False</code></em>, <strong><code>save</code></strong>=<em><code>False</code></em>, <strong><code>force_load</code></strong>=<em><code>False</code></em>, <strong><code>force_save</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
+<h2 id="NoSaverIO" class="doc_header"><code>class</code> <code>NoSaverIO</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L576" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoSaverIO</code>(<strong><code>load</code></strong>=<em><code>False</code></em>, <strong><code>save</code></strong>=<em><code>False</code></em>, <strong><code>force_load</code></strong>=<em><code>False</code></em>, <strong><code>force_save</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/utils.html#DataIO"><code>DataIO</code></a></p>
 </blockquote>
 
 <pre><code>DataIO that does not load or save anything.</code></pre>
@@ -538,7 +788,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="data_io_factory" class="doc_header"><code>data_io_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L522" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>data_io_factory</code>(<strong><code>data_io</code></strong>, <strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="data_io_factory" class="doc_header"><code>data_io_factory</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L589" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>data_io_factory</code>(<strong><code>data_io</code></strong>, <strong><code>component</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -575,7 +825,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_data_io_factory" class="doc_header"><code>test_data_io_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_utils.py#L26" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_io_factory</code>()</p>
+<h4 id="test_data_io_factory" class="doc_header"><code>test_data_io_factory</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L106" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_io_factory</code>()</p>
 </blockquote>
 
 </div>
@@ -627,20 +877,6 @@ the transformation.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>running test_data_io_factory
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -661,10 +897,51 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L538" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="ModelPlotter" class="doc_header"><code>class</code> <code>ModelPlotter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L605" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ModelPlotter</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>diagram_node_name</code></strong>=<em><code>None</code></em>, <strong><code>diagram_edge_name</code></strong>=<em><code>''</code></em>, <strong><code>diagram_module_path</code></strong>=<em><code>''</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Helper class that provides information about the component used for plotting the pipeline diagram.</code></pre>
+<table>
+<thead><tr>
+<th></th>
+<th>Type</th>
+<th>Default</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>component</code></strong></td>
+<td></td>
+<td><code>None</code></td>
+<td><em>No Content</em></td>
+</tr>
+<tr>
+<td><strong><code>diagram_node_name</code></strong></td>
+<td></td>
+<td><code>None</code></td>
+<td>diagram options</td>
+</tr>
+<tr>
+<td><strong><code>diagram_edge_name</code></strong></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td><em>No Content</em></td>
+</tr>
+<tr>
+<td><strong><code>diagram_module_path</code></strong></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td><em>No Content</em></td>
+</tr>
+<tr>
+<td><strong><code>kwargs</code></strong></td>
+<td></td>
+<td></td>
+<td><em>No Content</em></td>
+</tr>
+</tbody>
+</table>
 
 </div>
 
@@ -700,7 +977,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Profiler" class="doc_header"><code>class</code> <code>Profiler</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L582" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Profiler</code>(<strong><code>component</code></strong>, <strong><code>do_profiling</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="Profiler" class="doc_header"><code>class</code> <code>Profiler</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L649" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Profiler</code>(<strong><code>component</code></strong>, <strong><code>do_profiling</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -737,7 +1014,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_profiler" class="doc_header"><code>test_profiler</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_utils.py#L37" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_profiler</code>()</p>
+<h4 id="test_profiler" class="doc_header"><code>test_profiler</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L117" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_profiler</code>()</p>
 </blockquote>
 
 </div>
@@ -839,136 +1116,6 @@ the transformation.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>running test_profiler
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>training</th>
-      <th>test</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>fit</th>
-      <td>0.533034</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>apply</th>
-      <td>NaN</td>
-      <td>0.281235</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead tr th {
-        text-align: left;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th>leaf</th>
-      <th colspan="2" halign="left">test</th>
-      <th colspan="3" halign="left">training</th>
-      <th colspan="2" halign="left">validation</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th>apply</th>
-      <th>fit</th>
-      <th>apply</th>
-      <th>fit</th>
-      <th>fit_apply</th>
-      <th>fit</th>
-      <th>fit_apply</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="2" valign="top">0</th>
-      <th>comp_a</th>
-      <td>True</td>
-      <td>0.279284</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0.533034</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>comp_b</th>
-      <td>True</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0.636009</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0.335077</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -989,7 +1136,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Comparator" class="doc_header"><code>class</code> <code>Comparator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L664" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Comparator</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>'comparator'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="Comparator" class="doc_header"><code>class</code> <code>Comparator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L758" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Comparator</code>(<strong><code>component</code></strong>=<em><code>None</code></em>, <strong><code>data_io</code></strong>=<em><code>None</code></em>, <strong><code>name</code></strong>=<em><code>'comparator'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1026,7 +1173,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MyTransformComparator" class="doc_header"><code>class</code> <code>MyTransformComparator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_utils.py#L98" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MyTransformComparator</code>(<strong><code>noise</code></strong>=<em><code>1e-10</code></em>, <strong><code>different</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="MyTransformComparator" class="doc_header"><code>class</code> <code>MyTransformComparator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L178" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MyTransformComparator</code>(<strong><code>noise</code></strong>=<em><code>1e-10</code></em>, <strong><code>different</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -1050,7 +1197,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_comparator" class="doc_header"><code>test_comparator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_utils.py#L122" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_comparator</code>()</p>
+<h4 id="test_comparator" class="doc_header"><code>test_comparator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L202" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_comparator</code>()</p>
 </blockquote>
 
 </div>
@@ -1138,232 +1285,6 @@ the transformation.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(28)<span class="ansi-cyan-fg">test_comparator</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     26 </span>
-<span class="ansi-green-fg">     27 </span><span class="ansi-green-fg">def</span> test_comparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 28 </span><span class="ansi-red-fg">    </span>tr <span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     29 </span><span class="ansi-red-fg">    </span>tr2<span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     30 </span><span class="ansi-red-fg">    </span>comp <span class="ansi-blue-fg">=</span> Comparator <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">)</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(29)<span class="ansi-cyan-fg">test_comparator</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     27 </span><span class="ansi-green-fg">def</span> test_comparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     28 </span><span class="ansi-red-fg">    </span>tr <span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 29 </span><span class="ansi-red-fg">    </span>tr2<span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     30 </span><span class="ansi-red-fg">    </span>comp <span class="ansi-blue-fg">=</span> Comparator <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     31 </span><span class="ansi-red-fg">    </span>result <span class="ansi-blue-fg">=</span> comp<span class="ansi-blue-fg">.</span>compare <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> tr2<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(30)<span class="ansi-cyan-fg">test_comparator</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     28 </span><span class="ansi-red-fg">    </span>tr <span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     29 </span><span class="ansi-red-fg">    </span>tr2<span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 30 </span><span class="ansi-red-fg">    </span>comp <span class="ansi-blue-fg">=</span> Comparator <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     31 </span><span class="ansi-red-fg">    </span>result <span class="ansi-blue-fg">=</span> comp<span class="ansi-blue-fg">.</span>compare <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> tr2<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     32 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">assert</span> len<span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">==</span><span class="ansi-cyan-fg">0</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(31)<span class="ansi-cyan-fg">test_comparator</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     29 </span><span class="ansi-red-fg">    </span>tr2<span class="ansi-blue-fg">=</span> MyTransformComparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     30 </span><span class="ansi-red-fg">    </span>comp <span class="ansi-blue-fg">=</span> Comparator <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">---&gt; 31 </span><span class="ansi-red-fg">    </span>result <span class="ansi-blue-fg">=</span> comp<span class="ansi-blue-fg">.</span>compare <span class="ansi-blue-fg">(</span>tr<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> tr2<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     32 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">assert</span> len<span class="ansi-blue-fg">(</span>result<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">==</span><span class="ansi-cyan-fg">0</span>
-<span class="ansi-green-fg">     33 </span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>--Call--
-&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(18)<span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     16 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">return</span> noise
-<span class="ansi-green-fg">     17 </span>
-<span class="ansi-green-fg">---&gt; 18 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">def</span> __call__ <span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     19 </span><span class="ansi-red-fg">        </span>df <span class="ansi-blue-fg">=</span> pd<span class="ansi-blue-fg">.</span>DataFrame <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1.0</span><span class="ansi-blue-fg">,</span><span class="ansi-cyan-fg">2.0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">3.0</span><span class="ansi-blue-fg">,</span><span class="ansi-cyan-fg">4.0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#39;a&#39;</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">&#39;b&#39;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">+</span> self<span class="ansi-blue-fg">.</span>_generate_noise <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     20 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>different<span class="ansi-blue-fg">:</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>--Return--
-{&#39;array&#39;: array([[20., ...  [40., 50.]]), &#39;sequence&#39;: [[1.0, 2.0], array([[11., ...  [31., 41.]]), {&#39;data&#39;:      a    b
-0....0
-1  3.0  4.0, &#39;vector&#39;: array([[10., ...  [30., 40.]])}]}
-&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(25)<span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     23 </span><span class="ansi-red-fg">        result = dict(sequence=[[1.0,2.0], x+1, dict(vector=x, data=df)],
-</span><span class="ansi-green-fg">     24 </span><span class="ansi-red-fg">                      array=x+10)
-</span><span class="ansi-green-fg">---&gt; 25 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">return</span> result
-<span class="ansi-green-fg">     26 </span>
-<span class="ansi-green-fg">     27 </span><span class="ansi-green-fg">def</span> test_comparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>--Call--
-&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(18)<span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     16 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">return</span> noise
-<span class="ansi-green-fg">     17 </span>
-<span class="ansi-green-fg">---&gt; 18 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">def</span> __call__ <span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     19 </span><span class="ansi-red-fg">        </span>df <span class="ansi-blue-fg">=</span> pd<span class="ansi-blue-fg">.</span>DataFrame <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">1.0</span><span class="ansi-blue-fg">,</span><span class="ansi-cyan-fg">2.0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">[</span><span class="ansi-cyan-fg">3.0</span><span class="ansi-blue-fg">,</span><span class="ansi-cyan-fg">4.0</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#39;a&#39;</span><span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">&#39;b&#39;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">+</span> self<span class="ansi-blue-fg">.</span>_generate_noise <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg">     20 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> self<span class="ansi-blue-fg">.</span>different<span class="ansi-blue-fg">:</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>--Return--
-{&#39;array&#39;: array([[20., ...  [40., 50.]]), &#39;sequence&#39;: [[1.0, 2.0], array([[11., ...  [31., 41.]]), {&#39;data&#39;:      a    b
-0....0
-1  3.0  4.0, &#39;vector&#39;: array([[10., ...  [30., 40.]])}]}
-&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/516144916.py</span>(25)<span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     23 </span><span class="ansi-red-fg">        result = dict(sequence=[[1.0,2.0], x+1, dict(vector=x, data=df)],
-</span><span class="ansi-green-fg">     24 </span><span class="ansi-red-fg">                      array=x+10)
-</span><span class="ansi-green-fg">---&gt; 25 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">return</span> result
-<span class="ansi-green-fg">     26 </span>
-<span class="ansi-green-fg">     27 </span><span class="ansi-green-fg">def</span> test_comparator <span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>--Call--
-&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/2970004199.py</span>(22)<span class="ansi-cyan-fg">compare</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     20 </span><span class="ansi-red-fg">            </span><span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">&#39;&#39;</span>
-<span class="ansi-green-fg">     21 </span>
-<span class="ansi-green-fg">---&gt; 22 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">def</span> compare <span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> left<span class="ansi-blue-fg">,</span> right<span class="ansi-blue-fg">,</span> message<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#39;&#39;</span><span class="ansi-blue-fg">,</span> rtol<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1e-07</span><span class="ansi-blue-fg">,</span> atol<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     23 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> type<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">==</span>type<span class="ansi-blue-fg">(</span>right<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     24 </span><span class="ansi-red-fg">            </span><span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">f&#39;{message}{type(left)}!={type(right)}&#39;</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/2970004199.py</span>(23)<span class="ansi-cyan-fg">compare</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     21 </span>
-<span class="ansi-green-fg">     22 </span><span class="ansi-red-fg">    </span><span class="ansi-green-fg">def</span> compare <span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> left<span class="ansi-blue-fg">,</span> right<span class="ansi-blue-fg">,</span> message<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#39;&#39;</span><span class="ansi-blue-fg">,</span> rtol<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">1e-07</span><span class="ansi-blue-fg">,</span> atol<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">---&gt; 23 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> type<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">==</span>type<span class="ansi-blue-fg">(</span>right<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     24 </span><span class="ansi-red-fg">            </span><span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">f&#39;{message}{type(left)}!={type(right)}&#39;</span>
-<span class="ansi-green-fg">     25 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> isinstance<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">,</span> tuple<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> isinstance<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">,</span> list<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>&gt; <span class="ansi-green-fg">/tmp/ipykernel_47082/2970004199.py</span>(25)<span class="ansi-cyan-fg">compare</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">     23 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> type<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">==</span>type<span class="ansi-blue-fg">(</span>right<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     24 </span><span class="ansi-red-fg">            </span><span class="ansi-green-fg">return</span> <span class="ansi-blue-fg">f&#39;{message}{type(left)}!={type(right)}&#39;</span>
-<span class="ansi-green-fg">---&gt; 25 </span><span class="ansi-red-fg">        </span><span class="ansi-green-fg">if</span> isinstance<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">,</span> tuple<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">or</span> isinstance<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">,</span> list<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     26 </span><span class="ansi-red-fg">            </span><span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">     27 </span><span class="ansi-red-fg">                </span>left <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>array<span class="ansi-blue-fg">(</span>left<span class="ansi-blue-fg">,</span> dtype<span class="ansi-blue-fg">=</span>float<span class="ansi-blue-fg">)</span>
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -1378,7 +1299,7 @@ the transformation.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_comparator2" class="doc_header"><code>test_comparator2</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_utils.py#L145" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_comparator2</code>()</p>
+<h4 id="test_comparator2" class="doc_header"><code>test_comparator2</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_utils.py#L225" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_comparator2</code>()</p>
 </blockquote>
 
 </div>
@@ -1432,33 +1353,6 @@ the transformation.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>comparing results for comparator
-Results are equal.
-
-comparing results for comparator
-Results are equal.
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>running test_comparator2
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -1479,7 +1373,7 @@ Results are equal.
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/utils.py#L778" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
+<h4 id="camel_to_snake" class="doc_header"><code>camel_to_snake</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L872" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>camel_to_snake</code>(<strong><code>name</code></strong>)</p>
 </blockquote>
 
 <pre><code>Convert CamelCase to snake_case.
@@ -1502,9 +1396,33 @@ the corresponding computation is stored:
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="snake_to_camel" class="doc_header"><code>snake_to_camel</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/utils.py#L883" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>snake_to_camel</code>(<strong><code>name</code></strong>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
 </div>
     {% endraw %}
 
 </div>
- 
+
 

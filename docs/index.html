@@ -1,6 +1,6 @@
 ---
 
-title: Block Types
+title: DS Blocks
 
 
 keywords: fastai
@@ -31,37 +31,37 @@ nb_path: "nbs/index.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><code>Block-types</code> makes it easy to write highly modular and compact data science pipelines. It is based on a generalization of the well-known scikit-learn pipeline design, enriching and extending them in multiple ways. By doing so, <code>block-types</code> makes it possible to express the ML solution in terms of independent building blocks that can be easily moved around and reused to create different solutions. At the same time, <code>block-types</code> makes it possible to write concise code by automatically taking care of common steps that are needed when buildling a data science pipeline, resulting in a significant reduction of boiler-plate code.</p>
-<p>The following are a selectiong of some of the features provided by <code>block-types</code>:</p>
+<p><code>ds-blocks</code> makes it easy to write highly modular and compact data science pipelines. It is based on a generalization of the well-known scikit-learn pipeline design, enriching and extending them in multiple ways. By doing so, <code>ds-blocks</code> makes it possible to express the ML solution in terms of independent building blocks that can be easily moved around and reused to create different solutions. At the same time, <code>ds-blocks</code> makes it possible to write concise code by automatically taking care of common steps that are needed when buildling a data science pipeline, resulting in a significant reduction of boiler-plate code.</p>
+<p>The following are a selectiong of some of the features provided by <code>ds-blocks</code>:</p>
 <ul>
 <li><p>Automatize common steps that are usually present in ML code, including common caching / loading of intermediate results across the entire pipeline, logging, profiling, conversion of data to appropriate format, and more.</p>
 </li>
 <li><p>Make it possible to easily show statistics and other types of information about the output of each component in the pipeline, print a summary of the pipeline, plot a diagram of the components, and show the dimensionality of the output provided by each component.</p>
 </li>
-<li><p>Extend scikit-learn pipelines in several ways, including: i) make it possible to use any data type in the communication between components. This is done through data conversion layers that facilitate reusing the components across different pipelines, regardless of the data format used by rest of the components. In particular, two important data types enabled in <code>block-types</code> are DataFrames and dictionaries. Using pandas DataFrame is suitable for many data science problems such as time-series analysis, making it easy to visualize different periods of time, subsets of variables and categories (i.e., normal vs anomaly). While standard scikit-learn components accept DataFrame as input data type, the output is always provided as a numpy array, making it necessary to manually convert the output back to the original DataFrame format every time, with the corresponding proliferation of boiler-plate code. Block-types enables a consistent use of DataFrames across the whole pipeline: when the input is a DataFrame, the output will be a DataFrame  as well, and when the input is a numpy array the output is a numpy array.</p>
+<li><p>Extend scikit-learn pipelines in several ways, including: i) make it possible to use any data type in the communication between components. This is done through data conversion layers that facilitate reusing the components across different pipelines, regardless of the data format used by rest of the components. In particular, two important data types enabled in <code>ds-blocks</code> are DataFrames and dictionaries. Using pandas DataFrame is suitable for many data science problems such as time-series analysis, making it easy to visualize different periods of time, subsets of variables and categories (i.e., normal vs anomaly). While standard scikit-learn components accept DataFrame as input data type, the output is always provided as a numpy array, making it necessary to manually convert the output back to the original DataFrame format every time, with the corresponding proliferation of boiler-plate code. <code>ds-blocks</code> enables a consistent use of DataFrames across the whole pipeline: when the input is a DataFrame, the output will be a DataFrame  as well, and when the input is a numpy array the output is a numpy array.</p>
 </li>
 <li><p>Enable the use of sampling components that not only change the variables (or columns) but also change the number of observations (or rows), by either under-sampling or over-sampling. This is not supported by standard scikit-learn components.</p>
 </li>
 </ul>
-<p>For further details, please see the <a href="https://jaume-jci.github.io/block-types/">documentation</a></p>
+<p>For further details, please see the <a href="https://jaume-jci.github.io/ds-blocks/">documentation</a></p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Install">Install<a class="anchor-link" href="#Install"> </a></h2><p>pip install block-types</p>
+<h2 id="Install">Install<a class="anchor-link" href="#Install"> </a></h2><p>pip install dsblocks</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Documentation">Documentation<a class="anchor-link" href="#Documentation"> </a></h2><p>Documenation can be found <a href="https://jaume-jci.github.io/block-types/">here</a></p>
+<h2 id="Documentation">Documentation<a class="anchor-link" href="#Documentation"> </a></h2><p>Documenation can be found <a href="https://jaume-jci.github.io/ds-blocks/">here</a></p>
 
 </div>
 </div>
 </div>
 </div>
- 
+
 

@@ -316,6 +316,6 @@ modules = ["tests/blocks/test_blocks.py",
 
 doc_url = "https://Jaume-JCI.github.io/"
 
-git_url = "https://github.com/Jaume-JCI/block-types/tree/main/"
+git_url = "https://github.com/Jaume-JCI/ds-blocks/tree/main/"
 
 def custom_doc_links(name): return None

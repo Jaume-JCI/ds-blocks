@@ -32,8 +32,8 @@ nb_path: "nbs/blocks/preprocessing.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>2022-02-02 15:24:14.999443: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /opt/intel/compilers_and_libraries_2018.1.163/linux/tbb/lib/intel64_lin/gcc4.7:/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/tbb/lib/intel64_lin/gcc4.7:/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64_lin::/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64/:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64/
-2022-02-02 15:24:14.999489: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+<pre>2022-05-07 21:50:50.207801: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library &#39;libcudart.so.11.0&#39;; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /opt/intel/compilers_and_libraries_2018.1.163/linux/tbb/lib/intel64_lin/gcc4.7:/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/tbb/lib/intel64_lin/gcc4.7:/opt/intel/compilers_and_libraries_2018.1.163/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/lib/intel64_lin::/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64/:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64/
+2022-05-07 21:50:50.207841: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 </pre>
 </div>
 </div>
@@ -85,7 +85,7 @@ nb_path: "nbs/blocks/preprocessing.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="OneHotEncoder" class="doc_header"><code>class</code> <code>OneHotEncoder</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/blocks/preprocessing.py#L22" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneHotEncoder</code>(<strong><code>categories</code></strong>=<em><code>'auto'</code></em>, <strong><code>handle_unknown</code></strong>=<em><code>'ignore'</code></em>, <strong><code>dtype</code></strong>=<em><code>int</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#PandasComponent"><code>PandasComponent</code></a></p>
+<h2 id="OneHotEncoder" class="doc_header"><code>class</code> <code>OneHotEncoder</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/blocks/preprocessing.py#L22" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>OneHotEncoder</code>(<strong><code>categories</code></strong>=<em><code>'auto'</code></em>, <strong><code>handle_unknown</code></strong>=<em><code>'ignore'</code></em>, <strong><code>dtype</code></strong>=<em><code>int</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/components.html#PandasComponent"><code>PandasComponent</code></a></p>
 </blockquote>
 
 <pre><code>Component that preserves the DataFrame format for incoming data and results.
@@ -128,7 +128,7 @@ conversion performed.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_one_hot_encoder" class="doc_header"><code>test_one_hot_encoder</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/blocks/test_preprocessing.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_one_hot_encoder</code>()</p>
+<h4 id="test_one_hot_encoder" class="doc_header"><code>test_one_hot_encoder</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/blocks/test_preprocessing.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_one_hot_encoder</code>()</p>
 </blockquote>
 
 </div>
@@ -213,8 +213,7 @@ result:
 <div class="output_area">
 
 
-<div class="output_html rendered_html output_subarea ">
-<div>
+<div class="output_html rendered_html output_subarea "><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
@@ -282,8 +281,7 @@ result:
     </tr>
   </tbody>
 </table>
-</div>
-</div>
+</div></div>
 
 </div>
 
@@ -298,8 +296,7 @@ result:
 <div class="output_area">
 
 
-<div class="output_html rendered_html output_subarea ">
-<div>
+<div class="output_html rendered_html output_subarea "><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
@@ -373,8 +370,7 @@ result:
     </tr>
   </tbody>
 </table>
-</div>
-</div>
+</div></div>
 
 </div>
 
@@ -408,7 +404,7 @@ result:
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="WindowGenerator" class="doc_header"><code>class</code> <code>WindowGenerator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/blocks/preprocessing.py#L57" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WindowGenerator</code>(<strong><code>sequence_length</code></strong>=<em><code>None</code></em>, <strong><code>sequence_stride</code></strong>=<em><code>None</code></em>, <strong><code>mixed_labels</code></strong>=<em><code>False</code></em>, <strong><code>sampling_interval</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h2 id="WindowGenerator" class="doc_header"><code>class</code> <code>WindowGenerator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/blocks/preprocessing.py#L57" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WindowGenerator</code>(<strong><code>sequence_length</code></strong>=<em><code>None</code></em>, <strong><code>sequence_stride</code></strong>=<em><code>None</code></em>, <strong><code>mixed_labels</code></strong>=<em><code>False</code></em>, <strong><code>sampling_interval</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/components.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>Creates a DataFrame of time-ordered sliding windows extracted from an input time-series.
@@ -465,7 +461,7 @@ illustration.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="generate_input_for_window_generator" class="doc_header"><code>generate_input_for_window_generator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/blocks/test_preprocessing.py#L50" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>generate_input_for_window_generator</code>()</p>
+<h4 id="generate_input_for_window_generator" class="doc_header"><code>generate_input_for_window_generator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/blocks/test_preprocessing.py#L50" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>generate_input_for_window_generator</code>()</p>
 </blockquote>
 
 </div>
@@ -516,7 +512,7 @@ illustration.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_window_generator" class="doc_header"><code>test_window_generator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/blocks/test_preprocessing.py#L64" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window_generator</code>()</p>
+<h4 id="test_window_generator" class="doc_header"><code>test_window_generator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/blocks/test_preprocessing.py#L64" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window_generator</code>()</p>
 </blockquote>
 
 </div>
@@ -600,8 +596,7 @@ illustration.</code></pre>
 <div class="output_area">
 
 
-<div class="output_html rendered_html output_subarea ">
-<div>
+<div class="output_html rendered_html output_subarea "><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
@@ -709,16 +704,14 @@ illustration.</code></pre>
     </tr>
   </tbody>
 </table>
-</div>
-</div>
+</div></div>
 
 </div>
 
 <div class="output_area">
 
 
-<div class="output_html rendered_html output_subarea ">
-<div>
+<div class="output_html rendered_html output_subarea "><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
@@ -783,8 +776,7 @@ illustration.</code></pre>
     </tr>
   </tbody>
 </table>
-</div>
-</div>
+</div></div>
 
 </div>
 
@@ -861,7 +853,7 @@ illustration.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="WindowAggregator" class="doc_header"><code>class</code> <code>WindowAggregator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/blocks/preprocessing.py#L203" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WindowAggregator</code>(<strong><code>sequence_length</code></strong>=<em><code>None</code></em>, <strong><code>sequence_stride</code></strong>=<em><code>None</code></em>, <strong><code>sampling_interval</code></strong>=<em><code>None</code></em>, <strong><code>mixed_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/block_types.html#SamplingComponent"><code>SamplingComponent</code></a></p>
+<h2 id="WindowAggregator" class="doc_header"><code>class</code> <code>WindowAggregator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/blocks/preprocessing.py#L203" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WindowAggregator</code>(<strong><code>sequence_length</code></strong>=<em><code>None</code></em>, <strong><code>sequence_stride</code></strong>=<em><code>None</code></em>, <strong><code>sampling_interval</code></strong>=<em><code>None</code></em>, <strong><code>mixed_labels</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/components.html#SamplingComponent"><code>SamplingComponent</code></a></p>
 </blockquote>
 
 <pre><code>This class produces the the inverse transform of the WindowGeneratorclass.
@@ -911,7 +903,7 @@ the inverse transform.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_window_aggregator" class="doc_header"><code>test_window_aggregator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/blocks/test_preprocessing.py#L93" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window_aggregator</code>()</p>
+<h4 id="test_window_aggregator" class="doc_header"><code>test_window_aggregator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/blocks/test_preprocessing.py#L93" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window_aggregator</code>()</p>
 </blockquote>
 
 </div>
@@ -966,5 +958,5 @@ the inverse transform.</code></pre>
     {% endraw %}
 
 </div>
- 
+
 

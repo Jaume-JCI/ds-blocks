@@ -44,6 +44,7 @@ nb_path: "nbs/core/data_conversion.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 
     </div>
@@ -70,7 +71,7 @@ nb_path: "nbs/core/data_conversion.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="DataConverter" class="doc_header"><code>class</code> <code>DataConverter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/data_conversion.py#L15" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataConverter</code>(<strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>0</code></em>, <strong><code>inplace</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h2 id="DataConverter" class="doc_header"><code>class</code> <code>DataConverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DataConverter</code>(<strong><code>logger</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>inplace</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong><code>convert_before</code></strong>=<em><code>None</code></em>, <strong><code>convert_before_transforming</code></strong>=<em><code>None</code></em>, <strong><code>convert_before_fitting</code></strong>=<em><code>None</code></em>, <strong><code>convert_after</code></strong>=<em><code>None</code></em>, <strong><code>convert_after_transforming</code></strong>=<em><code>None</code></em>, <strong><code>convert_after_fitting</code></strong>=<em><code>None</code></em>, <strong><code>convert_before_transforming_after_fit</code></strong>=<em><code>None</code></em>, <strong><code>convert_after_transforming_after_fit</code></strong>=<em><code>None</code></em>, <strong><code>unpack_single_tuple_for_fitting</code></strong>=<em><code>True</code></em>, <strong><code>unpack_single_tuple_for_transforming</code></strong>=<em><code>True</code></em>, <strong><code>unpack_single_tuple</code></strong>=<em><code>None</code></em>, <strong><code>unpack_single_tuple_for_result_func</code></strong>=<em><code>False</code></em>, <strong><code>ensure_tuple</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 <pre><code>Convert input and output data format.
@@ -100,6 +101,137 @@ making it more reusable across different pipelines.</code></pre>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-/-test">Example / test<a class="anchor-link" href="#Example-/-test"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="test_data_converter_functions" class="doc_header"><code>test_data_converter_functions</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L27" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_converter_functions</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@pytest.mark.reference_fails</span>
+<span class="k">def</span> <span class="nf">test_data_converter_functions</span> <span class="p">():</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">DataConverter</span> <span class="p">(</span><span class="n">convert_before</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">),</span>
+                        <span class="n">convert_after</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">})</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">DataConverter</span> <span class="p">(</span><span class="n">convert_before_fitting</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">),</span>
+                        <span class="n">convert_after_fitting</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;train&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">},</span>
+                        <span class="n">convert_before_transforming</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                        <span class="n">convert_after_transforming</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">})</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">DataConverter</span> <span class="p">(</span><span class="n">convert_before_fitting</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">),</span>
+                        <span class="n">convert_after_transforming</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">})</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">Xr</span> <span class="o">==</span> <span class="p">(</span><span class="n">X</span><span class="p">,)</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">Xr</span> <span class="o">==</span> <span class="p">(</span><span class="n">X</span><span class="p">,)</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span><span class="o">.</span><span class="n">run</span> <span class="p">(</span><span class="n">test_data_converter_functions</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>running test_data_converter_functions
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="NoConverter">NoConverter<a class="anchor-link" href="#NoConverter"> </a></h2>
 </div>
 </div>
@@ -115,7 +247,7 @@ making it more reusable across different pipelines.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="NoConverter" class="doc_header"><code>class</code> <code>NoConverter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/data_conversion.py#L117" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoConverter</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
+<h2 id="NoConverter" class="doc_header"><code>class</code> <code>NoConverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L244" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>NoConverter</code>(<strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
 </blockquote>
 
 <pre><code>Performs no conversion.</code></pre>
@@ -154,7 +286,7 @@ making it more reusable across different pipelines.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_no_converter" class="doc_header"><code>test_no_converter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_data_conversion.py#L26" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_no_converter</code>()</p>
+<h4 id="test_no_converter" class="doc_header"><code>test_no_converter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L83" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_no_converter</code>()</p>
 </blockquote>
 
 </div>
@@ -181,6 +313,25 @@ making it more reusable across different pipelines.</code></pre>
     <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">X</span><span class="o">==</span><span class="n">Xr</span>
     <span class="k">assert</span> <span class="n">y</span><span class="o">==</span><span class="n">yr</span>
+    
+    <span class="c1"># We can pass conversion functions to the NoConverter class. </span>
+    <span class="c1"># In that case, the NoConverter behaves as the base class DataConverter</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">NoConverter</span> <span class="p">(</span><span class="n">convert_before_fitting</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">),</span>
+                        <span class="n">convert_after_transforming</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;test&#39;</span><span class="p">:</span><span class="n">x</span><span class="p">})</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">Xr</span> <span class="o">==</span> <span class="p">(</span><span class="n">X</span><span class="p">,)</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">Xr</span> <span class="o">==</span> <span class="p">(</span><span class="n">X</span><span class="p">,)</span>
+
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">Xr</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">==</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -223,6 +374,396 @@ making it more reusable across different pipelines.</code></pre>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="GenericConverter">GenericConverter<a class="anchor-link" href="#GenericConverter"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="GenericConverter" class="doc_header"><code>class</code> <code>GenericConverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L250" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GenericConverter</code>(<strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong><code>separate_labels</code></strong>=<em><code>True</code></em>, <strong><code>no_labels</code></strong>=<em><code>False</code></em>, <strong><code>labels_returned_by_transform</code></strong>=<em><code>None</code></em>, <strong><code>labels_to_be_returned_by_transform</code></strong>=<em><code>None</code></em>, <strong><code>labels_included_without_fitting</code></strong>=<em><code>False</code></em>, <strong><code>raise_error_if_no_label_inconsistency</code></strong>=<em><code>False</code></em>, <strong><code>raise_warning_if_no_label_inconsistency</code></strong>=<em><code>False</code></em>, <strong><code>inplace</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
+</blockquote>
+
+<pre><code>Supply X, y to `fit`, and provide only X to `transform` / `predict` / `apply`
+
+Cases:
+- Usual case:
+    (X, y) are provided to fit.
+    Only X is provided to transform.
+    Only X is returned by transform.
+- Transform uses labels:
+    (X, y) are provided to fit.
+    (X, y) are provided to transform.
+    (X, y) are returned by transform.
+- separate_labels = False, or no_labels=True
+    X is provided to fit
+    X is provided to transform
+    X is returned by transform</code></pre>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-/-test">Example / test<a class="anchor-link" href="#Example-/-test"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="test_generic_converter" class="doc_header"><code>test_generic_converter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L110" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_generic_converter</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">test_generic_converter</span> <span class="p">():</span>    
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span><span class="p">()</span>
+               
+    <span class="k">def</span> <span class="nf">transform_returns_labels_singleX</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+    
+    <span class="k">def</span> <span class="nf">transform_returns_labels_twoXs</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span>
+    
+    <span class="k">def</span> <span class="nf">transform_does_not_return_labels_singleX</span> <span class="p">(</span><span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span>
+    
+    <span class="k">def</span> <span class="nf">transform_does_not_return_labels_twoXs</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+    
+    <span class="k">def</span> <span class="nf">transform_does_not_return_labels_singleX_and_y</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">X</span>
+    
+    <span class="k">def</span> <span class="nf">transform_does_not_return_labels_twoXs_and_y</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+    
+    <span class="k">def</span> <span class="nf">fit_apply</span> <span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_single_tuple</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">)</span> <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">X</span>
+        <span class="c1"># fit (*X) fit does nothing</span>
+        <span class="c1"># apply</span>
+        <span class="k">return</span> <span class="n">apply</span> <span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">result_func</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">apply</span> <span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_single_tuple</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="n">fit_apply</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result_func</span> <span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="mi">10</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="mi">10</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span>  <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+        
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span> <span class="p">(</span><span class="n">transform_uses_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span>  <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_returns_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span> <span class="p">(</span><span class="n">transform_uses_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">labels_returned_by_transform</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs_and_y</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span> <span class="p">(</span><span class="n">raise_error_if_no_label_inconsistency</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span> <span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="mi">10</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">GenericConverter</span> <span class="p">(</span><span class="n">no_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_singleX</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span><span class="o">==</span><span class="mi">10</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fit_apply</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result_func</span><span class="o">=</span><span class="n">transform_does_not_return_labels_twoXs</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span><span class="o">.</span><span class="n">run</span> <span class="p">(</span><span class="n">test_generic_converter</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>running test_generic_converter
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="StandardConverter">StandardConverter<a class="anchor-link" href="#StandardConverter"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="StandardConverter" class="doc_header"><code>class</code> <code>StandardConverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L354" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>StandardConverter</code>(<strong><code>inplace</code></strong>=<em><code>False</code></em>, <strong><code>unpack_single_tuple</code></strong>=<em><code>False</code></em>, <strong><code>unpack_single_tuple_for_result_func</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
+</blockquote>
+
+<pre><code>Convert input and output data format.
+
+Assumes that, when fitting, the data is introduced either as a single element or
+as a tuple with more than one element.</code></pre>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example-/-test">Example / test<a class="anchor-link" href="#Example-/-test"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="test_standard_converter" class="doc_header"><code>test_standard_converter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L212" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_standard_converter</code>()</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@pytest.mark.reference_fails</span>
+<span class="k">def</span> <span class="nf">test_standard_converter</span> <span class="p">():</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">StandardConverter</span> <span class="p">()</span>
+
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sequential_fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">((</span><span class="n">X</span><span class="p">,</span><span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_transforming</span> <span class="p">((</span><span class="n">X</span><span class="p">,</span><span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">Xr</span><span class="p">,</span> <span class="n">yr</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_transforming</span> <span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span> <span class="n">sequential_fit_apply</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xr</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">Xr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">yr</span><span class="o">==</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>    
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span><span class="o">.</span><span class="n">run</span> <span class="p">(</span><span class="n">test_standard_converter</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>running test_standard_converter
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="PandasConverter">PandasConverter<a class="anchor-link" href="#PandasConverter"> </a></h2>
 </div>
 </div>
@@ -238,7 +779,7 @@ making it more reusable across different pipelines.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="PandasConverter" class="doc_header"><code>class</code> <code>PandasConverter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/data_conversion.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasConverter</code>(<strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong><code>transformed_index</code></strong>=<em><code>None</code></em>, <strong><code>transformed_columns</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>True</code></em>, <strong><code>inplace</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
+<h2 id="PandasConverter" class="doc_header"><code>class</code> <code>PandasConverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L388" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>PandasConverter</code>(<strong><code>transform_uses_labels</code></strong>=<em><code>False</code></em>, <strong><code>transformed_index</code></strong>=<em><code>None</code></em>, <strong><code>transformed_columns</code></strong>=<em><code>None</code></em>, <strong><code>separate_labels</code></strong>=<em><code>True</code></em>, <strong><code>inplace</code></strong>=<em><code>False</code></em>, <strong><code>metadata</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
 </blockquote>
 
 <pre><code>Convert DataFrame to numpy array and back, if needed.
@@ -328,7 +869,7 @@ By default, this class assumes the following:
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_pandas_converter" class="doc_header"><code>test_pandas_converter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_data_conversion.py#L35" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pandas_converter</code>()</p>
+<h4 id="test_pandas_converter" class="doc_header"><code>test_pandas_converter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L256" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_pandas_converter</code>()</p>
 </blockquote>
 
 </div>
@@ -406,20 +947,6 @@ By default, this class assumes the following:
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>running test_pandas_converter
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -440,7 +967,7 @@ By default, this class assumes the following:
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Window2Dto3Dconverter" class="doc_header"><code>class</code> <code>Window2Dto3Dconverter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/data_conversion.py#L358" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Window2Dto3Dconverter</code>(<strong><code>sequence_length</code></strong>:<code>int</code>, <strong><code>data_converter</code></strong>:<a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
+<h2 id="Window2Dto3Dconverter" class="doc_header"><code>class</code> <code>Window2Dto3Dconverter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L639" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Window2Dto3Dconverter</code>(<strong><code>sequence_length</code></strong>:<code>int</code>, <strong><code>data_converter</code></strong>:<a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/data_conversion.html#DataConverter"><code>DataConverter</code></a></p>
 </blockquote>
 
 <pre><code>Convert sequence of windows from WindowGenerator's 2D format to 3D.
@@ -487,7 +1014,7 @@ respectively.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="generate_input_for_window_generator" class="doc_header"><code>generate_input_for_window_generator</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_data_conversion.py#L71" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>generate_input_for_window_generator</code>()</p>
+<h4 id="generate_input_for_window_generator" class="doc_header"><code>generate_input_for_window_generator</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L292" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>generate_input_for_window_generator</code>()</p>
 </blockquote>
 
 </div>
@@ -538,7 +1065,7 @@ respectively.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_window2d_to_3d_converter" class="doc_header"><code>test_window2d_to_3d_converter</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_data_conversion.py#L84" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window2d_to_3d_converter</code>()</p>
+<h4 id="test_window2d_to_3d_converter" class="doc_header"><code>test_window2d_to_3d_converter</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L305" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_window2d_to_3d_converter</code>()</p>
 </blockquote>
 
 </div>
@@ -559,7 +1086,7 @@ respectively.</code></pre>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">test_window2d_to_3d_converter</span> <span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">block_types.blocks.preprocessing</span> <span class="kn">import</span> <span class="n">WindowGenerator</span>
+    <span class="kn">from</span> <span class="nn">dsblocks.blocks.preprocessing</span> <span class="kn">import</span> <span class="n">WindowGenerator</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">generate_input_for_window_generator</span> <span class="p">()</span>
     <span class="n">window_generator</span> <span class="o">=</span> <span class="n">WindowGenerator</span><span class="p">(</span><span class="n">sequence_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sequence_stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
@@ -577,7 +1104,7 @@ respectively.</code></pre>
     <span class="n">dfr2</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_before_fitting</span> <span class="p">(</span><span class="n">window_data</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">dfr2</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">91</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">91</span><span class="p">,)</span>
 
-    <span class="n">aux</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">dfr2</span><span class="p">)</span>
+    <span class="n">aux</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">convert_after_fitting</span> <span class="p">(</span><span class="n">dfr2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">aux</span><span class="o">.</span><span class="n">shape</span><span class="o">==</span><span class="p">(</span><span class="mi">91</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dfr</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">==</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span><span class="mi">33</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">63</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
@@ -606,20 +1133,6 @@ respectively.</code></pre>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>running test_window2d_to_3d_converter
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -640,7 +1153,7 @@ respectively.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="data_converter_factory" class="doc_header"><code>data_converter_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/core/data_conversion.py#L500" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>data_converter_factory</code>(<strong><code>converter</code></strong>, <strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="data_converter_factory" class="doc_header"><code>data_converter_factory</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/core/data_conversion.py#L781" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>data_converter_factory</code>(<strong><code>converter</code></strong>, <strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -677,7 +1190,7 @@ respectively.</code></pre>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="test_data_converter_factory" class="doc_header"><code>test_data_converter_factory</code><a href="https://github.com/Jaume-JCI/block-types/tree/main/block_types/tests/core/test_data_conversion.py#L112" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_converter_factory</code>()</p>
+<h4 id="test_data_converter_factory" class="doc_header"><code>test_data_converter_factory</code><a href="https://github.com/Jaume-JCI/ds-blocks/tree/main/dsblocks/tests/core/test_data_conversion.py#L333" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>test_data_converter_factory</code>()</p>
 </blockquote>
 
 </div>
@@ -729,5 +1242,5 @@ respectively.</code></pre>
     {% endraw %}
 
 </div>
- 
+
 
