@@ -24,8 +24,8 @@ entries:
           title: Datasets
           url: datasets.datasets.html
         - output: web,pdf
-          title: Block types
-          url: core.components.html
+          title: Components
+          url: components.html
         - output: web,pdf
           title: Data Conversion
           url: core.data_conversion.html

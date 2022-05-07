@@ -9,7 +9,7 @@
     " ":{
       "Modules": {
             "Datasets": "datasets.datasets.html",
-            "Block types": "core.components.html",
+            "Components": "components.html",
             "Data Conversion": "core.data_conversion.html",
             "Block utilities": "core.utils.html",
             "Utils": "utils.utils.html"
