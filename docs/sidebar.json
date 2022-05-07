@@ -1,5 +1,5 @@
 {
-  "Block Types": {
+  "DS Blocks": {
     "Overview": "/",
     "": {
         "Tutorials": {
@@ -9,7 +9,7 @@
     " ":{
       "Modules": {
             "Datasets": "datasets.datasets.html",
-            "Block types": "core.block_types.html",
+            "Block types": "core.components.html",
             "Data Conversion": "core.data_conversion.html",
             "Block utilities": "core.utils.html",
             "Utils": "utils.utils.html"

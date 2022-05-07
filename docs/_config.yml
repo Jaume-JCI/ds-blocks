@@ -3,7 +3,7 @@ output: web
 topnav_title: ds-blocks
 site_title: ds-blocks
 company_name: Johnson Controls Inc.
-description: Block types
+description: DS Blocks
 # Set to false to disable KaTeX math
 use_math: true
 # Add Google analytics id if you have one and want to use it here

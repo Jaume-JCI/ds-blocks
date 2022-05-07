@@ -25,7 +25,7 @@ entries:
           url: datasets.datasets.html
         - output: web,pdf
           title: Block types
-          url: core.block_types.html
+          url: core.components.html
         - output: web,pdf
           title: Data Conversion
           url: core.data_conversion.html
@@ -47,6 +47,6 @@ entries:
         title: Misc
       title: '  '
     output: web
-    title: Block Types
+    title: DS Blocks
   output: web
   title: Sidebar

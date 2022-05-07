@@ -2,7 +2,7 @@ topnav:
 - title: Topnav
   items:
     - title: github
-      external_url: https://github.com/Jaume-JCI/block-types/blob/main/
+      external_url: https://github.com/Jaume-JCI/ds-blocks/blob/main/
 
 #Topnav dropdowns
 topnav_dropdowns:
