@@ -74,13 +74,15 @@ class MultiComponent (SamplingComponent):
         if not hasattr (self, 'finalized_component_list'):
             self.finalized_component_list = False
 
-        if root == True: root = self
-        elif automatic_root: root = self if root is None else root
         # we need to call super().__init__() *after* having creating the `components` field,
         # since the constructor of Component calls a method that is overriden in Pipeline,
         # and this method makes use of the mentioned `components` field
+        if root == True: root = self
+        elif automatic_root: root = self if root is None else root
+
         super().__init__ (separate_labels=separate_labels, path_results=path_results, path_models=path_models,
                           root=root, **kwargs)
+        if self.root == True: root = self
 
         self.set_split ('whole')
 
@@ -101,6 +103,7 @@ class MultiComponent (SamplingComponent):
             self.num_names = {}
             self.names = {}
             self.set_unique_names ()
+            self.gather_and_save_info ()
 
     def __repr__ (self):
         return f'MultiComponent {self.class_name} (name={self.name})'
@@ -130,9 +133,9 @@ class MultiComponent (SamplingComponent):
     def _add_named_attribute (self, component, nick_name):
         if not hasattr(self, 'finalized_component_list'):
             self.finalized_component_list = False
-        if not hasattr(self, component.name):
-            super().__setattr__(component.name, component)
         if not self.finalized_component_list:
+            if not hasattr(self, component.name):
+                super().__setattr__(component.name, component)
             if hasattr(component, 'nick_name') and self.warning_if_nick_name_exists:
                 self.logger.warning (f'{component} already has a nick_name: {component.nick_name}')
                 warnings.warn (f'{component} already has a nick_name: {component.nick_name}')
@@ -147,6 +150,9 @@ class MultiComponent (SamplingComponent):
         if isinstance(v, Component):
             self.register_components(v)
             self._add_named_attribute (v, k)
+
+    def set_but_not_add_component_attr (self, k, v):
+        super().__setattr__(k, v)
 
     def add_component (self, component):
         if not hasattr(self, 'finalized_component_list'):
@@ -410,12 +416,18 @@ class MultiComponent (SamplingComponent):
         if path_results is None:  path_results = pipe.data_io.path_results
         if path_results is not None:
             path_results.mkdir (parents=True, exist_ok=True)
-            joblib.dump (pipe, path_results / 'pipeline.pk')
+            try:
+                joblib.dump (pipe, path_results / 'pipeline.pk')
+            except Exception as e:
+                self.logger.warning (f'could not pickle object: {e}')
         if save_run:
             if path_session is None: path_session = dflt.path_session_folder
             path_session = Path (path_session) / f'last_run/{dflt.session_filename}'
             path_session.parent.mkdir (parents=True, exist_ok=True)
-            joblib.dump (pipe, path_session)
+            try:
+                joblib.dump (pipe, path_session)
+            except Exception as e:
+                self.logger.warning (f'could not pickle object: {e}')
 
     def save_logs (self, save_run=True, path_results=None, path_session=None):
         path_log_file = f'{dflt.path_logger_folder}/{dflt.logger_filename}'
@@ -514,7 +526,7 @@ class MultiComponent (SamplingComponent):
                 component.data_io.chain_folders (folder)
 
     def set_root (self, root):
-        self.root = root
+        super().__setattr__ ('root', root)
         for component in self.components:
             if isinstance (component, MultiComponent):
                 component.set_root (root)

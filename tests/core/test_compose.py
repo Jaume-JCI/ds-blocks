@@ -6,19 +6,19 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_gather_and_save_info',
            'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
            'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
-           'test_set_root', 'test_pass_functions_to_multi_component', 'test_set_suffix', 'Transform1', 'Transform2',
-           'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp',
-           'test_pipeline_set_comp', 'test_athena_pipeline_training', 'test_pipeline_load_estimator',
-           'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2', 'test_construct_diagram',
-           'test_show_summary', 'test_multi_comp_profiling2', 'test_make_pipeline', 'test_pipeline_factory',
-           'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1',
-           'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
-           'test_pipeline_find_last_result', 'test_pipeline_find_last_result_parallel1',
-           'test_pipeline_find_last_result_parallel2', 'test_pipeline_find_last_result_parallel3',
-           'test_pipeline_find_last_fitted_model_seq', 'test_pipeline_find_last_fitted_model_parallel',
-           'test_pipeline_find_last_fitted_model_parallel_remove', 'TransformM', 'test_multi_modality',
-           'test_column_selector', 'test_concat', 'test_identity', 'column_transformer_data',
-           'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'test_set_root', 'test_set_root_2', 'test_pass_functions_to_multi_component', 'test_set_suffix',
+           'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis',
+           'test_pipeline_new_comp', 'test_pipeline_set_comp', 'test_athena_pipeline_training',
+           'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2',
+           'test_construct_diagram', 'test_show_summary', 'test_multi_comp_profiling2', 'test_make_pipeline',
+           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
+           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
+           'test_pandas_pipeline', 'test_parallel', 'test_pipeline_find_last_result',
+           'test_pipeline_find_last_result_parallel1', 'test_pipeline_find_last_result_parallel2',
+           'test_pipeline_find_last_result_parallel3', 'test_pipeline_find_last_fitted_model_seq',
+           'test_pipeline_find_last_fitted_model_parallel', 'test_pipeline_find_last_fitted_model_parallel_remove',
+           'TransformM', 'test_multi_modality', 'test_column_selector', 'test_concat', 'test_identity',
+           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
            'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
            'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
@@ -1260,6 +1260,19 @@ def test_set_root ():
     assert [x.name for x in c.higher1.inner2.components] == ['first_1', 'second_1']
     assert [x.data_io.fitting_file_name for x in c.higher1.inner2.components] == ['first_1_estimator.pk', 'second_1_estimator.pk']
     assert [x.data_io.result_file_name for x in c.higher1.inner2.components] == ['first_1_result.pk', 'second_1_result.pk']
+
+# Comes from compose.ipynb, cell
+def test_set_root_2 ():
+    from dsblocks.utils.dummies import Intermediate
+
+    class Higher (MultiComponent):
+        def __init__ (self, x=2, y=3, **kwargs):
+            self.first = Intermediate (name='first_intermediate', **kwargs)
+            self.second = Intermediate (name='second_intermediate', **kwargs)
+            super().__init__ (**kwargs)
+
+    higher = Higher (Higher=dict(root=True))
+    assert higher.second_intermediate.root is higher
 
 # Comes from compose.ipynb, cell
 from dsblocks.utils.dummies import Sum1, DummyEstimator
