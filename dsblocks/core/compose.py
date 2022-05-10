@@ -195,11 +195,10 @@ class MultiComponent (SamplingComponent):
                 component.clear_descendants ()
 
     def gather_descendants (self, root='', nick_name=True):
-        if not hasattr (self, 'cls'):
-            self.cls = Bunch ()
-            self.obj = Bunch ()
-            self.full_obj = Bunch ()
-            self.full_cls = Bunch ()
+        self.cls = Bunch ()
+        self.obj = Bunch ()
+        self.full_obj = Bunch ()
+        self.full_cls = Bunch ()
 
         if hasattr(self, 'nick_name'):
             name = self.nick_name if nick_name else self.name
