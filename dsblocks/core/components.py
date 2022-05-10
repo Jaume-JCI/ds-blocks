@@ -599,8 +599,12 @@ class Component ():
         self.data_io.setup (self)
 
     def set_name (self, name):
+        self._set_name (name)
+
+    def _set_name (self, name, change_original=True):
         self.name = name
         self.data_io.set_file_names (name)
+        if change_original: self.original_name = name
 
     def set_suffix (self, suffix):
         self.suffix = suffix
@@ -609,7 +613,7 @@ class Component ():
         else:
             base_name = self.name
             self.original_name = self.name
-        self.set_name (f'{base_name}_{suffix}')
+        self._set_name (f'{base_name}_{suffix}', change_original=False)
 
     def set_estimator (self, estimator):
         self.estimator = estimator

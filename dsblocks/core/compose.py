@@ -807,17 +807,18 @@ class Parallel (MultiComponent):
 
         return Xr
 
-    def find_last_result (self, split=None):
-        self.is_data_source = True
+    def find_last_result (self, split=None, func='apply'):
+        is_data_source = True
         for i, component in enumerate(self.components):
             self.set_component_info (component, i)
             if not (component.data_io.can_load_result () and component.data_io.exists_result (split=split)):
                 if isinstance (component, MultiComponent):
-                    self.is_data_source = self.is_data_source and component.find_last_result (split=split)
+                    is_data_source = is_data_source and component.find_last_result (split=split)
                 else:
-                    self.is_data_source = False
+                    is_data_source = False
             self.store_component_find_last_result_info (component, i)
-        return self.is_data_source
+        self.is_data_source[func][split] = is_data_source
+        return is_data_source
 
     def find_last_fitted_model (self, split=None):
         self.load_all_estimators = False
@@ -1350,6 +1351,7 @@ class ParallelInstances (Parallel):
         """
         n_iterations = len(configs) if n_iterations is None else n_iterations
         components = (component, ) * n_iterations
+        self.storage = None
         super().__init__ (*components, **kwargs)
         self.create_component_storage_info ()
 
@@ -1363,22 +1365,31 @@ class ParallelInstances (Parallel):
                               load_all_estimators=[self.load_all_estimators]*self.n_iterations)
 
     def set_component_info (self, component, i):
+        if self.storage is None: self.create_component_storage_info ()
         suffix = self.configs[i].get('suffix', '')
         component.set_suffix (suffix)
         component.start_idx = copy.deepcopy(self.storage.start_idx[i])
-        component.is_data_source = self.storage.is_data_source[i]
+        component.is_data_source = copy.deepcopy(self.storage.is_data_source[i])
         component.all_components_fitted = self.storage.all_components_fitted[i]
         component.load_all_estimators = self.storage.load_all_estimators[i]
 
     def store_component_find_last_result_info (self, component, i):
-        self.storage.start_idx[i] = component.start_idx
-        self.storage.is_data_source[i] = component.is_data_source
+        self.storage.start_idx[i] = copy.deepcopy(component.start_idx)
+        self.storage.is_data_source[i] = copy.deepcopy(component.is_data_source)
 
     def store_component_find_last_fitted_model_info (self, component, i):
-        self.storage.start_idx[i] = component.start_idx
-        self.storage.is_data_source[i] = component.is_data_source
+        self.storage.start_idx[i] = copy.deepcopy(component.start_idx)
+        self.storage.is_data_source[i] = copy.deepcopy(component.is_data_source)
         self.storage.all_components_fitted[i] = component.all_components_fitted
         self.storage.load_all_estimators[i] = component.load_all_estimators
+
+    def set_unique_names (self):
+        self.register_global_name (self)
+        component = self.components[0]
+        if isinstance (component, MultiComponent):
+            component.set_unique_names ()
+        else:
+            self.register_global_name (component)
 
 # Cell
 class CrossValidator (ParallelInstances):

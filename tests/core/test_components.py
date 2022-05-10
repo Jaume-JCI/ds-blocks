@@ -965,6 +965,21 @@ def test_set_suffix ():
     component.set_suffix ('third')
     assert component.name == 'my_component_third'
 
+    component.set_name ('another')
+    assert component.name == 'another'
+
+    component.set_suffix ('first')
+    assert component.name == 'another_first'
+    component.set_suffix ('second')
+    assert component.name == 'another_second'
+
+    component.set_name ('last')
+    assert component.name == 'last'
+    component.set_suffix ('first')
+    assert component.name == 'last_first'
+    component.set_suffix ('second')
+    assert component.name == 'last_second'
+
 # Comes from components.ipynb, cell
 #@pytest.mark.reference_fails
 def test_sampling_component ():
