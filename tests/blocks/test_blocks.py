@@ -99,8 +99,8 @@ def test_sksplit_generator ():
     reference = pd.concat ([df_original, pd.DataFrame({'split': ['test']*2 + ['training']*8})], axis=1)
     dfr=generator.fit_apply (df)
     assert (reference==dfr).all().all()
-    dfr=generator.fit_apply (df)
 
+    dfr=generator.fit_apply (df)
     reference = pd.concat ([df_original, pd.DataFrame({'split': ['training']*2 + ['test']*2 + ['training']*6})],
                            axis=1)
     assert (reference==dfr).all().all()

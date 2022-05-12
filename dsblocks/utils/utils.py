@@ -15,6 +15,7 @@ import re
 import inspect
 import numpy as np
 import copy
+import warnings
 
 # block-types
 import dsblocks.config.bt_defaults as dflt
