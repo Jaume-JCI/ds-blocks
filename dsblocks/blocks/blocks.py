@@ -79,8 +79,8 @@ class FixedDoubleKFold (DoubleKFoldBase):
 # Cell
 class SkSplitGenerator (Component):
     def __init__ (self, split_generator, group_col=None, label_col=None, split_col=None,
-                  use_splitter=False, training_label='training', validation_label='validation', test_label='test',
-                  type_split='single', input_test_label='test', **kwargs):
+                  use_splitter=False, training_label='training', validation_label='validation',
+                  test_label='test', type_split='single', input_test_label='test', **kwargs):
         super ().__init__ (**kwargs)
         self.splitter = Splitter () if use_splitter else None
         self.generator = None
@@ -90,7 +90,8 @@ class SkSplitGenerator (Component):
             self.validation_label = self.test_label
         elif type_split == 'fixed':
             self.split_generator = FixedDoubleKFold (split_generator, input_test_label=input_test_label,
-                                                     split_col=split_col, label_col=label_col, group_col=group_col)
+                                                     split_col=split_col, label_col=label_col,
+                                                     group_col=group_col)
         else:
             raise NotImplementedError (f'type_split {type_split} not recognized')
 

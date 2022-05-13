@@ -59,6 +59,8 @@ class Component ():
                   error_if_apply: bool = False,
                   error_if_fit: bool = False,
                   error_if_fit_apply: bool = False,
+                  error_if_result_not_loaded: bool = False,
+                  error_if_estimator_not_loaded: bool = False,
                   logger=None,
                   verbose: int = dflt.verbose,
                   name_logger:str = dflt.name_logger,
@@ -259,10 +261,13 @@ class Component ():
                 previous_result = None
                 if self.data_io.can_load_result (load):
                     previous_result = self.data_io.load_result (split=split)
+                elif self.error_if_result_not_loaded:
+                    raise RuntimeError ('result not loaded, and it should')
                 already_computed = previous_result is not None
             else:
                 raise ValueError (f'function {func} not valid')
-
+        elif self.error_if_estimator_not_loaded:
+            raise RuntimeError ('estimator not loaded, and it should')
         if not already_computed:
             if func=='_fit_apply':
                 X = self.data_converter.convert_before_fit_apply (
@@ -503,6 +508,8 @@ class Component ():
         if self.data_io.can_load_result (load):
             previous_result = self.data_io.load_result (split=split)
         if previous_result is None:
+            if self.error_if_result_not_loaded:
+                raise RuntimeError ('result not loaded, and it should')
             X = self.data_converter.convert_single_tuple_for_transforming (X)
             X = self.data_converter.convert_before_transforming (
                 *X, fit_apply=fit_apply, sequential_fit_apply=sequential_fit_apply, **converter_args)
