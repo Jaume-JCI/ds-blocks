@@ -2,7 +2,8 @@
 
 __all__ = ['make_reproducible', 'get_logging_level', 'delete_logger', 'set_logger', 'set_empty_logger', 'set_verbosity',
            'remove_previous_results', 'set_tf_loglevel', 'get_top_function', 'check_last_part', 'argnames',
-           'get_specific_dict_param', 'obtain_class_specific_attrs', 'get_hierarchy_level', 'replace_attr_and_store']
+           'store_attr', 'get_specific_dict_param', 'obtain_class_specific_attrs', 'get_hierarchy_level',
+           'replace_attr_and_store']
 
 # Cell
 import sys
@@ -192,6 +193,24 @@ def _store_attr(self, overwrite=False, error_if_present=False, ignore=set(), **a
             continue
         setattr(self, n, v)
         if stored is not None: stored[n] = v
+
+# Cell
+def store_attr(names=None, self=None, but='', store_args=None, **attrs):
+    """Store params named in comma-separated `names` from calling context into attrs in `self`"""
+    # Code copied almost unchanged from fastcore's store_attr
+    fr = sys._getframe(1)
+    args = argnames(fr, True)
+    if self is not None and 'self' not in args: args = ('self', *args)
+    if self is None: self = fr.f_locals[args[0]]
+    if store_args is None: store_args = not hasattr(self,'__slots__')
+    if store_args and not hasattr(self, '__stored_args__'): self.__stored_args__ = {}
+    if names and isinstance(names,str): names = re.split(', *', names)
+    ns = names if names is not None else getattr(self, '__slots__', args[1:])
+    added = {n:fr.f_locals[n] for n in ns}
+    attrs = {**attrs, **added}
+    if isinstance(but,str): but = re.split(', *', but)
+    attrs = {k:v for k,v in attrs.items() if k not in but}
+    return _store_attr(self, **attrs)
 
 # Cell
 def get_specific_dict_param (self, **kwargs):
