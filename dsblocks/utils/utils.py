@@ -41,6 +41,7 @@ def make_reproducible (v1_seed=False, new_session=False):
     """
     os.environ['CUDA_VISIBLE_DEVICES'] = ''
     os.environ['PYTHONHASHSEED'] = '0'
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
     # The below is necessary for starting Numpy generated random numbers
     # in a well-defined initial state.
