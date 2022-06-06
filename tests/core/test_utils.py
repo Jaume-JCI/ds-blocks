@@ -12,6 +12,7 @@ from IPython.display import display
 import pandas as pd
 import numpy as np
 import time
+from pathlib import Path
 
 from dsblocks.core.utils import *
 from dsblocks.utils.utils import remove_previous_results

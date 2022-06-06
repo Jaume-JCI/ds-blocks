@@ -26,8 +26,10 @@ def dsblocks_install_git_hooks():
 
 echo "\n==================== pre-commit hook ===================="
 # Export conda environment to yaml file
-conda env export > {env_name}.yml
-git add {env_name}.yml
+conda env export > envs/{env_name}.yml
+git add envs/{env_name}.yml
 """)
 
     os.chmod (fn, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH |  stat.S_IXOTH)
+
+    os.makedirs ('envs', exist_ok=True)
