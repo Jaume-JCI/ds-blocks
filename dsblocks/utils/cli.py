@@ -19,10 +19,10 @@ def dsblocks_install_git_hooks():
     try: path = get_config().config_file.parent
     except: path = Path.cwd()
     hook_path = path/'.git'/'hooks'
-    fn = hook_path/'pre-push'
+    fn = hook_path/'pre-commit'
     hook_path.mkdir(parents=True, exist_ok=True)
 
-    fn.write_text("""#!/usr/bin/bash
+    fn.write_text("""#!/bin/sh
 
 echo "\n==================== pre-push hook ===================="
 
@@ -44,12 +44,12 @@ else
 fi
 """)
 
-    os.chmod(fn, os.stat(fn).st_mode | stat.S_IEXEC)
+    os.chmod (fn, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH |  stat.S_IXOTH)
 
     fn = hook_path/'post-merge'
     hook_path.mkdir(parents=True, exist_ok=True)
 
-    fn.write_text("""#!/usr/bin/bash
+    fn.write_text("""#!/bin/sh
 
 echo "\n==================== post-merge hook ===================="
 
@@ -63,4 +63,4 @@ echo "Have to update the conda environment"
 check_run env.yml "conda env update --file env.yml"
 """)
 
-    os.chmod(fn, os.stat(fn).st_mode | stat.S_IEXEC)
+    os.chmod (fn, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH |  stat.S_IXOTH)

@@ -20,14 +20,14 @@ def test_dsblocks_install_git_hooks ():
         os.remove ('.git/hooks/post-merge')
 
     dsblocks_install_git_hooks ()
-    assert {'post-merge', 'pre-push'}.issubset(os.listdir ('.git/hooks'))
-    with open('.git/hooks/pre-push', 'rt') as f: txt = f.read ()
-    assert txt.startswith ('#!/usr/bin/bash\n\necho')
+    assert {'post-merge', 'pre-commit'}.issubset(os.listdir ('.git/hooks'))
+    with open('.git/hooks/pre-commit', 'rt') as f: txt = f.read ()
+    assert txt.startswith ('#!/bin/sh\n\necho')
     assert txt.endswith ('fi\n')
 
     with open('.git/hooks/post-merge', 'rt') as f: txt = f.read ()
-    assert txt.startswith ('#!/usr/bin/bash\n\necho')
+    assert txt.startswith ('#!/bin/sh\n\necho')
     assert txt.endswith ('le env.yml"\n')
 
-    os.remove ('.git/hooks/pre-push')
+    os.remove ('.git/hooks/pre-commit')
     os.remove ('.git/hooks/post-merge')
