@@ -16,19 +16,12 @@ def test_dsblocks_install_git_hooks ():
     if os.path.exists('.git/hooks/pre-push'):
         os.remove ('.git/hooks/pre-push')
 
-    if os.path.exists('.git/hooks/post-merge'):
-        os.remove ('.git/hooks/post-merge')
-
     dsblocks_install_git_hooks ()
-    assert {'post-merge', 'pre-commit'}.issubset(os.listdir ('.git/hooks'))
+
+    assert {'pre-commit'}.issubset(os.listdir ('.git/hooks'))
     with open('.git/hooks/pre-commit', 'rt') as f: txt = f.read ()
     assert txt.startswith ('#!/bin/sh\n\necho')
-    assert txt.endswith ('fi\n')
-
-    with open('.git/hooks/post-merge', 'rt') as f: txt = f.read ()
-    assert txt.startswith ('#!/bin/sh\n\necho')
     env_name = os.environ['CONDA_DEFAULT_ENV']
-    assert txt.endswith (f'le {env_name}.yml"\n')
+    assert txt.endswith (f'{env_name}.yml\n')
 
     os.remove ('.git/hooks/pre-commit')
-    os.remove ('.git/hooks/post-merge')
