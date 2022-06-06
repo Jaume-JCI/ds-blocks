@@ -27,7 +27,8 @@ def test_dsblocks_install_git_hooks ():
 
     with open('.git/hooks/post-merge', 'rt') as f: txt = f.read ()
     assert txt.startswith ('#!/bin/sh\n\necho')
-    assert txt.endswith ('le env.yml"\n')
+    env_name = os.environ['CONDA_DEFAULT_ENV']
+    assert txt.endswith (f'le {env_name}.yml"\n')
 
     os.remove ('.git/hooks/pre-commit')
     os.remove ('.git/hooks/post-merge')

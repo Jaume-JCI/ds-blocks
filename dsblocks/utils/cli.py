@@ -21,25 +21,25 @@ def dsblocks_install_git_hooks():
     hook_path = path/'.git'/'hooks'
     fn = hook_path/'pre-commit'
     hook_path.mkdir(parents=True, exist_ok=True)
+    env_name = os.environ['CONDA_DEFAULT_ENV']
+    fn.write_text(f"""#!/bin/sh
 
-    fn.write_text("""#!/bin/sh
-
-echo "\n==================== pre-push hook ===================="
+echo "\n==================== pre-commit hook ===================="
 
 # Export conda environment to yaml file
-conda env export > env.yml
+conda env export > {env_name}.yml
 
 # Check if new environment file is different from original
-git diff --exit-code --quiet env.yml
+git diff --exit-code --quiet {env_name}.yml
 
 # If new environment file is different, commit it
-if [[ $? -eq 0 ]]; then
+if [ $? -eq 0 ]
+then
     echo "Conda environment not changed. No additional commit."
 else
-    echo "Conda environment changed. Commiting new env.yml"
-    git add env.yml
-    git commit -m "Updating conda environment"
-    echo 'You need to push again to push additional "Updating conda environment" commit.'
+    echo "Conda environment changed. Commiting new {env_name}.yml"
+    git add {env_name}.yml
+    git commit -m "Updating conda environment {env_name}"
     exit 1
 fi
 """)
@@ -49,18 +49,18 @@ fi
     fn = hook_path/'post-merge'
     hook_path.mkdir(parents=True, exist_ok=True)
 
-    fn.write_text("""#!/bin/sh
+    fn.write_text(f"""#!/bin/sh
 
 echo "\n==================== post-merge hook ===================="
 
 changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
 
-check_run() {
+check_run() {{
     echo "$changed_files" | grep --quiet "$1" && eval "$2"
-}
+}}
 
 echo "Have to update the conda environment"
-check_run env.yml "conda env update --file env.yml"
+check_run {env_name}.yml "conda env update --file {env_name}.yml"
 """)
 
     os.chmod (fn, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP | stat.S_IROTH |  stat.S_IXOTH)
