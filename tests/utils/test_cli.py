@@ -21,7 +21,6 @@ def test_dsblocks_install_git_hooks ():
     assert {'pre-commit'}.issubset(os.listdir ('.git/hooks'))
     with open('.git/hooks/pre-commit', 'rt') as f: txt = f.read ()
     assert txt.startswith ('#!/bin/sh\n\necho')
-    env_name = os.environ['CONDA_DEFAULT_ENV']
-    assert txt.endswith (f'{env_name}.yml\n')
+    assert txt.endswith ('$CONDA_DEFAULT_ENV.yml\n')
 
     os.remove ('.git/hooks/pre-commit')
