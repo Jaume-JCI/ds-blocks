@@ -985,8 +985,16 @@ class _BaseColumnTransformer (MultiComponent):
         dfs = []
         assert len(self.components) > 0
         assert self.components[-1] is self.concat
+        index = None
         for component in self.components[:-1]:
-            dfs.append (component.transform (df, **kwargs))
+            df_component=component.transform (df, **kwargs)
+            if df_component.shape[0]==df.shape[0]:
+                df_component.index=df.index
+            elif index is not None:
+                df_component.index=index
+            else:
+                index=df_component.index
+            dfs.append (df_component)
         df_result = self.concat.transform (*dfs)
         return df_result
 

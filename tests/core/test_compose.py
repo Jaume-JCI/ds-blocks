@@ -20,11 +20,12 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'TransformM', 'test_multi_modality', 'test_column_selector', 'test_concat', 'test_identity',
            'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
-           'test_make_column_transformer_fit_transform', 'Transform1', 'Transform2', 'multi_split_data',
-           'test_multi_split_transform', 'test_multi_split_fit', 'test_multi_split_chain', 'test_multi_split_io',
-           'test_multi_split_non_dict', 'test_multi_split_non_dict_bis', 'multi_split_data_df_column',
-           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'test_cross_validator_1',
-           'test_cross_validator_2', 'test_cross_validator_3']
+           'test_make_column_transformer_fit_transform', 'test_make_column_transformer_different_indexes', 'Transform1',
+           'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
+           'test_multi_split_chain', 'test_multi_split_io', 'test_multi_split_non_dict',
+           'test_multi_split_non_dict_bis', 'multi_split_data_df_column', 'test_multi_split_df_column_transform',
+           'test_multi_split_df_column_fit', 'test_cross_validator_1', 'test_cross_validator_2',
+           'test_cross_validator_3']
 
 # Cell
 import pytest
@@ -2496,6 +2497,31 @@ def test_make_column_transformer_fit_transform (column_transformer_data):
     assert (dfr['c1_times100'] == sum(df.cont2)*100+df.cont2).all()
     assert (dfr['c2_times100'] == sum(df.cont4)*100+df.cont4).all()
     assert (dfr['c2_times1000'] == sum(df.cont4)*1000+df.cont4).all()
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_make_column_transformer_different_indexes (column_transformer_data):
+    df, tr1 = column_transformer_data
+    def my_transform (df):
+        df = df.copy()
+        df = df + 1
+        df.index=list(range(5,10))
+        return df
+    tr1 = Component (apply=my_transform)
+    tr2 = PandasComponent(FunctionTransformer (lambda x: x*2), name='tr2')
+
+    column_transformer = make_column_transformer (
+        (tr1, ['cont2', 'cont4']),
+        (tr2, ['cont2', 'cat_1']),
+        error_if_apply=True,
+        verbose=2
+    )
+    dfr = column_transformer.fit_transform(df)
+
+    # display & test
+    display(dfr)
+
+    assert not dfr.isna().any().any()
 
 # Comes from compose.ipynb, cell
 class Transform1 (Component):
