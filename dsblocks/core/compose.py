@@ -1293,6 +1293,10 @@ class MultiSplitDict (MultiSplitComponent):
 # Cell
 class MultiSplitDFColumn (MultiSplitComponent):
     def __init__ (self, component=None, apply_to=['whole'], drop_split=False, add_split=True, **kwargs):
+        if (getattr(component, 'apply_to_separate_splits', None)==True
+            and ((isinstance (apply_to, list) and apply_to==['whole'])
+                 or (isinstance(apply_to, str) and apply_to=='whole'))):
+            apply_to = ['training', 'validation', 'test']
         super().__init__ (component=component, apply_to=apply_to, **kwargs)
 
     def __repr__ (self):

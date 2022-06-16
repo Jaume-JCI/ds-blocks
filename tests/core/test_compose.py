@@ -2850,6 +2850,7 @@ def test_cross_validator_1 ():
     i=4
     assert (result2[i][0].values == statistics[i]+df['a'].values).all()
 
+# Comes from compose.ipynb, cell
 def test_cross_validator_2 ():
     # set-up
     def classifier_func (X):
@@ -2872,6 +2873,7 @@ def test_cross_validator_2 ():
     assert (results.loc[results.split=='test', 'accuracy_score'] == [1, 0, 0.5, 1, 0]).all()
     assert (results.loc[results.split=='training', 'accuracy_score'] == [0.375, 0.625, 0.5, 0.375, 0.625]).all()
 
+# Comes from compose.ipynb, cell
 def test_cross_validator_3 ():
     class DummyHistoryClassifier (Component):
         def __init__ (self, **kwargs):
