@@ -1292,7 +1292,7 @@ class MultiSplitDict (MultiSplitComponent):
 
 # Cell
 class MultiSplitDFColumn (MultiSplitComponent):
-    def __init__ (self, component=None, apply_to=['whole'], drop_split=False, **kwargs):
+    def __init__ (self, component=None, apply_to=['whole'], drop_split=False, add_split=True, **kwargs):
         super().__init__ (component=component, apply_to=apply_to, **kwargs)
 
     def __repr__ (self):
@@ -1341,7 +1341,7 @@ class MultiSplitDFColumn (MultiSplitComponent):
         return []
 
     def _add_result (self, result, split, result_split, X):
-        if self.drop_split:
+        if self.drop_split or (not hasattr(result_split, 'split') and self.add_split):
             if split=='whole': result_split['split'] = X.split
             else: result_split['split']=split
         result.append (result_split)

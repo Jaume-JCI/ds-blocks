@@ -2816,71 +2816,58 @@ from dsblocks.blocks.blocks import SkSplitGenerator
 from dsblocks.blocks.blocks import PandasEvaluator
 
 def test_cross_validator_1 ():
+    # setup
     df = pd.DataFrame ({'a': list(range(10)),
-                           'b': list (range(10)),
-                           'label': [0]*5+[1]*5})
+                        'b': list (range(10)),
+                        'label': [0]*5+[1]*5})
 
-    splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_col='label',
-                                      split_col='split')
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
     classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
-    classifier = MultiSplitDFColumn (classifier)
-    dfr = splitter.fit_apply (df)
-    r = classifier.fit_apply (dfr)
+    dfclass = MultiSplitDFColumn (classifier)
 
-
-    classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
-                                  project_op='min', statistic='min')
-    classifier = MultiSplitDFColumn (classifier)
-
-    df = pd.DataFrame ({'a': list(range(10)),
-                           'b': list (range(10)),
-                           'label': [0]*5+[1]*5})
-    splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_col='label',
-                                      split_col='split')
-    cv = CrossValidator (classifier, splitter=splitter)
+    # using `CrossValidator`
+    cv = CrossValidator (dfclass, splitter=splitter)
     result = cv.fit_apply (df)
+
+    # using reference where MultiSplitDFColumn uses all splits
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    dfclass = MultiSplitDFColumn (classifier, apply_to=['training','validation','test'])
+    cv2 = CrossValidator (dfclass, splitter=splitter)
+    result2 = cv2.fit_apply (df)
+
+    # check results
     assert len(result)==5
+    for r, r2 in zip (result, result2): pd.testing.assert_frame_equal (r, r2.sort_index())
 
     assert (result[0].columns == [0,'label','split']).all()
 
     statistics = [-3000, -5000, -6000, -5000, -5000]
     i=0
-    assert (result[i][0].values == np.r_[statistics[i]+df['a'].values[2:],statistics[i]+df['a'].values[:2]]).all()
+    assert (result2[i][0].values == np.r_[statistics[i]+df['a'].values[2:],statistics[i]+df['a'].values[:2]]).all()
     for i in range(1,4):
-        assert (result[i][0].values == np.r_[statistics[i]+df['a'].values[0:2*i],statistics[i]+df['a'].values[2*(i+1):], statistics[i]+df['a'].values[2*i:2*(i+1)]]).all()
+        assert (result2[i][0].values == np.r_[statistics[i]+df['a'].values[0:2*i],statistics[i]+df['a'].values[2*(i+1):], statistics[i]+df['a'].values[2*i:2*(i+1)]]).all()
     i=4
-    assert (result[i][0].values == statistics[i]+df['a'].values).all()
+    assert (result2[i][0].values == statistics[i]+df['a'].values).all()
 
 def test_cross_validator_2 ():
+    # set-up
     def classifier_func (X):
         return pd.DataFrame ({'label': X.label,
                               'classification': np.floor(X['a'].values / 2) % 2})
-
+    df = pd.DataFrame ({'a': list(range(10)),
+                       'b': list (range(10)),
+                       'label': [0]*5+[1]*5})
     classifier_comp = Component (apply=classifier_func)
     classifier = MultiSplitDFColumn (classifier_comp)
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    evaluator = MultiSplitDFColumn(PandasEvaluator(convert_after=lambda x: pd.DataFrame (x, index=[0])))
 
-    df = pd.DataFrame ({'a': list(range(10)),
-                           'b': list (range(10)),
-                           'label': [0]*5+[1]*5})
-    splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_col='label',
-                                      split_col='split')
-    cv = CrossValidator (classifier, splitter=splitter)
-    result = cv.fit_apply (df)
-
-    df = pd.DataFrame ({'a': list(range(10)),
-                           'b': list (range(10)),
-                           'label': [0]*5+[1]*5})
-    splitter = SkSplitGenerator (KFold (n_splits=5),
-                                  label_col='label',
-                                      split_col='split')
-    evaluator = MultiSplitDFColumn(PandasEvaluator(convert_after=lambda x: pd.DataFrame (x, index=[0]))
-                                  )
+    # `CrossValidator` usage
     cv = CrossValidator (classifier, splitter=splitter, evaluator=evaluator, add_evaluation=False)
     result = cv.fit_apply (df)
+
+    # check results
     results = pd.concat(result)
     assert (results.loc[results.split=='test', 'accuracy_score'] == [1, 0, 0.5, 1, 0]).all()
     assert (results.loc[results.split=='training', 'accuracy_score'] == [0.375, 0.625, 0.5, 0.375, 0.625]).all()
