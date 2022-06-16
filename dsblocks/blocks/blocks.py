@@ -120,6 +120,9 @@ class SkSplitGenerator (Component):
             X = self.splitter (X)
         return X
 
+    def reset (self):
+        self.generator = None
+
 # Cell
 class Evaluator (Component, metaclass=abc.ABCMeta):
     def __init__ (self, classification_metrics='accuracy_score', regression_metrics=[], custom_metrics=[],

@@ -1418,7 +1418,7 @@ class CrossValidator (ParallelInstances):
     Runs cross-validation on given pipeline.
     """
     def __init__ (self, component, splitter=None, evaluator=None, n_iterations=None, score_method=None,
-                  select_epoch=False, add_evaluation=True, **kwargs):
+                  select_epoch=False, add_evaluation=True, mode=None, **kwargs):
         """Assigns attributes and calls parent constructor.
         """
         components = (splitter, component) if splitter is not None else (component, )
@@ -1431,6 +1431,12 @@ class CrossValidator (ParallelInstances):
         super().__init__ (pipeline, configs=configs, n_iterations=n_iterations, **kwargs)
         self.dict_results = None
         self.stored_fit_info = False
+        if mode is None:
+            self.max_prefix = 'max_'
+            self.min_prefix = 'min_'
+        else:
+            self.max_prefix = ''
+            self.min_prefix = ''
 
     def store_component_fit_info (self, component, i):
         if self.score_method is not None:
@@ -1469,11 +1475,13 @@ class CrossValidator (ParallelInstances):
             for k in self.dict_results:
                 if isinstance (self.dict_results[k], np.ndarray):
                     final_dict_results[f'last_{k}'] = self.dict_results[k][-1]
-                    final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
-                    final_dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
-                    final_dict_results[f'max_{k}'] = np.max(self.dict_results[k])
-                    final_dict_results[f'min_{k}'] = np.min(self.dict_results[k])
-                    del final_dict_results[k]
+                    if self.mode is None or self.mode=='max':
+                        final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
+                        final_dict_results[f'{self.max_prefix}{k}'] = np.max(self.dict_results[k])
+                    if self.mode is None or self.mode=='min':
+                        final_dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
+                        final_dict_results[f'{self.min_prefix}{k}'] = np.min(self.dict_results[k])
+                    if self.mode is None: del final_dict_results[k]
             self.dict_results = final_dict_results
         self.stored_fit_info = True
         self.data_io.save_result (self.dict_results, result_file_name='cross_validation_final_metrics.pk')

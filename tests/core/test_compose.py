@@ -25,8 +25,9 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_split_chain', 'test_multi_split_io', 'test_multi_split_non_dict',
            'test_multi_split_non_dict_bis', 'multi_split_data_df_column',
            'test_multi_split_df_column_transform_whole_df', 'test_multi_split_df_column_transform',
-           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'test_cross_validator_1',
-           'test_cross_validator_2', 'test_cross_validator_3']
+           'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
+           'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
+           'test_cross_validator_4']
 
 # Cell
 import pytest
@@ -2811,16 +2812,20 @@ def test_multi_split_df_column_fit ():
         assert (tr2.data[split] == df[df.split==split]).all().all()
 
 # Comes from compose.ipynb, cell
+def get_cross_validator_input_data ():
+    df = pd.DataFrame ({'a': list(range(10)),
+                        'b': list (range(10)),
+                        'label': [0]*5+[1]*5})
+    return df
+
+# Comes from compose.ipynb, cell
 from dsblocks.utils.dummies import DummyClassifier
 from dsblocks.blocks.blocks import SkSplitGenerator
 from dsblocks.blocks.blocks import PandasEvaluator
 
 def test_cross_validator_1 ():
     # setup
-    df = pd.DataFrame ({'a': list(range(10)),
-                        'b': list (range(10)),
-                        'label': [0]*5+[1]*5})
-
+    df = get_cross_validator_input_data ()
     splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
     classifier = DummyClassifier (data_converter=PandasConverter (metadata=['split']),
                                   project_op='min', statistic='min')
@@ -2831,7 +2836,7 @@ def test_cross_validator_1 ():
     result = cv.fit_apply (df)
 
     # using reference where MultiSplitDFColumn uses all splits
-    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    splitter.reset ()
     dfclass = MultiSplitDFColumn (classifier, apply_to=['training','validation','test'])
     cv2 = CrossValidator (dfclass, splitter=splitter)
     result2 = cv2.fit_apply (df)
@@ -2856,9 +2861,7 @@ def test_cross_validator_2 ():
     def classifier_func (X):
         return pd.DataFrame ({'label': X.label,
                               'classification': np.floor(X['a'].values / 2) % 2})
-    df = pd.DataFrame ({'a': list(range(10)),
-                       'b': list (range(10)),
-                       'label': [0]*5+[1]*5})
+    df = get_cross_validator_input_data ()
     classifier_comp = Component (apply=classifier_func)
     classifier = MultiSplitDFColumn (classifier_comp)
     splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
@@ -2874,32 +2877,31 @@ def test_cross_validator_2 ():
     assert (results.loc[results.split=='training', 'accuracy_score'] == [0.375, 0.625, 0.5, 0.375, 0.625]).all()
 
 # Comes from compose.ipynb, cell
-def test_cross_validator_3 ():
-    class DummyHistoryClassifier (Component):
-        def __init__ (self, **kwargs):
-            super ().__init__ (**kwargs)
-        def _apply (self, X, **kwargs):
-            return X
-        def _fit (self, X, y=None, **kwargs):
-            self.dict_results = {
-                'score': np.abs (X['a'].values-5) if (X['a'].values[0] % 2) == 1 else np.abs(X['a'].values-4)}
-        def history (self):
-            return self.dict_results
+class DummyHistoryClassifier (Component):
+    def __init__ (self, **kwargs):
+        super ().__init__ (**kwargs)
+    def _apply (self, X, **kwargs):
+        return X
+    def _fit (self, X, y=None, **kwargs):
+        self.dict_results = {
+            'score': np.abs (X['a'].values-5) if (X['a'].values[0] % 2) == 1 else np.abs(X['a'].values-4)}
+    def history (self):
+        return self.dict_results
 
+def test_cross_validator_3 ():
     classifier_comp = DummyHistoryClassifier ()
     classifier = MultiSplitDFColumn (classifier_comp)
-
-    df = pd.DataFrame ({'a': list(range(10)),
-                           'b': list (range(10)),
-                           'label': [0]*5+[1]*5})
+    df = get_cross_validator_input_data ()
     splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+
+    # example usage
     cv = CrossValidator (classifier, splitter=splitter, score_method='history')
     result = cv.fit_apply (df)
 
     assert (list(result.keys()) == ['score']
             and (result['score'] == np.array([3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6])).all())
 
-    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    splitter.reset ()
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True)
     result = cv.fit_apply (df)
 
@@ -2908,7 +2910,7 @@ def test_cross_validator_3 ():
     # ************************************************
     # ************************************************
     path_results = 'test_cross_validator_3'
-    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    splitter.reset ()
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
                          path_results=path_results)
     result = cv.fit_apply (df)
@@ -2917,6 +2919,49 @@ def test_cross_validator_3 ():
 
     result = joblib.load (f'{path_results}/whole/cross_validation_final_metrics.pk')
     assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+
+    result = joblib.load (f'{path_results}/whole/cross_validation_metrics.pk')
+    assert list(result.keys())==['score'] and (result['score']==[3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6]).all()
+
+    assert sorted (os.listdir(f'{path_results}/whole'))==['cross_validation_final_metrics.pk',
+                                                     'cross_validation_metrics.pk',
+                                                     'cross_validator_result.pk',
+                                                     'pipeline_0_result.pk',
+                                                     'pipeline_1_result.pk',
+                                                     'pipeline_2_result.pk',
+                                                     'pipeline_3_result.pk',
+                                                     'pipeline_4_result.pk']
+
+    remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+def test_cross_validator_4 ():
+    # set up
+    classifier_comp = DummyHistoryClassifier ()
+    classifier = MultiSplitDFColumn (classifier_comp)
+    df = get_cross_validator_input_data ()
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+
+    # usage
+    cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
+                         mode='max')
+    result = cv.fit_apply (df)
+
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
+
+    # ************************************************
+    # ************************************************
+    path_results = 'test_cross_validator_4'
+    splitter.reset ()
+    cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
+                         mode='max', path_results=path_results)
+    result = cv.fit_apply (df)
+
+    # check
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
+
+    result = joblib.load (f'{path_results}/whole/cross_validation_final_metrics.pk')
+    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
 
     result = joblib.load (f'{path_results}/whole/cross_validation_metrics.pk')
     assert list(result.keys())==['score'] and (result['score']==[3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6]).all()
