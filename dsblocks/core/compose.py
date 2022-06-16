@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 import shutil
 import copy
+import warnings
 
 import joblib
 from sklearn.utils import Bunch
@@ -614,10 +615,10 @@ class Pipeline (MultiComponent):
 
         if first < len(self.components):
             component = self.components[first]
-            X = component.fit_apply (*X, sequential_fit_apply=True, **kwargs)
+            X = component.fit_apply (*X, sequential_fit_apply=True, split=split, **kwargs)
             first += 1
         for component in self.components[first:last]:
-            X = component.fit_apply (X, sequential_fit_apply=True, **kwargs)
+            X = component.fit_apply (X, sequential_fit_apply=True, split=split, **kwargs)
         return X
 
     def _apply (self, *X, split=None, **kwargs):
@@ -630,10 +631,10 @@ class Pipeline (MultiComponent):
 
         if first < len(self.components):
             component = self.components[first]
-            X = component.apply (*X, **kwargs)
+            X = component.apply (*X, split=split, **kwargs)
             first += 1
         for component in self.components[first:]:
-            X = component.apply (X, **kwargs)
+            X = component.apply (X, split=split, **kwargs)
         return X
 
     def find_last_result (self, split=None, func='apply', first=-1):
@@ -989,6 +990,10 @@ class _BaseColumnTransformer (MultiComponent):
         for component in self.components[:-1]:
             df_component=component.transform (df, **kwargs)
             if df_component.shape[0]==df.shape[0]:
+                if not (df_component.index==df.index).all():
+                    message = f'index obtained by {component} is different than original index'
+                    warnings.warn (message)
+                    self.logger.warning (message)
                 df_component.index=df.index
             elif index is not None:
                 df_component.index=index
@@ -1089,6 +1094,7 @@ def make_column_transformer (*transformers, remainder='drop', name=None, class_n
     return column_transformer
 
 
+
 # Cell
 class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
     def __init__ (self,
@@ -1170,7 +1176,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _add_result (self, result, split, result_split):
+    def _add_result (self, result, split, result_split, X):
         pass
 
     def _apply (self, X, apply_to = None, output_not_dict=False, split=None, **kwargs):
@@ -1185,7 +1191,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
             if self._included_split (split, X):
                 X_split = self._select_split (X, split)
                 result_split = component.apply (X_split, split=split, **kwargs)
-                result = self._add_result (result, split, result_split)
+                result = self._add_result (result, split, result_split, X)
             else:
                 self._issue_error_or_warning (split, X)
 
@@ -1218,7 +1224,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
             if not component.find_last_fitted_model (split=split):
                 all_components_fitted = False
         elif (component.is_model and
-              not (component.data_io.can_load_model () and component.data_io.exists_model ())):
+              not (component.data_io.can_load_model () and component.data_io.exists_estimator ())):
                 all_components_fitted = False
 
         if all_components_fitted and self.data_io.exists_result (split=split):
@@ -1273,7 +1279,7 @@ class MultiSplitDict (MultiSplitComponent):
     def _initialize_result (self):
         return {}
 
-    def _add_result (self, result, split, result_split):
+    def _add_result (self, result, split, result_split, X):
         result[split] = result_split
         return result
 
@@ -1286,8 +1292,8 @@ class MultiSplitDict (MultiSplitComponent):
 
 # Cell
 class MultiSplitDFColumn (MultiSplitComponent):
-    def __init__ (self, component=None, **kwargs):
-        super().__init__ (component=component, **kwargs)
+    def __init__ (self, component=None, apply_to=['whole'], drop_split=False, **kwargs):
+        super().__init__ (component=component, apply_to=apply_to, **kwargs)
 
     def __repr__ (self):
         return f'MultiSplitDF {self.class_name} (name={self.name})'
@@ -1327,13 +1333,17 @@ class MultiSplitDFColumn (MultiSplitComponent):
         return split == 'whole' or split in X.split.values
 
     def _select_split (self, X, split):
-        return X[X.split==split] if split != 'whole' else X
+        X_split = X[X.split==split] if split != 'whole' else X
+        if self.drop_split: X_split = X_split.drop(columns='split')
+        return X_split
 
     def _initialize_result (self):
         return []
 
-    def _add_result (self, result, split, result_split):
-        result_split['split']=split
+    def _add_result (self, result, split, result_split, X):
+        if self.drop_split:
+            if split=='whole': result_split['split'] = X.split
+            else: result_split['split']=split
         result.append (result_split)
         return result
 

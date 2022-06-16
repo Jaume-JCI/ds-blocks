@@ -62,6 +62,7 @@ dependencies:
     - idna==3.3
     - importlib-metadata==4.11.3
     - iniconfig==1.1.1
+    - ipdb==0.13.9
     - ipykernel==6.13.0
     - ipython==8.3.0
     - ipython-genutils==0.2.0
@@ -158,6 +159,7 @@ dependencies:
     - tf-estimator-nightly==2.8.0.dev2021122109
     - threadpoolctl==3.1.0
     - tinycss2==1.1.1
+    - toml==0.10.2
     - tomli==2.0.1
     - tornado==6.1
     - traitlets==5.1.1
