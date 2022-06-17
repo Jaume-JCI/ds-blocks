@@ -2906,7 +2906,7 @@ def test_cross_validator_3 ():
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True)
     result = cv.fit_apply (df)
 
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+    assert result=={'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7, 'max_score': 4.6, 'argmin_score': 3, 'min_score': 1.0}
 
     # ************************************************
     # ************************************************
@@ -2916,10 +2916,10 @@ def test_cross_validator_3 ():
                          path_results=path_results)
     result = cv.fit_apply (df)
 
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+    assert result=={'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7, 'max_score': 4.6, 'argmin_score': 3, 'min_score': 1.0}
 
     result = joblib.load (f'{path_results}/whole/cross_validation_final_metrics.pk')
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'argmin_score': 3, 'max_score': 4.6, 'min_score': 1.0}
+    assert result=={'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7, 'max_score': 4.6, 'argmin_score': 3, 'min_score': 1.0}
 
     result = joblib.load (f'{path_results}/whole/cross_validation_metrics.pk')
     assert list(result.keys())==['score'] and (result['score']==[3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6]).all()
@@ -2948,7 +2948,7 @@ def test_cross_validator_4 ():
                          optimization_mode='max')
     result = cv.fit_apply (df)
 
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
+    assert result=={'score': 4.6, 'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7}
 
     # ************************************************
     # ************************************************
@@ -2959,10 +2959,10 @@ def test_cross_validator_4 ():
     result = cv.fit_apply (df)
 
     # check
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
+    assert result=={'score': 4.6, 'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7}
 
     result = joblib.load (f'{path_results}/whole/cross_validation_final_metrics.pk')
-    assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
+    assert result=={'score': 4.6, 'last_score': 4.6, 'n_iterations': 5, 'argmax_score': 7}
 
     result = joblib.load (f'{path_results}/whole/cross_validation_metrics.pk')
     assert list(result.keys())==['score'] and (result['score']==[3.6, 2.6, 1.2, 1. , 1.2, 2.2, 3.6, 4.6]).all()
@@ -3152,22 +3152,22 @@ def test_cross_validator_pruner ():
 
         if trial.number==4:
             assert should_prune and npipelines==1 and cv.n_iterations==1
-            assert cv.dict_results=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
+            assert cv.dict_results=={'score': 56.4, 'last_score': 55.4, 'n_iterations': 1.0, 'argmax_score': 2}
             check_dict_of_array (dict_results,
                                  {'score': np.array([55.4, 55.4, 56.4, 55.4, 55.4, 55.4, 55.4])})
-            assert final_results=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
-            assert cross_validator_result=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
+            assert final_results=={'score': 56.4, 'last_score': 55.4, 'n_iterations': 1.0, 'argmax_score': 2}
+            assert cross_validator_result=={'score': 56.4, 'last_score': 55.4, 'n_iterations': 1.0, 'argmax_score': 2}
 
         else:
             assert not should_prune and npipelines==5 and cv.n_iterations==5
             check_rounded_result (cv.dict_results,
-                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+                                  {'score': 1045.0, 'last_score': 1044.0, 'n_iterations': 5.0, 'argmax_score': 1.0})
             check_rounded_result (dict_results,
                                   {'score': np.array([1044, 1045, 1044, 1044, 1044, 1044, 1044])})
             check_rounded_result (final_results,
-                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+                                  {'score': 1045.0, 'last_score': 1044.0, 'n_iterations': 5.0, 'argmax_score': 1.0})
             check_rounded_result (cross_validator_result,
-                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+                                  {'score': 1045.0, 'last_score': 1044.0, 'n_iterations': 5.0, 'argmax_score': 1.0})
 
         return 5.0
 
