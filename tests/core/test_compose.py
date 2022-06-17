@@ -27,7 +27,7 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_split_df_column_transform_whole_df', 'test_multi_split_df_column_transform',
            'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
            'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
-           'test_cross_validator_4']
+           'test_cross_validator_4', 'test_optuna_pruner', 'test_cross_validator_pruner']
 
 # Cell
 import pytest
@@ -2944,7 +2944,7 @@ def test_cross_validator_4 ():
 
     # usage
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
-                         mode='max')
+                         optimization_mode='max')
     result = cv.fit_apply (df)
 
     assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
@@ -2954,7 +2954,7 @@ def test_cross_validator_4 ():
     path_results = 'test_cross_validator_4'
     splitter.reset ()
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
-                         mode='max', path_results=path_results)
+                         optimization_mode='max', path_results=path_results)
     result = cv.fit_apply (df)
 
     # check
@@ -2975,4 +2975,133 @@ def test_cross_validator_4 ():
                                                      'pipeline_3_result.pk',
                                                      'pipeline_4_result.pk']
 
+    remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+def test_optuna_pruner ():
+    try:
+        import optuna
+    except ImportError:
+        print ('optuna not installed - exiting')
+        return
+    path_results = 'test_optuna_pruner'
+    study_name='test_pruner'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+    global i
+    i = 0
+    def objective (trial):
+        global i
+        v = 0
+        if i == 4:
+            v = 0
+        else:
+            v = 5
+        trial.report (v, 0)
+        if i==4:
+            assert trial.should_prune()
+        else:
+            assert not trial.should_prune()
+        i += 1
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
+    remove_previous_results (path_results)
+
+    ### second
+    path_results = 'test_optuna_pruner_second'
+    study_name='test_pruner_second'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+    i = 0
+    def objective (trial):
+        global i
+        v = 0
+        if i == 4:
+            v = 0
+        else:
+            v = 5
+        trial.report (v, 0)
+        assert not trial.should_prune()
+        i += 1
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
+    remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+def test_cross_validator_pruner ():
+    try:
+        import optuna
+    except ImportError:
+        print ('optuna not installed - exiting')
+        return
+
+    class PrunerClassifier (Component):
+        def __init__ (self, **kwargs):
+            super ().__init__ (**kwargs)
+            self.i = None
+        def _apply (self, X, **kwargs):
+            return X
+        def _fit (self, X, y=None, **kwargs):
+            score = 0.0 if self.i == 4 else 5.0
+            self.dict_results = dict (score=score)
+        def history (self):
+            return self.dict_results
+
+    path_results = 'test_cross_validator_pruner'
+    study_name='test_pruner'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+
+    # set-up
+    def create_cv ():
+        classifier_comp = PrunerClassifier ()
+        classifier = MultiSplitDFColumn (classifier_comp)
+        df = get_cross_validator_input_data ()
+        splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+        cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
+                             optimization_mode='max', path_results=path_results, key_score='score')
+        return cv, classifier_comp
+
+    df = get_cross_validator_input_data ()
+
+    global i
+    i = 0
+    def objective (trial):
+        global i
+        v = 0
+        if i == 4:
+            v = 0
+        else:
+            v = 5
+        cv, classifier_comp = create_cv ()
+        cv.trial = trial
+        classifier_comp.i = i
+        result = cv.fit_apply (df)
+        should_prune = trial.should_prune()
+        dict_results = cv.load_result (result_file_name='cross_validation_metrics.pk')
+        print (f'iteration {i}, should_prune: {should_prune}, force_fitting: {cv.force_fitting_end}, '
+               f'dict_results: {cv.dict_results}, stored: {dict_results}')
+        if i==4: assert should_prune
+        else: assert not should_prune
+        i += 1
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
     remove_previous_results (path_results)
