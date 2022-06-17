@@ -1432,7 +1432,8 @@ class CrossValidator (ParallelInstances):
     """
     def __init__ (self, component, splitter=None, evaluator=None, n_iterations=None, score_method=None,
                   select_epoch=False, add_evaluation=True, optimization_mode=None, trial=None,
-                  key_score=None, pruner_optimization_mode=None, **kwargs):
+                  key_score=None, pruner_optimization_mode=None, indicate_same_step=False,
+                  **kwargs):
         """Assigns attributes and calls parent constructor.
         """
         components = (splitter, component) if splitter is not None else (component, )
@@ -1482,7 +1483,9 @@ class CrossValidator (ParallelInstances):
         result = dict_results[self.key_score]
         if self.pruner_optimization_mode=='max': result = np.max(result)
         elif self.pruner_optimization_mode=='min': result = np.min(result)
-        self.trial.report (result, 0)
+        step_number = 0 if self.indicate_same_step else i
+        self.logger.debug (f'reporting {result} at step {step_number}')
+        self.trial.report (result, step_number)
         if self.trial.should_prune():
             self.logger.info (f'prunning at {i}-th fold')
             self.force_end = True
@@ -1507,6 +1510,7 @@ class CrossValidator (ParallelInstances):
             for k in self.dict_results:
                 if isinstance (self.dict_results[k], np.ndarray):
                     final_dict_results[f'last_{k}'] = self.dict_results[k][-1]
+                    final_dict_results['n_iterations'] = self.n_iterations
                     if self.optimization_mode is None or self.optimization_mode=='max':
                         final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
                         final_dict_results[f'{self.max_prefix}{k}'] = np.max(self.dict_results[k])

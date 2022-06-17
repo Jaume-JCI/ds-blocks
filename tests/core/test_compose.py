@@ -27,7 +27,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_split_df_column_transform_whole_df', 'test_multi_split_df_column_transform',
            'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
            'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
-           'test_cross_validator_4', 'test_optuna_pruner', 'test_cross_validator_pruner']
+           'test_cross_validator_4', 'run_study', 'run_multiple_studies', 'test_optuna_pruner', 'test_optuna_pruner_2',
+           'test_optuna_pruner_3', 'test_optuna_pruner_4', 'test_optuna_pruner_5', 'test_cross_validator_pruner']
 
 # Cell
 import pytest
@@ -2978,66 +2979,86 @@ def test_cross_validator_4 ():
     remove_previous_results (path_results)
 
 # Comes from compose.ipynb, cell
+try:
+    import optuna
+    imported_optuna = True
+except ImportError:
+    print ('optuna not installed - exiting')
+    imported_optuna = False
+
+def run_study (n_startup_trials=5, n_warmup_steps=0, study_suffix='', nfolds=1,
+               trial_outlier=4, fold_outlier='all', indicate_same_step=True,
+               same_value_per_step=True, n_trials=10):
+
+    print ('\n\nnew study')
+    print (dict(n_startup_trials=n_startup_trials, n_warmup_steps=n_warmup_steps,
+                study_suffix=study_suffix, nfolds=nfolds, trial_outlier=trial_outlier,
+                fold_outlier=fold_outlier, indicate_same_step=indicate_same_step,
+                same_value_per_step=same_value_per_step))
+
+    if not imported_optuna: return
+    path_results = f'test_optuna_pruner{study_suffix}'
+    study_name=f'test_pruner{study_suffix}'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=n_startup_trials, n_warmup_steps=n_warmup_steps)
+    os.makedirs (path_results, exist_ok=True)
+
+    def objective (trial):
+        shoulds = []
+        for fold in range (nfolds):
+            if trial.number==trial_outlier and (fold==fold_outlier or fold_outlier=='all'):
+                v = 0
+            else:
+                v = 5
+            step = 0 if indicate_same_step else fold
+            fold_value = v if same_value_per_step else fold*100+v
+            trial.report (fold_value, step)
+            shoulds.append (trial.should_prune())
+        print (f'trial {trial.number}, shoulds: {shoulds}')
+        if False:
+            if trial.number==4:
+                assert trial.should_prune()
+            else:
+                assert not trial.should_prune()
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=n_trials, n_jobs=1)
+    remove_previous_results (path_results)
+
+def run_multiple_studies (n_startup_trials=2, n_warmup_steps=0, study_suffix='', **kwargs):
+    run_study (n_startup_trials=2, n_warmup_steps=0, study_suffix=study_suffix, **kwargs)
+    run_study (n_startup_trials=5, n_warmup_steps=0, study_suffix=study_suffix + '_b', **kwargs)
+
+# Comes from compose.ipynb, cell
 def test_optuna_pruner ():
-    try:
-        import optuna
-    except ImportError:
-        print ('optuna not installed - exiting')
-        return
-    path_results = 'test_optuna_pruner'
-    study_name='test_pruner'
-    pruner = optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=0)
-    os.makedirs (path_results, exist_ok=True)
-    global i
-    i = 0
-    def objective (trial):
-        global i
-        v = 0
-        if i == 4:
-            v = 0
-        else:
-            v = 5
-        trial.report (v, 0)
-        if i==4:
-            assert trial.should_prune()
-        else:
-            assert not trial.should_prune()
-        i += 1
-        return 5.0
+    run_multiple_studies (study_suffix='')
 
-    study = optuna.create_study(direction='maximize',
-                                study_name=study_name,
-                                storage=f'sqlite:///{path_results}/{study_name}.db',
-                                pruner=pruner, load_if_exists=True)
+# Comes from compose.ipynb, cell
+def test_optuna_pruner_2 ():
+    run_multiple_studies (study_suffix='_2', nfolds=10, trial_outlier=4, fold_outlier='all',
+                          indicate_same_step=True, same_value_per_step=True)
 
-    study.optimize(objective, n_trials=10, n_jobs=1)
-    remove_previous_results (path_results)
+# Comes from compose.ipynb, cell
+def test_optuna_pruner_3 ():
+    run_multiple_studies (study_suffix='_3', nfolds=10, trial_outlier=4, fold_outlier='all',
+                          indicate_same_step=True, same_value_per_step=False)
 
-    ### second
-    path_results = 'test_optuna_pruner_second'
-    study_name='test_pruner_second'
-    pruner = optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=0)
-    os.makedirs (path_results, exist_ok=True)
-    i = 0
-    def objective (trial):
-        global i
-        v = 0
-        if i == 4:
-            v = 0
-        else:
-            v = 5
-        trial.report (v, 0)
-        assert not trial.should_prune()
-        i += 1
-        return 5.0
+# Comes from compose.ipynb, cell
+def test_optuna_pruner_4 ():
+    run_multiple_studies (study_suffix='_4', nfolds=10, trial_outlier=4, fold_outlier=3,
+                          indicate_same_step=True, same_value_per_step=False)
+    #run_study (n_startup_trials=2, n_warmup_steps=0, study_suffix='_4', n_trials=100,
+    #       nfolds=100, trial_outlier=90, fold_outlier=90, indicate_same_step=True,
+    #       same_value_per_step=False)
 
-    study = optuna.create_study(direction='maximize',
-                                study_name=study_name,
-                                storage=f'sqlite:///{path_results}/{study_name}.db',
-                                pruner=pruner, load_if_exists=True)
-
-    study.optimize(objective, n_trials=10, n_jobs=1)
-    remove_previous_results (path_results)
+# Comes from compose.ipynb, cell
+def test_optuna_pruner_5 ():
+    run_multiple_studies (study_suffix='_5', nfolds=10, trial_outlier=4, fold_outlier=3,
+                          indicate_same_step=False, same_value_per_step=False)
 
 # Comes from compose.ipynb, cell
 def test_cross_validator_pruner ():
