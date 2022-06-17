@@ -27,7 +27,7 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_split_df_column_transform_whole_df', 'test_multi_split_df_column_transform',
            'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
            'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
-           'test_cross_validator_4']
+           'test_cross_validator_4', 'test_optuna_pruner', 'test_cross_validator_pruner']
 
 # Cell
 import pytest
@@ -2944,7 +2944,7 @@ def test_cross_validator_4 ():
 
     # usage
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
-                         mode='max')
+                         optimization_mode='max')
     result = cv.fit_apply (df)
 
     assert result=={'last_score': 4.6, 'argmax_score': 7, 'score': 4.6}
@@ -2954,7 +2954,7 @@ def test_cross_validator_4 ():
     path_results = 'test_cross_validator_4'
     splitter.reset ()
     cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
-                         mode='max', path_results=path_results)
+                         optimization_mode='max', path_results=path_results)
     result = cv.fit_apply (df)
 
     # check
@@ -2974,5 +2974,198 @@ def test_cross_validator_4 ():
                                                      'pipeline_2_result.pk',
                                                      'pipeline_3_result.pk',
                                                      'pipeline_4_result.pk']
+
+    remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+def test_optuna_pruner ():
+    try:
+        import optuna
+    except ImportError:
+        print ('optuna not installed - exiting')
+        return
+    path_results = 'test_optuna_pruner'
+    study_name='test_pruner'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+    global i
+    i = 0
+    def objective (trial):
+        global i
+        v = 0
+        if i == 4:
+            v = 0
+        else:
+            v = 5
+        trial.report (v, 0)
+        if i==4:
+            assert trial.should_prune()
+        else:
+            assert not trial.should_prune()
+        i += 1
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
+    remove_previous_results (path_results)
+
+    ### second
+    path_results = 'test_optuna_pruner_second'
+    study_name='test_pruner_second'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+    i = 0
+    def objective (trial):
+        global i
+        v = 0
+        if i == 4:
+            v = 0
+        else:
+            v = 5
+        trial.report (v, 0)
+        assert not trial.should_prune()
+        i += 1
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
+    remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+def test_cross_validator_pruner ():
+    try:
+        import optuna
+    except ImportError:
+        print ('optuna not installed - exiting')
+        return
+    import glob
+
+    def check_rounded_result (result, reference):
+        if type(reference.get('score')) == np.ndarray:
+            assert list(result.keys())==['score']
+            assert (np.floor(result['score'])==reference['score']).all()
+        else:
+            rounded_result = {k: np.floor(result[k]) for k in result}
+            assert rounded_result==reference
+
+    def check_dict_of_array (result, reference):
+        assert list(result.keys())==['score']
+        assert type(result['score'])==np.ndarray
+        assert (result['score']==reference['score']).all()
+
+
+    class PrunerClassifier (Component):
+        def __init__ (self, **kwargs):
+            super ().__init__ (**kwargs)
+            self.experiment_number = None
+        def _apply (self, X, **kwargs):
+            return X
+        def _fit (self, X, y=None, **kwargs):
+            score = 1.0 if self.experiment_number == 4 else 1000.0
+            self.logger.debug (f'base score due to experiment parameters: {score}')
+
+            experiment_addition = self.experiment_number/10.0
+            score += experiment_addition
+            self.logger.debug (f'experiment_addition: {experiment_addition} => score: {score}')
+
+            training_data_addition = np.mean(X.a.values)*10
+            score += training_data_addition
+            self.logger.debug (f'training_data_addition: {training_data_addition} => score: {score}')
+
+            if self.experiment_number == 4: scores = [score-1.0]*2 + [score] + [score-1.0]*4
+            else: scores = [score-1.0, score] + [score-1.0]*5
+            self.logger.info (f'final scores across epochs: {scores}')
+            self.dict_results = dict (score=scores)
+        def history (self):
+            return self.dict_results
+
+    path_results = 'test_cross_validator_pruner'
+    study_name='test_pruner'
+    pruner = optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=0)
+    os.makedirs (path_results, exist_ok=True)
+
+    # set-up
+    df = get_cross_validator_input_data ()
+    classifier_comp = PrunerClassifier (verbose=2)
+    classifier = MultiSplitDFColumn (classifier_comp)
+    splitter = SkSplitGenerator (KFold (n_splits=5), label_col='label', split_col='split')
+    def create_cv (trial):
+        splitter.reset ()
+        classifier_comp.experiment_number = trial.number
+        cv = CrossValidator (classifier, splitter=splitter, score_method='history', select_epoch=True,
+                             optimization_mode='max', path_results=f'{path_results}/{trial.number}',
+                             key_score='score', pruner_optimization_mode='max', verbose=2, trial=trial)
+        return cv
+
+    df = get_cross_validator_input_data ()
+
+    def objective (trial):
+        v = 0
+        if trial.number == 4:
+            v = 0
+        else:
+            v = 5
+        cv = create_cv (trial)
+
+        cv.logger.info (f'{"*"*100}\n')
+        cv.logger.info (f'experiment number {trial.number}')
+        result = cv.fit_apply (df)
+        should_prune = trial.should_prune()
+        dict_results = cv.load_result (result_file_name='cross_validation_metrics.pk')
+        final_results = cv.load_result (result_file_name='cross_validation_final_metrics.pk')
+        cross_validator_result = cv.load_result (result_file_name='cross_validator_result.pk')
+        npipelines = len(glob.glob (f'{path_results}/{trial.number}/whole/pipeline_*_result.pk'))
+
+        cv.logger.info (f'experiment number {trial.number}, should_prune: {should_prune}, '
+               f'npipelines: {npipelines}, n_iterations: {cv.n_iterations}\n'
+               f'dict_results: {cv.dict_results}\nstored: {dict_results}\n'
+               f'final_results: {final_results}\ncross_validator_result: {cross_validator_result}')
+
+        if trial.number==4:
+            assert should_prune and npipelines==1 and cv.n_iterations==1
+            assert cv.dict_results=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
+            check_dict_of_array (dict_results,
+                                 {'score': np.array([55.4, 55.4, 56.4, 55.4, 55.4, 55.4, 55.4])})
+            assert final_results=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
+            assert cross_validator_result=={'score': 56.4, 'last_score': 55.4, 'argmax_score': 2}
+
+        else:
+            assert not should_prune and npipelines==5 and cv.n_iterations==5
+            check_rounded_result (cv.dict_results,
+                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+            check_rounded_result (dict_results,
+                                  {'score': np.array([1044, 1045, 1044, 1044, 1044, 1044, 1044])})
+            check_rounded_result (final_results,
+                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+            check_rounded_result (cross_validator_result,
+                                  {'score': 1045, 'last_score': 1044, 'argmax_score': 1})
+
+        return 5.0
+
+    study = optuna.create_study(direction='maximize',
+                                study_name=study_name,
+                                storage=f'sqlite:///{path_results}/{study_name}.db',
+                                pruner=pruner, load_if_exists=True)
+
+    study.optimize(objective, n_trials=10, n_jobs=1)
+
+    classifier_comp.logger.info ('\n\nFinal results across epochs for the different experiments')
+    for experiment_number in range(10):
+        dict_results = joblib.load (f'{path_results}/{experiment_number}/whole/cross_validation_metrics.pk')
+        classifier_comp.logger.info (dict_results)
+
+    classifier_comp.logger.info ('\nFinal results for the different experiments')
+    for experiment_number in range(10):
+        final_results = joblib.load (f'{path_results}/{experiment_number}/whole/'
+                                     'cross_validation_final_metrics.pk')
+        classifier_comp.logger.info (final_results)
 
     remove_previous_results (path_results)

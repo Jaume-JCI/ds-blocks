@@ -756,6 +756,7 @@ class Parallel (MultiComponent):
         finalize_result = (self.finalize_result if finalize_result is None
                                       else finalize_result)
         self.finalize_result = finalize_result
+        self.force_end = False
 
         super().__init__ (*components, **kwargs)
 
@@ -773,7 +774,16 @@ class Parallel (MultiComponent):
             Xi = self.select_input_to_fit (self.components, i, *X)
             component.fit (*Xi, **kwargs)
             self.store_component_fit_info (component, i)
+            if self.force_end:
+                self._finish_loop (i)
+                break
         self.store_fit_info ()
+
+    def _finish_loop (self, i):
+        message = f"finishing fit's loop at iteration {i}"
+        #print (message)
+        self.logger.info (message)
+        self.force_end = False
 
     def _apply (self, *X, **kwargs):
         """Transform data with components of pipeline, and predict labels with last component.
@@ -801,6 +811,9 @@ class Parallel (MultiComponent):
             Xi_r = component.fit_apply (*Xi, **kwargs)
             Xr = self.join_result (Xr, Xi_r, self.components, i)
             self.store_component_fit_apply_info (component, i)
+            if self.force_end:
+                self._finish_loop (i)
+                break
 
         Xr = self.finalize_result (Xr)
         self.store_fit_apply_info ()
@@ -1418,7 +1431,8 @@ class CrossValidator (ParallelInstances):
     Runs cross-validation on given pipeline.
     """
     def __init__ (self, component, splitter=None, evaluator=None, n_iterations=None, score_method=None,
-                  select_epoch=False, add_evaluation=True, mode=None, **kwargs):
+                  select_epoch=False, add_evaluation=True, optimization_mode=None, trial=None,
+                  key_score=None, pruner_optimization_mode=None, **kwargs):
         """Assigns attributes and calls parent constructor.
         """
         components = (splitter, component) if splitter is not None else (component, )
@@ -1431,12 +1445,14 @@ class CrossValidator (ParallelInstances):
         super().__init__ (pipeline, configs=configs, n_iterations=n_iterations, **kwargs)
         self.dict_results = None
         self.stored_fit_info = False
-        if mode is None:
+        if optimization_mode is None:
             self.max_prefix = 'max_'
             self.min_prefix = 'min_'
         else:
             self.max_prefix = ''
             self.min_prefix = ''
+        if self.trial is not None and self.key_score is not None and self.pruner_optimization_mode is None:
+            self.pruner_optimization_mode = self.optimization_mode
 
     def store_component_fit_info (self, component, i):
         if self.score_method is not None:
@@ -1444,7 +1460,13 @@ class CrossValidator (ParallelInstances):
             if score_method is None:
                 raise ValueError (f'score method {self.score_method} not found in {component}')
 
-            self._add_dict_results (score_method())
+            dict_results = score_method()
+            self._add_dict_results (dict_results)
+            if self.trial is not None:
+                if self.key_score is None:
+                    self.logger.warning (f'key_score is None but trial is {self.trial}')
+                else:
+                    self._apply_pruner (dict_results, i)
 
     store_component_fit_apply_info = store_component_fit_info
 
@@ -1455,6 +1477,16 @@ class CrossValidator (ParallelInstances):
                                  for k, v in dict_results.items()}
         else:
             for k in dict_results: self.dict_results[k] += dict_results[k]
+
+    def _apply_pruner (self, dict_results, i):
+        result = dict_results[self.key_score]
+        if self.pruner_optimization_mode=='max': result = np.max(result)
+        elif self.pruner_optimization_mode=='min': result = np.min(result)
+        self.trial.report (result, 0)
+        if self.trial.should_prune():
+            self.logger.info (f'prunning at {i}-th fold')
+            self.force_end = True
+            self.n_iterations = i+1
 
     def join_result (self, Xr, Xi_r, components, i):
         if self.evaluator is not None and self.add_evaluation:
@@ -1475,13 +1507,13 @@ class CrossValidator (ParallelInstances):
             for k in self.dict_results:
                 if isinstance (self.dict_results[k], np.ndarray):
                     final_dict_results[f'last_{k}'] = self.dict_results[k][-1]
-                    if self.mode is None or self.mode=='max':
+                    if self.optimization_mode is None or self.optimization_mode=='max':
                         final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
                         final_dict_results[f'{self.max_prefix}{k}'] = np.max(self.dict_results[k])
-                    if self.mode is None or self.mode=='min':
+                    if self.optimization_mode is None or self.optimization_mode=='min':
                         final_dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
                         final_dict_results[f'{self.min_prefix}{k}'] = np.min(self.dict_results[k])
-                    if self.mode is None: del final_dict_results[k]
+                    if self.optimization_mode is None: del final_dict_results[k]
             self.dict_results = final_dict_results
         self.stored_fit_info = True
         self.data_io.save_result (self.dict_results, result_file_name='cross_validation_final_metrics.pk')
