@@ -104,6 +104,7 @@ def set_logger (name, path_results=dflt.path_logger_folder, stdout=dflt.stdout_l
     logger.setLevel(logging_level)
 
     for hdlr in logger.handlers[:]:  # remove all old handlers
+        hdlr.close()
         logger.removeHandler(hdlr)
     # Create handlers
     if stdout:

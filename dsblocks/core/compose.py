@@ -602,6 +602,7 @@ class Pipeline (MultiComponent):
 
         By default, y will be None, and the labels are part of `X`, as a variable.
         """
+        assert len(self.components) > 1, 'Sequential class needs to have more than one component'
         X = self._fit_apply (*X, last=-1, **kwargs)
         self.components[-1].fit (X, **kwargs)
 
@@ -1438,7 +1439,7 @@ class CrossValidator (ParallelInstances):
         """Assigns attributes and calls parent constructor."""
         components = (splitter, component) if splitter is not None else (component, )
         components += (evaluator, ) if evaluator is not None else ()
-        pipeline = Sequential (*components, **kwargs)
+        pipeline = Sequential (*components, **kwargs) if len(components)>1 else component
 
         assert splitter is not None or n_iterations is not None, 'either splitter or n_iterations need to be specified'
         n_iterations = splitter.split_generator.get_n_splits() if n_iterations is None else n_iterations
