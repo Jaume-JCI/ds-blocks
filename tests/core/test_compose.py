@@ -23,7 +23,7 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_make_column_transformer_fit_transform', 'test_make_column_transformer_different_indexes', 'Transform1',
            'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
            'test_multi_split_chain', 'test_multi_split_io', 'test_multi_split_non_dict',
-           'test_multi_split_non_dict_bis', 'multi_split_data_df_column',
+           'test_multi_split_non_dict_bis', 'test_multi_split_root', 'multi_split_data_df_column',
            'test_multi_split_df_column_transform_whole_df', 'test_multi_split_df_column_transform',
            'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
            'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
@@ -2714,6 +2714,18 @@ def test_multi_split_non_dict_bis ():
 
     assert type(result)==np.ndarray
     assert (result==data['test']*2).all()
+
+# Comes from compose.ipynb, cell
+#@pytest.mark.reference_fails
+def test_multi_split_root (multi_split_data):
+    """ Have MultiSplitComponent be root"""
+    data, *_ = multi_split_data
+    print ('original data')
+    display (data)
+    component = MultiSplitDict (Component (apply=lambda x:x+1), root=True)
+    result = component.apply (data)
+    print ('transformed data')
+    display (result)
 
 # Comes from compose.ipynb, cell
 def multi_split_data_df_column ():

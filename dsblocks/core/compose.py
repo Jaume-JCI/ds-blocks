@@ -1131,7 +1131,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
                 name = f'{component.name}_multi_split'
             else:
                 name = f'{component.__class__.__name__}_multi_split'
-
+        self.set_components (component)
         super().__init__ (name=name, class_name=class_name, **kwargs)
 
     @abc.abstractmethod
