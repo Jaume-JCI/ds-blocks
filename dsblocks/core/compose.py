@@ -1131,6 +1131,7 @@ class MultiSplitComponent (MultiComponent, metaclass=abc.ABCMeta):
                 name = f'{component.name}_multi_split'
             else:
                 name = f'{component.__class__.__name__}_multi_split'
+        self.warning_if_nick_name_exists=False # needed when calling set_components in next line
         self.set_components (component)
         super().__init__ (name=name, class_name=class_name, **kwargs)
 
@@ -1434,12 +1435,12 @@ class CrossValidator (ParallelInstances):
                   select_epoch=False, add_evaluation=True, optimization_mode=None, trial=None,
                   key_score=None, pruner_optimization_mode=None, indicate_same_step=False,
                   **kwargs):
-        """Assigns attributes and calls parent constructor.
-        """
+        """Assigns attributes and calls parent constructor."""
         components = (splitter, component) if splitter is not None else (component, )
         components += (evaluator, ) if evaluator is not None else ()
         pipeline = Sequential (*components, **kwargs)
 
+        assert splitter is not None or n_iterations is not None, 'either splitter or n_iterations need to be specified'
         n_iterations = splitter.split_generator.get_n_splits() if n_iterations is None else n_iterations
         configs = [dict(suffix=i) for i in range(n_iterations)]
 
