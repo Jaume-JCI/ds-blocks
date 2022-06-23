@@ -799,11 +799,17 @@ class Comparator ():
             return ''
 
         if isinstance (left, np.ndarray):
-            try:
-                np.testing.assert_allclose (left, right, rtol=rtol, atol=atol)
-                return ''
-            except AssertionError as e:
-                return message + str(e)
+            if (left.dtype == np.object) and (right.dtype == np.object):
+                if left.tolist() != right.tolist():
+                    return message + f'{left}!={right}'
+                else:
+                    return ''
+            else:
+                try:
+                    np.testing.assert_allclose (left, right, rtol=rtol, atol=atol)
+                    return ''
+                except AssertionError as e:
+                    return message + str(e)
         elif isinstance (left, pd.DataFrame):
             try:
                 pd.testing.assert_frame_equal (left, right)

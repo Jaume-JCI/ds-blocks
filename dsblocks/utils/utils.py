@@ -301,7 +301,7 @@ def get_hierarchy_level (base_class=object):
                     (type(self) != last_type) ):
                     hierarchy_level += 1
                     last_type = type(self)
-    except:
+    except Exception as e:
         warnings.warn (f'error {e} while calculating hierarchy level, returning 0')
     return hierarchy_level
 
