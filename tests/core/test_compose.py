@@ -28,7 +28,8 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_multi_split_df_column_transform', 'test_multi_split_df_column_fit', 'get_cross_validator_input_data',
            'test_cross_validator_1', 'test_cross_validator_2', 'DummyHistoryClassifier', 'test_cross_validator_3',
            'test_cross_validator_4', 'run_study', 'run_multiple_studies', 'test_optuna_pruner', 'test_optuna_pruner_2',
-           'test_optuna_pruner_3', 'test_optuna_pruner_4', 'test_optuna_pruner_5', 'test_cross_validator_pruner']
+           'test_optuna_pruner_3', 'test_optuna_pruner_4', 'test_optuna_pruner_5', 'test_cross_validator_pruner',
+           'DummyClassifierInstance', 'test_instances_ensembler_1', 'test_instances_ensembler_2']
 
 # Cell
 import pytest
@@ -3202,3 +3203,29 @@ def test_cross_validator_pruner ():
         classifier_comp.logger.info (final_results)
 
     remove_previous_results (path_results)
+
+# Comes from compose.ipynb, cell
+class DummyClassifierInstance (Component):
+    def __init__ (self, **kwargs):
+        super ().__init__ (**kwargs)
+    def _apply (self, X, **kwargs):
+        return (X.values[:,0] > self.threshold).astype(float)
+    def _fit (self, X, y=None, **kwargs):
+        self.row = self.suffix
+        self.threshold = X.values[self.row, 0]
+
+# Comes from compose.ipynb, cell
+def test_instances_ensembler_1 ():
+    df = get_cross_validator_input_data ()
+    classifier = DummyClassifierInstance ()
+    ensembler = InstancesEnsembler (classifier, n_models=5)
+    result = ensembler.fit_apply(df)
+    assert result.tolist()==[0.  , 0.04, 0.08, 0.12000000000000002, 0.16, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ]
+
+# Comes from compose.ipynb, cell
+def test_instances_ensembler_2 ():
+    df = get_cross_validator_input_data ()
+    classifier = DummyClassifierInstance ()
+    ensembler = InstancesEnsembler (classifier, n_models=5)
+    result = ensembler.fit_apply(df)
+    assert result.tolist()==[0.  , 0.04, 0.08, 0.12000000000000002, 0.16, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ]

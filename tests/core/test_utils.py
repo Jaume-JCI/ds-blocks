@@ -2,7 +2,7 @@
 
 __all__ = ['test_get_specific_data_io_parameters', 'DummyComponent', 'test_data_io_folder', 'dummy_component',
            'test_data_io_chaining', 'test_data_io_factory', 'test_profiler', 'MyTransformComparator', 'test_comparator',
-           'test_comparator2']
+           'test_compare', 'test_comparator2']
 
 # Cell
 import pytest
@@ -175,7 +175,6 @@ def test_profiler ():
     assert (dfd.avg.index.get_level_values(1)==['comp_a', 'comp_b']).all()
 
 # Comes from utils.ipynb, cell
-#@pytest.mark.reference_fails
 class MyTransformComparator ():
     def __init__ (self, noise=1e-10, different = False, **kwargs):
         self.noise = noise
@@ -220,6 +219,13 @@ def test_comparator ():
     result = comp.compare (tr(), tr2())
     print(result)
     assert len(result)>0
+
+# Comes from utils.ipynb, cell
+def test_compare ():
+    tr = MyTransformComparator ()
+    tr2= MyTransformComparator ()
+    result = compare (tr(), tr2())
+    assert len(result)==0
 
 # Comes from utils.ipynb, cell
 #@pytest.mark.reference_fails

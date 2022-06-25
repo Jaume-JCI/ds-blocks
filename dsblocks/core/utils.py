@@ -2,8 +2,8 @@
 
 __all__ = ['save_csv', 'save_parquet', 'save_multi_index_parquet', 'save_keras_model', 'save_csv_gz', 'read_csv',
            'read_csv_gz', 'load_keras_model', 'estimator2io', 'result2io', 'DataIO', 'PandasIO', 'PickleIO',
-           'SklearnIO', 'NoSaverIO', 'data_io_factory', 'ModelPlotter', 'Profiler', 'Comparator', 'camel_to_snake',
-           'snake_to_camel']
+           'SklearnIO', 'NoSaverIO', 'data_io_factory', 'ModelPlotter', 'Profiler', 'Comparator', 'compare',
+           'camel_to_snake', 'snake_to_camel']
 
 # Cell
 from pathlib import Path
@@ -873,6 +873,11 @@ class Comparator ():
                 if verbose is not None:
                     self.logger.setLevel(get_logging_level (self.component.verbose))
                 return False
+
+# Cell
+def compare (left, right, **kwargs):
+    c = Comparator ()
+    return c.compare (left, right, **kwargs)
 
 # Cell
 def camel_to_snake (name):

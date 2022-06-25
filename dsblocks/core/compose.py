@@ -3,7 +3,7 @@
 __all__ = ['MultiComponent', 'Pipeline', 'Sequential', 'make_pipeline', 'pipeline_factory', 'PandasPipeline',
            'Parallel', 'MultiModality', 'ColumnSelector', 'Concat', 'ColumnTransformer', 'Identity',
            'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict',
-           'MultiSplitDFColumn', 'ParallelInstances', 'CrossValidator', 'EnsembleInstances']
+           'MultiSplitDFColumn', 'ParallelInstances', 'CrossValidator', 'InstancesEnsembler']
 
 # Cell
 import abc
@@ -1400,10 +1400,13 @@ class ParallelInstances (Parallel):
                               all_components_fitted=[self.all_components_fitted]*self.n_iterations,
                               load_all_estimators=[self.load_all_estimators]*self.n_iterations)
 
-    def set_component_info (self, component, i):
-        if self.storage is None: self.create_component_storage_info ()
+    def set_component_config (self, component, i):
         suffix = self.configs[i].get('suffix', '')
         component.set_suffix (suffix)
+
+    def set_component_info (self, component, i):
+        if self.storage is None: self.create_component_storage_info ()
+        self.set_component_config (component, i)
         component.start_idx = copy.deepcopy(self.storage.start_idx[i])
         component.is_data_source = copy.deepcopy(self.storage.is_data_source[i])
         component.all_components_fitted = self.storage.all_components_fitted[i]
@@ -1532,105 +1535,58 @@ class CrossValidator (ParallelInstances):
             return super().finalize_result (Xr, components=components)
 
 # Cell
-class EnsembleInstances (ParallelInstances):
+class InstancesEnsembler (ParallelInstances):
     """
-    Runs cross-validation on given pipeline.
+    Ensemble of given instances
     """
-    def __init__ (self, component, splitter=None, evaluator=None, n_iterations=None, score_method=None,
-                  select_epoch=False, add_evaluation=True, optimization_mode=None, trial=None,
-                  key_score=None, pruner_optimization_mode=None, indicate_same_step=False,
-                  **kwargs):
+    def __init__ (self, component, path_models=None, file_names=None, template_paths=None,
+                  template_names=None, n_models=None, ensemble_type='weighted',
+                  weights=None, **kwargs):
         """Assigns attributes and calls parent constructor."""
-        components = (splitter, component) if splitter is not None else (component, )
-        components += (evaluator, ) if evaluator is not None else ()
-        pipeline = Sequential (*components, **kwargs) if len(components)>1 else component
+        if n_models is None:
+            if path_models is not None:
+                n_models = len(path_models)
+            elif file_names is not None:
+                n_models = len(file_names)
+            else:
+                raise ValueError ('one of n_models, path_models, or file_names must be indicated')
 
-        assert splitter is not None or n_iterations is not None, 'either splitter or n_iterations need to be specified'
-        n_iterations = splitter.split_generator.get_n_splits() if n_iterations is None else n_iterations
-        configs = [dict(suffix=i) for i in range(n_iterations)]
-
-        super().__init__ (pipeline, configs=configs, n_iterations=n_iterations, **kwargs)
-        self.dict_results = None
-        self.stored_fit_info = False
-        if optimization_mode is None:
-            self.max_prefix = 'max_'
-            self.min_prefix = 'min_'
+        if (path_models is None and file_names is None and template_paths is None and template_names is None):
+            configs = [dict(suffix=i) for i in range(n_models)]
         else:
-            self.max_prefix = ''
-            self.min_prefix = ''
-        if self.trial is not None and self.key_score is not None and self.pruner_optimization_mode is None:
-            self.pruner_optimization_mode = self.optimization_mode
+            configs = {}
 
-    def store_component_fit_info (self, component, i):
-        if self.score_method is not None:
-            score_method = self.find_method (self.score_method)
-            if score_method is None:
-                raise ValueError (f'score method {self.score_method} not found in {component}')
-
-            dict_results = score_method()
-            self._add_dict_results (dict_results)
-            if self.trial is not None:
-                if self.key_score is None:
-                    self.logger.warning (f'key_score is None but trial is {self.trial}')
-                else:
-                    self._apply_pruner (dict_results, i)
-
-    store_component_fit_apply_info = store_component_fit_info
-
-    def _add_dict_results (self, dict_results):
-        dict_results = copy.deepcopy(dict_results)
-        if self.dict_results is None:
-            self.dict_results = {k: np.array(v) if isinstance(v, list) else v
-                                 for k, v in dict_results.items()}
+        if ensemble_type=='weighted':
+            self.finalize_result = self.result_weighted_mean
+            if weights is None:
+                weights = np.ones ((n_models, )) * 1.0/n_models
         else:
-            for k in dict_results: self.dict_results[k] += dict_results[k]
+            raise NotImplementedError (f'ensemble_type {ensemble_type} not implemented')
 
-    def _apply_pruner (self, dict_results, i):
-        result = dict_results[self.key_score]
-        if self.pruner_optimization_mode=='max': result = np.max(result)
-        elif self.pruner_optimization_mode=='min': result = np.min(result)
-        step_number = 0 if self.indicate_same_step else i
-        self.logger.debug (f'reporting {result} at step {step_number}')
-        self.trial.report (result, step_number)
-        if self.trial.should_prune():
-            self.logger.info (f'prunning at {i}-th fold')
-            self.force_end = True
-            self.n_iterations = i+1
+        super().__init__ (component, configs=configs, n_iterations=n_models, **kwargs)
 
-    def join_result (self, Xr, Xi_r, components, i):
-        if self.evaluator is not None and self.add_evaluation:
-            self._add_dict_results (Xi_r)
-            return None
-        elif self.dict_results is None:
-            return super().join_result (Xr, Xi_r, components, i)
-
-    def store_fit_info (self):
-        if self.stored_fit_info:
-            return
-        if self.dict_results is not None:
-            for k in self.dict_results:
-                self.dict_results[k] = self.dict_results[k] / self.n_iterations
-        self.data_io.save_result (self.dict_results, result_file_name='cross_validation_metrics.pk')
-        if self.select_epoch:
-            final_dict_results = self.dict_results.copy()
-            for k in self.dict_results:
-                if isinstance (self.dict_results[k], np.ndarray):
-                    final_dict_results[f'last_{k}'] = self.dict_results[k][-1]
-                    final_dict_results['n_iterations'] = self.n_iterations
-                    if self.optimization_mode is None or self.optimization_mode=='max':
-                        final_dict_results[f'argmax_{k}'] = np.argmax(self.dict_results[k])
-                        final_dict_results[f'{self.max_prefix}{k}'] = np.max(self.dict_results[k])
-                    if self.optimization_mode is None or self.optimization_mode=='min':
-                        final_dict_results[f'argmin_{k}'] = np.argmin(self.dict_results[k])
-                        final_dict_results[f'{self.min_prefix}{k}'] = np.min(self.dict_results[k])
-                    if self.optimization_mode is None: del final_dict_results[k]
-            self.dict_results = final_dict_results
-        self.stored_fit_info = True
-        self.data_io.save_result (self.dict_results, result_file_name='cross_validation_final_metrics.pk')
-
-    def finalize_result (self, Xr, components=None):
-        if self.dict_results is not None:
-            self.store_fit_info ()
-            return self.dict_results
+    def set_component_config (self, component, i):
+        path_models = None
+        fitting_file_name = None
+        if self.template_paths is not None:
+            path_models = Path(self.template_paths.format (i))
+        elif self.path_models is not None:
+            path_models = self.path_models[i]
+        if path_models is not None:
+            file_name = path_models.name
+            path_results = path_models.parent
+            component.set_name (file_name)
+            component.data_io.path_models = path_models
         else:
-            return super().finalize_result (Xr, components=components)
+            if self.template_names is not None:
+                fitting_file_name = self.template_names.format (i)
+            elif self.file_names is not None:
+                fitting_file_name = self.file_names[i]
+        if path_models is None and fitting_file_name is None:
+            super().set_component_config (component, i)
+
+    def result_weighted_mean (self, Xr, components=None):
+        Xr = np.array(Xr)
+        assert Xr.shape[0] == self.n_models or Xr.shape[1] == self.n_models
+        if Xr.shape[1]==self.n_models: Xr = Xr.T
+        return (self.weights.reshape(-1,1) * Xr).mean(axis=0)
