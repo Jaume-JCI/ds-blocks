@@ -99,6 +99,9 @@ class MultiComponent (SamplingComponent):
         self.all_components_fitted = False
         self.load_all_estimators = False
 
+        self.set_root_info (root)
+
+    def set_root_info (self, root):
         if root is not None: self.set_root (root)
         if root is self:
             self.num_names = {}
