@@ -34,6 +34,7 @@ __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
 # Cell
 import pytest
 import os
+import shutil
 import joblib
 from IPython.display import display
 import pandas as pd
@@ -3209,10 +3210,10 @@ class DummyClassifierInstance (Component):
     def __init__ (self, **kwargs):
         super ().__init__ (**kwargs)
     def _apply (self, X, **kwargs):
-        return (X.values[:,0] > self.threshold).astype(float)
+        return (X.values[:,0] > self.estimator.threshold).astype(float)
     def _fit (self, X, y=None, **kwargs):
         self.row = self.suffix
-        self.threshold = X.values[self.row, 0]
+        self.create_estimator (threshold = X.values[self.row, 0])
 
 # Comes from compose.ipynb, cell
 def test_instances_ensembler_1 ():
@@ -3224,8 +3225,57 @@ def test_instances_ensembler_1 ():
 
 # Comes from compose.ipynb, cell
 def test_instances_ensembler_2 ():
+    path_results='test_ensembler'
+    path_models='test_ensembler_models'
     df = get_cross_validator_input_data ()
-    classifier = DummyClassifierInstance ()
+    classifier = DummyClassifierInstance (path_results=path_results, path_models=path_models)
     ensembler = InstancesEnsembler (classifier, n_models=5)
     result = ensembler.fit_apply(df)
+
+    assert sorted(os.listdir (f'{path_results}/whole'))==[
+        'dummy_classifier_instance_0_result.pk',
+        'dummy_classifier_instance_1_result.pk',
+        'dummy_classifier_instance_2_result.pk',
+        'dummy_classifier_instance_3_result.pk',
+        'dummy_classifier_instance_4_result.pk']
+
+    assert sorted(os.listdir (f'{path_models}/models'))==['dummy_classifier_instance_0_estimator.pk',
+         'dummy_classifier_instance_1_estimator.pk',
+         'dummy_classifier_instance_2_estimator.pk',
+         'dummy_classifier_instance_3_estimator.pk',
+         'dummy_classifier_instance_4_estimator.pk']
+
+    for i in range (5):
+        assert joblib.load (f'{path_models}/models/dummy_classifier_instance_{i}_estimator.pk')=={'threshold': i}
+
+    base_separate = 'test_ensemble_separate'
+    separate_model_paths = []
+    separate_model_paths.append(f'{base_separate}/folder_a/aaa/first.pk')
+    separate_model_paths.append(f'{base_separate}/folder_b/bbb/second.pk')
+    separate_model_paths.append(f'{base_separate}/folder_c/ccc/third.pk')
+    separate_model_paths.append(f'{base_separate}/folder_d/ddd/fourth.pk')
+    separate_model_paths.append(f'{base_separate}/folder_e/eee/fifth.pk')
+    for i in range (len(separate_model_paths)):
+        Path(separate_model_paths[i]).parent.mkdir (parents=True, exist_ok=True)
+        shutil.move (f'{path_models}/models/dummy_classifier_instance_{i}_estimator.pk', separate_model_paths[i])
+
+    remove_previous_results (path_models)
+    remove_previous_results (path_results)
+
+    classifier = DummyClassifierInstance (path_results=path_results, path_models=path_models)
+    ensembler = InstancesEnsembler (classifier, n_models=5, separate_model_paths=separate_model_paths)
+
+    classifier.load_estimator()
+    assert ensembler.component.estimator is None
+
+    result = ensembler.fit_apply(df)
+    print (result)
     assert result.tolist()==[0.  , 0.04, 0.08, 0.12000000000000002, 0.16, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ]
+
+    assert os.path.exists(path_results)
+    os.listdir(path_results)
+    assert not os.path.exists(path_models)
+
+    remove_previous_results (path_results)
+    remove_previous_results (path_models)
+    remove_previous_results (base_separate)

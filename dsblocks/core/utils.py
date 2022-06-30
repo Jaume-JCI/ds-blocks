@@ -218,6 +218,7 @@ class DataIO ():
                path_models=None,
                fitting_file_name=None,
                fitting_file_extension=None,
+               models_folder='models',
                fitting_load_func=None,
                fitting_save_func=None,
                estimator_io='pickle',
@@ -237,6 +238,7 @@ class DataIO ():
                load=True,
                save=True,
                split='whole',
+               use_split_folder=True,
                folder='',
                stop_propagation=False,
                **kwargs):
@@ -247,6 +249,7 @@ class DataIO ():
         # saving / loading estimator parameters
         self.fitting_file_name = fitting_file_name
         self.fitting_file_extension = fitting_file_extension
+        self.models_folder = models_folder
         self.fitting_load_func = fitting_load_func
         self.fitting_save_func = fitting_save_func
         self.estimator_io = estimator_io
@@ -266,6 +269,7 @@ class DataIO ():
         # whether the transformation has been applied to training data (i.e., to be saved in training path)
         # or to test data (i.e,. to be saved in test path)
         self.split = split
+        self.use_split_folder = use_split_folder
 
         # global saving and loading
         self.set_save (save)
@@ -330,13 +334,11 @@ class DataIO ():
         path_models = self.path_models if path_models is None else Path(path_models).resolve()
         fitting_file_name = self.fitting_file_name if fitting_file_name is None else fitting_file_name
         if path_models is not None:
-            if self.folder != '':
-                path_model_file = path_models / self.folder / 'models' / fitting_file_name
-            else:
-                path_model_file = path_models / 'models' / fitting_file_name
+            path_model_file = path_models / self.folder / self.models_folder / fitting_file_name
         else:
             path_model_file = None
         return path_model_file
+
     def load_estimator (self, path_models=None, fitting_file_name=None):
         """Load estimator parameters."""
         path_model_file = self.get_path_model_file (path_models=path_models,
@@ -360,14 +362,12 @@ class DataIO ():
             self._save (path_model_file, self.fitting_save_func, self.component.estimator)
 
     def get_path_result_file (self, split=None, path_results=None, result_file_name=None):
-        split = self.split if split is None else split
+        self_split = self.split if self.use_split_folder else ''
+        split = self_split if split is None else split
         path_results = self.path_results if path_results is None else Path(path_results).resolve()
         result_file_name = self.result_file_name if result_file_name is None else result_file_name
         if path_results is not None:
-            if self.folder != '':
-                path_result_file = path_results / self.folder / split / result_file_name
-            else:
-                path_result_file = path_results / split / result_file_name
+            path_result_file = path_results / self.folder / split / result_file_name
         else:
             path_result_file = None
         return path_result_file
@@ -436,6 +436,28 @@ class DataIO ():
 
     def set_save_splits (self, save_splits):
         self.save_splits = save_splits
+
+    def set_full_path_results (self, path_results):
+        path_results = Path(path_results).resolve()
+        self.result_file_name = path_results.name
+        self.path_results = path_results.parent
+        if self.folder is not None and self.folder != '':
+            folder = self.folder
+            self.folder = ''
+            self.path_models = self.path_models / folder
+        self.use_split_folder = False
+        self.component.path_results = self.path_results
+
+    def set_full_path_models (self, path_models):
+        path_models = Path(path_models).resolve()
+        self.fitting_file_name = path_models.name
+        self.path_models = path_models.parent
+        if self.folder is not None and self.folder != '':
+            folder = self.folder
+            self.folder = ''
+            self.path_results = self.path_results / folder
+        self.models_folder = ''
+        self.component.path_models = self.path_models
 
     def set_path_results (self, path_results):
         self.path_results = path_results

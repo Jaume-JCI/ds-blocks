@@ -1542,22 +1542,18 @@ class InstancesEnsembler (ParallelInstances):
     """
     Ensemble of given instances
     """
-    def __init__ (self, component, path_models=None, file_names=None, template_paths=None,
-                  template_names=None, n_models=None, ensemble_type='weighted',
+    def __init__ (self, component, separate_model_paths=None, n_models=None, ensemble_type='weighted',
                   weights=None, **kwargs):
         """Assigns attributes and calls parent constructor."""
         if n_models is None:
-            if path_models is not None:
-                n_models = len(path_models)
-            elif file_names is not None:
-                n_models = len(file_names)
+            if separate_model_paths is not None:
+                n_models = len(separate_model_paths)
             else:
-                raise ValueError ('one of n_models, path_models, or file_names must be indicated')
+                raise ValueError ('either n_models or separate_model_paths need to be indicated')
+        elif separate_model_paths is not None:
+            assert n_models==len(separate_model_paths)
 
-        if (path_models is None and file_names is None and template_paths is None and template_names is None):
-            configs = [dict(suffix=i) for i in range(n_models)]
-        else:
-            configs = {}
+        configs = [dict(suffix=i) for i in range(n_models)]
 
         if ensemble_type=='weighted':
             self.finalize_result = self.result_weighted_mean
@@ -1569,27 +1565,13 @@ class InstancesEnsembler (ParallelInstances):
         super().__init__ (component, configs=configs, n_iterations=n_models, **kwargs)
 
     def set_component_config (self, component, i):
-        path_models = None
-        fitting_file_name = None
-        if self.template_paths is not None:
-            path_models = Path(self.template_paths.format (i))
-        elif self.path_models is not None:
-            path_models = self.path_models[i]
-        if path_models is not None:
-            file_name = path_models.name
-            path_results = path_models.parent
-            component.set_name (file_name)
-            component.data_io.path_models = path_models
-        else:
-            if self.template_names is not None:
-                fitting_file_name = self.template_names.format (i)
-            elif self.file_names is not None:
-                fitting_file_name = self.file_names[i]
-        if path_models is None and fitting_file_name is None:
-            super().set_component_config (component, i)
+        super().set_component_config (component, i) # this needs to be called first
+        if self.separate_model_paths is not None:
+            component.data_io.set_full_path_models (self.separate_model_paths[i])
 
     def result_weighted_mean (self, Xr, components=None):
         Xr = np.array(Xr)
         assert Xr.shape[0] == self.n_models or Xr.shape[1] == self.n_models
         if Xr.shape[1]==self.n_models: Xr = Xr.T
         return (self.weights.reshape(-1,1) * Xr).mean(axis=0)
+
