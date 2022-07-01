@@ -3,7 +3,8 @@
 __all__ = ['MultiComponent', 'Pipeline', 'Sequential', 'make_pipeline', 'pipeline_factory', 'PandasPipeline',
            'Parallel', 'MultiModality', 'ColumnSelector', 'Concat', 'ColumnTransformer', 'Identity',
            'make_column_transformer_pipelines', 'make_column_transformer', 'MultiSplitComponent', 'MultiSplitDict',
-           'MultiSplitDFColumn', 'ParallelInstances', 'CrossValidator', 'InstancesEnsembler']
+           'MultiSplitDFColumn', 'ParallelInstances', 'CrossValidator', 'finalize_result_parallel_models',
+           'ParallelModelInstances', 'WeightedClassifier', 'make_ensembler']
 
 # Cell
 import abc
@@ -1538,12 +1539,18 @@ class CrossValidator (ParallelInstances):
             return super().finalize_result (Xr, components=components)
 
 # Cell
-class InstancesEnsembler (ParallelInstances):
+def finalize_result_parallel_models (self, Xr, components=None):
+    Xr = np.array(Xr)
+    assert Xr.shape[0] == self.n_models or Xr.shape[1] == self.n_models
+    if Xr.shape[1]==self.n_models: Xr = Xr.T
+    return Xr
+
+# Cell
+class ParallelModelInstances (ParallelInstances):
     """
     Ensemble of given instances
     """
-    def __init__ (self, component, separate_model_paths=None, n_models=None, ensemble_type='weighted',
-                  weights=None, **kwargs):
+    def __init__ (self, component, separate_model_paths=None, n_models=None, **kwargs):
         """Assigns attributes and calls parent constructor."""
         if n_models is None:
             if separate_model_paths is not None:
@@ -1555,13 +1562,6 @@ class InstancesEnsembler (ParallelInstances):
 
         configs = [dict(suffix=i) for i in range(n_models)]
 
-        if ensemble_type=='weighted':
-            self.finalize_result = self.result_weighted_mean
-            if weights is None:
-                weights = np.ones ((n_models, )) * 1.0/n_models
-        else:
-            raise NotImplementedError (f'ensemble_type {ensemble_type} not implemented')
-
         super().__init__ (component, configs=configs, n_iterations=n_models, **kwargs)
 
     def set_component_config (self, component, i):
@@ -1569,9 +1569,29 @@ class InstancesEnsembler (ParallelInstances):
         if self.separate_model_paths is not None:
             component.data_io.set_full_path_models (self.separate_model_paths[i])
 
-    def result_weighted_mean (self, Xr, components=None):
-        Xr = np.array(Xr)
-        assert Xr.shape[0] == self.n_models or Xr.shape[1] == self.n_models
-        if Xr.shape[1]==self.n_models: Xr = Xr.T
-        return (self.weights.reshape(-1,1) * Xr).mean(axis=0)
+    def finalize_result (self, Xr, components=None):
+        return finalize_result_parallel_models (self, Xr, components=components)
 
+# Cell
+class WeightedClassifier (Component):
+    def __init__ (self, weights=None, **kwargs):
+        super().__init__ (**kwargs)
+    def _apply (self, X, **kwargs):
+        if self.weights is None:
+            n_models = X.shape[0]
+            self.weights = np.ones ((n_models, )) * 1.0/n_models
+        return (self.weights.reshape(-1,1) * X).mean(axis=0)
+
+# Cell
+def make_ensembler (component, instances=True, final_classifier=None, root=False, class_name='Ensembler',
+                    name='ensembler', **kwargs):
+    """Assigns attributes and calls parent constructor."""
+    if instances:
+        parallel_models = ParallelModelInstances (component, **kwargs)
+    else:
+        raise NotImplementedError ('Only ParallelModelInstances is implemented as of now.')
+    if final_classifier is None:
+        final_classifier = WeightedClassifier (**kwargs)
+
+    return Sequential (parallel_models, final_classifier, root=root, class_name=class_name, name=name,
+                       **kwargs)

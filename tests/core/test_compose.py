@@ -3219,7 +3219,7 @@ class DummyClassifierInstance (Component):
 def test_instances_ensembler_1 ():
     df = get_cross_validator_input_data ()
     classifier = DummyClassifierInstance ()
-    ensembler = InstancesEnsembler (classifier, n_models=5)
+    ensembler = make_ensembler (classifier, n_models=5)
     result = ensembler.fit_apply(df)
     assert result.tolist()==[0.  , 0.04, 0.08, 0.12000000000000002, 0.16, 0.2 , 0.2 , 0.2 , 0.2 , 0.2 ]
 
@@ -3229,7 +3229,7 @@ def test_instances_ensembler_2 ():
     path_models='test_ensembler_models'
     df = get_cross_validator_input_data ()
     classifier = DummyClassifierInstance (path_results=path_results, path_models=path_models)
-    ensembler = InstancesEnsembler (classifier, n_models=5)
+    ensembler = make_ensembler (classifier, n_models=5)
     result = ensembler.fit_apply(df)
 
     assert sorted(os.listdir (f'{path_results}/whole'))==[
@@ -3263,10 +3263,10 @@ def test_instances_ensembler_2 ():
     remove_previous_results (path_results)
 
     classifier = DummyClassifierInstance (path_results=path_results, path_models=path_models)
-    ensembler = InstancesEnsembler (classifier, n_models=5, separate_model_paths=separate_model_paths)
+    ensembler = make_ensembler (classifier, n_models=5, separate_model_paths=separate_model_paths)
 
     classifier.load_estimator()
-    assert ensembler.component.estimator is None
+    assert ensembler.components[0].component.estimator is None
 
     result = ensembler.fit_apply(df)
     print (result)
