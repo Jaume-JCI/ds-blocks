@@ -54,6 +54,7 @@ class MultiComponent (SamplingComponent):
                   path_models=dflt.path_models,
                   root=None,
                   automatic_root=False,
+                  unique_names=True,
                   **kwargs):
         """Assigns attributes and calls parent constructor.
 
@@ -100,14 +101,14 @@ class MultiComponent (SamplingComponent):
         self.all_components_fitted = False
         self.load_all_estimators = False
 
-        self.set_root_info (root)
+        self.set_root_info (root, unique_names=unique_names)
 
-    def set_root_info (self, root):
+    def set_root_info (self, root, unique_names=True):
         if root is not None: self.set_root (root)
         if root is self:
             self.num_names = {}
             self.names = {}
-            self.set_unique_names ()
+            if unique_names: self.set_unique_names ()
             self.gather_and_save_info ()
 
     def __repr__ (self):

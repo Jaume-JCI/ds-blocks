@@ -2,8 +2,8 @@
 
 __all__ = ['json_load', 'json_dump', 'make_reproducible', 'get_logging_level', 'delete_logger', 'set_logger',
            'set_empty_logger', 'set_verbosity', 'remove_previous_results', 'set_tf_loglevel', 'get_top_function',
-           'check_last_part', 'argnames', 'store_attr', 'get_specific_dict_param', 'obtain_class_specific_attrs',
-           'get_hierarchy_level', 'replace_attr_and_store']
+           'get_calling_modules', 'check_last_part', 'argnames', 'store_attr', 'get_specific_dict_param',
+           'obtain_class_specific_attrs', 'get_hierarchy_level', 'replace_attr_and_store']
 
 # Cell
 import sys
@@ -192,6 +192,29 @@ def get_top_function (folder=None):
             last_function_called = copy.deepcopy(frame.function)
     #print (last_function_called)
     return last_function_called
+
+# Cell
+def get_calling_modules (folder=None, but=None, unique_modules=True):
+    folder = Path.cwd().name if folder is None else folder
+    stack = inspect.stack()
+    selected_frames = {} if unique_modules else []
+    for frame in stack:
+        if folder in os.path.abspath(frame.filename) or folder=='all':
+            if but is None or frame.function not in but:
+                if unique_modules:
+                    if frame.filename not in selected_frames:
+                        selected_frames[frame.filename] = []
+                    selected_frames[frame.filename].append (copy.copy(frame))
+                else:
+                    selected_frames.append (copy.copy(frame))
+
+    if unique_modules:
+        selected_frames2 = []
+        for k in selected_frames:
+            selected_frames2.append (selected_frames[k][-1])
+        selected_frames = selected_frames2
+
+    return selected_frames
 
 # Cell
 def check_last_part (path, path_ref):
