@@ -94,12 +94,10 @@ def test_get_calling_modules ():
     def i (x):
         j (x)
     def j (x):
-        modules = get_calling_modules (folder='ipykernel')
-        assert 'ipykernel' in  modules[-1].filename
+        modules = get_calling_modules (folder='all')
         print (modules[-1], x)
 
-        modules = get_calling_modules (folder='ipykernel', but={'<module>'})
-        assert 'ipykernel' in  modules[-1].filename
+        modules = get_calling_modules (folder='all', but={'<module>'})
         print ('\n', modules[-1], x)
 
     f (5)
