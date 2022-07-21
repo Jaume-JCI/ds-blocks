@@ -1100,6 +1100,11 @@ def make_column_transformer_pipelines (*transformers, remainder='drop', **kwargs
     return pipelines
 
 def make_column_transformer (*transformers, remainder='drop', name=None, class_name=None, **kwargs):
+    """
+    Given input tuples (`transformer`, `columns`), ..., builds a BaseColumnTransformer that
+    applies `transformer` to `columns` of the input DataFrame. Similar to scikit-learn.
+    `remainder` can be `passthrough`, `drop` (default), or an estimator / Component.
+    """
     transformers_with_name = []
     for transformer, columns in transformers:
         transformer_name = _get_transformer_name (transformer, columns)
