@@ -122,6 +122,29 @@ class MultiComponent (SamplingComponent):
         self.save_object (path_results=path_results, path_session=path_session,
                           remove_non_pickable=remove_non_pickable)
 
+    def show (self, hierarchy_level=np.inf, horizontal=False):
+        comps = [(k, self.cls[k]) if not isinstance(self.cls[k], list) else (k, self.cls[k][0]) for k in self.cls]
+        comps = [x[0] for x in comps if x[1].hierarchy_level < hierarchy_level]
+        comps = sorted(comps)
+        if horizontal:
+            print (comps)
+        else:
+            for k in comps:
+                print (k)
+
+    def show_hierarchy (self):
+        char = ['*','=','+', '-', '.']
+        def hierarchy (self, depth=10000, level=0, before=None, i=0):
+            line = char[level-1]*50 if (level <= len(char) and level > 0) else ''
+            print (line)
+            suffix = '' if before is None else f'{before}: '
+            print (f'{suffix}{self.class_name}')
+            if (self.hierarchy_level < depth) and isinstance (self, MultiComponent):
+                for i, c in enumerate(self.components):
+                    new_before = f'{" "*(level+1)}{before}.{i}' if before is not None else f'{" "*(level+1)}{i}'
+                    hierarchy (c, depth=depth-1, level=level+1, before=new_before, i=i)
+        hierarchy (self)
+
     def register_components (self, *components):
         """
         Registering component in `self.components` list.

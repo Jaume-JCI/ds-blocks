@@ -3,22 +3,23 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_fitted_model_seq_others', 'test_pipeline_find_last_fitted_model_parallel_2',
            'test_data_conversion_sequential_parallel_column_transformer', 'SimpleMultiComponent', 'test_multi_comp_io',
-           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_gather_and_save_info',
-           'test_multi_comp_hierarchy', 'test_multi_comp_profiling', 'test_multi_comp_all_equal',
-           'test_multi_component_setters', 'test_show_result_statistics', 'test_pass_components', 'test_chain_folders',
-           'test_set_root', 'test_set_root_2', 'test_pass_functions_to_multi_component', 'test_set_suffix',
-           'Transform1', 'Transform2', 'SimplePipeline', 'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis',
-           'test_pipeline_new_comp', 'test_pipeline_set_comp', 'test_athena_pipeline_training',
-           'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1', 'build_pipeline_construct_diagram_2',
-           'test_construct_diagram', 'test_show_summary', 'test_multi_comp_profiling2', 'test_make_pipeline',
-           'test_pipeline_factory', 'PandasTransformWithLabels1', 'PandasTransformWithLabels2', 'SimplePandasPipeline',
-           'TransformWithLabels1', 'TransformWithLabels2', 'SimplePandasPipelineNoPandasComponent',
-           'test_pandas_pipeline', 'test_parallel', 'test_pipeline_find_last_result',
-           'test_pipeline_find_last_result_parallel1', 'test_pipeline_find_last_result_parallel2',
-           'test_pipeline_find_last_result_parallel3', 'test_pipeline_find_last_fitted_model_seq',
-           'test_pipeline_find_last_fitted_model_parallel', 'test_pipeline_find_last_fitted_model_parallel_remove',
-           'TransformM', 'test_multi_modality', 'test_column_selector', 'test_concat', 'test_identity',
-           'column_transformer_data', 'test_make_column_transformer', 'test_make_column_transformer_passthrough',
+           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_show', 'test_show_hierarchy',
+           'test_gather_and_save_info', 'test_multi_comp_hierarchy', 'test_multi_comp_profiling',
+           'test_multi_comp_all_equal', 'test_multi_component_setters', 'test_show_result_statistics',
+           'test_pass_components', 'test_chain_folders', 'test_set_root', 'test_set_root_2',
+           'test_pass_functions_to_multi_component', 'test_set_suffix', 'Transform1', 'Transform2', 'SimplePipeline',
+           'test_pipeline_fit_apply', 'test_pipeline_fit_apply_bis', 'test_pipeline_new_comp', 'test_pipeline_set_comp',
+           'test_athena_pipeline_training', 'test_pipeline_load_estimator', 'build_pipeline_construct_diagram_1',
+           'build_pipeline_construct_diagram_2', 'test_construct_diagram', 'test_show_summary',
+           'test_multi_comp_profiling2', 'test_make_pipeline', 'test_pipeline_factory', 'PandasTransformWithLabels1',
+           'PandasTransformWithLabels2', 'SimplePandasPipeline', 'TransformWithLabels1', 'TransformWithLabels2',
+           'SimplePandasPipelineNoPandasComponent', 'test_pandas_pipeline', 'test_parallel',
+           'test_pipeline_find_last_result', 'test_pipeline_find_last_result_parallel1',
+           'test_pipeline_find_last_result_parallel2', 'test_pipeline_find_last_result_parallel3',
+           'test_pipeline_find_last_fitted_model_seq', 'test_pipeline_find_last_fitted_model_parallel',
+           'test_pipeline_find_last_fitted_model_parallel_remove', 'TransformM', 'test_multi_modality',
+           'test_column_selector', 'test_concat', 'test_identity', 'column_transformer_data',
+           'test_make_column_transformer', 'test_make_column_transformer_passthrough',
            'test_make_column_transformer_remainder', 'test_make_column_transformer_descendants',
            'test_make_column_transformer_fit_transform', 'test_make_column_transformer_different_indexes', 'Transform1',
            'Transform2', 'multi_split_data', 'test_multi_split_transform', 'test_multi_split_fit',
@@ -717,6 +718,18 @@ def test_athena_pipeline_training ():
     assert higher.hierarchy_path=='higher'
 
     assert higher.first.hierarchy_path=='higher.first_intermediate'
+
+# Comes from compose.ipynb, cell
+from dsblocks.utils.dummies import Higher
+def test_show ():
+    higher = Higher (Higher=dict(root=True))
+    higher.show()
+
+# Comes from compose.ipynb, cell
+def test_show_hierarchy ():
+    higher = Higher ()
+    higher = Higher (Higher=dict(root=True))
+    higher.show_hierarchy()
 
 # Comes from compose.ipynb, cell
 def test_gather_and_save_info ():
