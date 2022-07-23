@@ -132,17 +132,21 @@ class MultiComponent (SamplingComponent):
             for k in comps:
                 print (k)
 
-    def show_hierarchy (self):
+    def showh (self, max_level=10000, vline=True):
         char = ['*','=','+', '-', '.']
-        def hierarchy (self, depth=10000, level=0, before=None, i=0):
-            line = char[level-1]*50 if (level <= len(char) and level > 0) else ''
-            print (line)
+        def hierarchy (self, level=0, before=None, i=0):
+            if vline:
+                line = char[level-1]*50 if (level <= len(char) and level > 0) else ''
+                space = " "*level
+                line = (space + line)[:50]
+                print (line)
             suffix = '' if before is None else f'{before}: '
             print (f'{suffix}{self.class_name}')
-            if (self.hierarchy_level < depth) and isinstance (self, MultiComponent):
+            if (level < max_level) and isinstance (self, MultiComponent):
+                space = " "*(level+1)
                 for i, c in enumerate(self.components):
-                    new_before = f'{" "*(level+1)}{before}.{i}' if before is not None else f'{" "*(level+1)}{i}'
-                    hierarchy (c, depth=depth-1, level=level+1, before=new_before, i=i)
+                    new_before = f'{space}{before}.{i}' if before is not None else f'{space}{i}'
+                    hierarchy (c, level=level+1, before=new_before, i=i)
         hierarchy (self)
 
     def register_components (self, *components):

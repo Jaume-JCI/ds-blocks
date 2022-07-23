@@ -3,7 +3,7 @@
 __all__ = ['column_transformer_data_fixture', 'multi_split_data_fixture',
            'test_pipeline_find_last_fitted_model_seq_others', 'test_pipeline_find_last_fitted_model_parallel_2',
            'test_data_conversion_sequential_parallel_column_transformer', 'SimpleMultiComponent', 'test_multi_comp_io',
-           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_show', 'test_show_hierarchy',
+           'test_multi_comp_desc', 'test_athena_pipeline_training', 'test_show', 'test_showh',
            'test_gather_and_save_info', 'test_multi_comp_hierarchy', 'test_multi_comp_profiling',
            'test_multi_comp_all_equal', 'test_multi_component_setters', 'test_show_result_statistics',
            'test_pass_components', 'test_chain_folders', 'test_set_root', 'test_set_root_2',
@@ -726,10 +726,16 @@ def test_show ():
     higher.show()
 
 # Comes from compose.ipynb, cell
-def test_show_hierarchy ():
+def test_showh ():
     higher = Higher ()
     higher = Higher (Higher=dict(root=True))
-    higher.show_hierarchy()
+    higher.showh()
+
+    print ('\nSecond\n')
+    higher.showh(vline=False)
+
+    print ('\nThird\n')
+    higher.showh(max_level=1, vline=False)
 
 # Comes from compose.ipynb, cell
 def test_gather_and_save_info ():
